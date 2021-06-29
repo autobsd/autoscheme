@@ -15,7 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="../../../src/version.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../../../src/s7/s7.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <!-- <ClCompile Include="autoscheme.cpp"> -->

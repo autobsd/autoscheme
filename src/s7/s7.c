@@ -344,7 +344,8 @@
   #define MS_WINDOWS 0
 #endif
 
-#ifdef __MINGW32__
+/* #ifdef __MINGW32__ */
+#ifdef MS_WINDOWS
 #define Jmp_Buf       jmp_buf
 #define SetJmp(A, B)  setjmp(A)
 #define LongJmp(A, B) longjmp(A, B)
@@ -358,6 +359,7 @@
    *   yet callgrind says there is almost no difference, so I removed setjmp from s7_optimize.
    */
 #endif
+
 
 #if (!MS_WINDOWS)
   #include <pthread.h>
@@ -71949,6 +71951,7 @@ static bool check_tc(s7_scheme *sc, s7_pointer name, int32_t vars, s7_pointer ar
  	      if (is_fxable(sc, in_test))
 		{
 		  s7_pointer la = NULL, z;
+		  z = NULL;
 		  if ((is_pair(in_false)) &&
 		      (car(in_false) == name) &&
 		      (is_pair(cdr(in_false))) &&
@@ -87293,6 +87296,8 @@ static s7_pointer fx_tc_and_a_if_a_la_z(s7_scheme *sc, s7_pointer arg)
 static bool op_tc_if_a_z_if_a_z_laa(s7_scheme *sc, bool cond, s7_pointer code)
 {
   s7_pointer if_test, if_true, if_false, f_test, f_true, la, la_slot, laa, laa_slot, endp, slot1;
+  if_false = NULL;
+
   if_test = (cond) ? cadr(code) : cdr(code);
   if_true = cdr(if_test);
   if (!cond) if_false = cadr(if_true);
@@ -87357,6 +87362,8 @@ static s7_pointer fx_tc_cond_a_z_a_z_laa(s7_scheme *sc, s7_pointer arg)
 static bool op_tc_if_a_z_if_a_laa_z(s7_scheme *sc, bool cond, s7_pointer code)
 {
   s7_pointer if_test, if_true, if_false, f_test, f_true, f_false, la, la_slot, laa, laa_slot, endp;
+  if_false = NULL;
+
   if_test = (cond) ? cadr(code) : cdr(code);
   if_true = cdr(if_test);
   if (!cond) if_false = cadr(if_true);

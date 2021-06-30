@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="../../../src/main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="../../../src/s7/s7.c">

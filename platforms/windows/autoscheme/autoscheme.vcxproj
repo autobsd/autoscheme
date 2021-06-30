@@ -146,7 +146,7 @@
     <ClCompile Include="../../../src/version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="../../../src/main.c" />
     <ClCompile Include="../../../src/s7/s7.c" />
 
     <!-- <ClCompile Include="autoscheme.cpp" /> -->

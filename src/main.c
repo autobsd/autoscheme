@@ -33,7 +33,7 @@ int version()
 
 int main( int argc, char **argv )
 {
-    return repl();
+    /* return repl(); */
     return version();
 
     return 0;

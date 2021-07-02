@@ -1,9 +1,56 @@
+#ifdef _WIN32
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
+#ifndef _WIN32
+#include <errno.h>
+#else
+#endif
+
 
 #include "version.h"
 #include "s7.h"
 
+
+int interpret( char *file_name )
+{
+    struct stat sb;
+    off_t file_size;
+    FILE *fp;
+
+    char *program_str;
+    s7_scheme *s7;
+
+    stat( file_name, &sb );
+    file_size = sb.st_size;
+
+    fp = fopen( file_name, "r" ); 
+
+    if( fp == NULL )
+    {
+    	printf( "File read error" );
+    	if( errno == 2 ) printf( " - No such file or directory: %s\n", file_name );
+    	exit( 1 );
+    }
+
+    program_str = malloc( file_size + 9 );
+    snprintf( program_str, 8, "(begin " );
+    fread( program_str + 7, 1, file_size, fp );
+    snprintf( program_str + 7 + file_size, 2,  ")" );
+
+    fclose( fp );
+
+    s7 = s7_init();
+    s7_eval_c_string( s7, program_str );
+
+    free( program_str );
+    return 0;
+}
 
 int scheme()
 {
@@ -74,6 +121,10 @@ int main( int argc, char **argv )
 	if( !strcmp( argv[1], "-r" ))
 	{
 	    return repl();
+	}
+	if( !strcmp( argv[i], "-i" ) && ((i + 1) < argc)  )
+	{
+	    return interpret( argv[i + 1] );
 	}
     }
 

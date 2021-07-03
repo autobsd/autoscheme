@@ -5,13 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-
-#ifndef _WIN32
-#include <errno.h>
-#else
-#endif
-
 
 #include "version.h"
 #include "s7.h"
@@ -19,55 +12,43 @@
 
 int interpret( char *file_name )
 {
-    struct stat sb;
-    off_t file_size;
-    FILE *fp;
+    char *buffer;
+    size_t buffer_size;
+    buffer_size = snprintf( NULL, 0, "(load \"%s\")", file_name ) + 1;
+    buffer = malloc( buffer_size );
+    sprintf( buffer, "(load \"%s\")", file_name );
 
-    char *program_str;
     s7_scheme *s7;
-
-    stat( file_name, &sb );
-    file_size = sb.st_size;
-
-    fp = fopen( file_name, "r" ); 
-
-    if( fp == NULL )
-    {
-    	printf( "File read error" );
-    	if( errno == 2 ) printf( " - No such file or directory: %s\n", file_name );
-    	exit( 1 );
-    }
-
-    program_str = malloc( file_size + 9 );
-    snprintf( program_str, 8, "(begin " );
-    fread( program_str + 7, 1, file_size, fp );
-    snprintf( program_str + 7 + file_size, 2,  ")" );
-
-    fclose( fp );
-
     s7 = s7_init();
-    s7_eval_c_string( s7, program_str );
+    s7_eval_c_string( s7, buffer );
 
-    free( program_str );
+    free( buffer );
     return 0;
 }
 
 int scheme()
 {
     s7_scheme *s7;
-    char buffer[512];
+    s7 = s7_init();              
+
     char response[1024];
 
-    s7 = s7_init();              
+    char *buffer;
+    size_t buffer_size;
 
     while( 1 )                    
     {
 	fprintf( stdout, "scheme> " );    
-	fgets( buffer, 512, stdin );
-	if(( buffer[0] != '\n' ) || ( strlen(buffer) > 1 ))
+	fgets( response, 1024, stdin );
+	if(( response[0] != '\n' ) || ( strlen(response) > 1 ))
 	{
-	    snprintf( response, 1024, "(begin %s)", buffer );
-	    s7_eval_c_string( s7, response ); 
+	    buffer_size = snprintf( NULL, 0, "(begin %s)", response ) + 1;
+	    buffer = malloc( buffer_size );
+	    sprintf( buffer, "(begin %s)", response );
+	    snprintf( buffer, 1024, "(begin %s)", response );
+
+	    s7_eval_c_string( s7, buffer ); 
+	    free( buffer );
 	}
     }
     return 0;
@@ -76,18 +57,26 @@ int scheme()
 int repl()
 {
     s7_scheme *s7;
-    char buffer[512];
+    s7 = s7_init();              
+
     char response[1024];
 
-    s7 = s7_init();              
+    char *buffer;
+    size_t buffer_size;
+
     while( 1 )                    
     {
 	fprintf( stdout, "scheme-REPL> " );    
-	fgets( buffer, 512, stdin );
-	if(( buffer[0] != '\n' ) || ( strlen(buffer) > 1 ))
+	fgets( response, 1024, stdin );
+	if(( response[0] != '\n' ) || ( strlen(response) > 1 ))
 	{
-	    snprintf( response, 1024, "(write %s)", buffer );
-	    s7_eval_c_string( s7, response ); 
+	    buffer_size = snprintf( NULL, 0, "(begin %s)", response ) + 1;
+	    buffer = malloc( buffer_size );
+	    sprintf( buffer, "(write %s)", response );
+	    snprintf( buffer, 1024, "(write %s)", response );
+
+	    s7_eval_c_string( s7, buffer ); 
+	    free( buffer );
 	}
 	fprintf( stdout, "\n" );    
     }
@@ -98,11 +87,10 @@ int version()
 {
     /* printf( "AutoScheme version %s\n", VERSION ); */
 
-    s7_scheme *s7;
     char buffer[512];
-
     snprintf( buffer, 512, "(begin (display \"AutoScheme version %s\")(newline))", VERSION );
 
+    s7_scheme *s7;
     s7 = s7_init();              
     s7_eval_c_string( s7, buffer ); 
  

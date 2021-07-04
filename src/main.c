@@ -6,8 +6,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "version.h"
+#define _Bool int
 #include "s7.h"
+
+#include "version.h"
+
+int interpret( char *file_name );
+int scheme( void );
+int repl( void );
+int version( void );
 
 
 int interpret( char *file_name )
@@ -18,9 +25,11 @@ int interpret( char *file_name )
     buffer = malloc( buffer_size );
     sprintf( buffer, "(load \"%s\")", file_name );
 
-    s7_scheme *s7;
-    s7 = s7_init();
-    s7_eval_c_string( s7, buffer );
+    {
+	s7_scheme *s7;
+	s7 = s7_init();
+	s7_eval_c_string( s7, buffer );
+    }
 
     free( buffer );
     return 0;
@@ -28,13 +37,13 @@ int interpret( char *file_name )
 
 int scheme()
 {
-    s7_scheme *s7;
-    s7 = s7_init();              
-
     char response[1024];
 
     char *buffer;
     size_t buffer_size;
+
+    s7_scheme *s7;
+    s7 = s7_init();              
 
     while( 1 )                    
     {
@@ -56,13 +65,13 @@ int scheme()
 
 int repl()
 {
-    s7_scheme *s7;
-    s7 = s7_init();              
-
     char response[1024];
 
     char *buffer;
     size_t buffer_size;
+
+    s7_scheme *s7;
+    s7 = s7_init();              
 
     while( 1 )                    
     {
@@ -90,10 +99,11 @@ int version()
     char buffer[512];
     snprintf( buffer, 512, "(begin (display \"AutoScheme version %s\")(newline))", VERSION );
 
-    s7_scheme *s7;
-    s7 = s7_init();              
-    s7_eval_c_string( s7, buffer ); 
- 
+    {
+	s7_scheme *s7;
+	s7 = s7_init();              
+	s7_eval_c_string( s7, buffer ); 
+    }
     return 0;
 }
 

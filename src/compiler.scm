@@ -1,9 +1,12 @@
 (display "compiling file...")(newline)
+(set! (*s7* 'print-length) 1024)
+
 
 (define display-program-function 
   (lambda (program port)
-    (let* ((program-string (with-output-to-string (lambda () (write program))))
+    (let* ((program-string (object->string program))
 	   )
+
 
       (display (string-append "int program( s7_scheme *s7 )\n"
 			      "{\n"
@@ -60,6 +63,7 @@
        (output-port (open-output-file output-file))
 
        )
+
 
   (close-input-port input-port)
 

@@ -37,4 +37,11 @@
      )
 
 
+   (define-library (scheme base)
+     (export + - * /)
+     (begin
+       ))
+
+   (cutlet (rootlet) '+ '- '* '/)
+
    )

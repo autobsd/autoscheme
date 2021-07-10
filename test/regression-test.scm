@@ -1,21 +1,9 @@
 (display "Regression Tests")(newline)(newline)
 
+(import (scheme base))
+(display "(+ 2 2): ")(write (+ 2 2))(newline)
+(display "(- 5 2): ")(write (- 5 2))(newline)
+(display "(* 3 4): ")(write (* 3 4))(newline)
+(display "(/ 12 3): ")(write (/ 12 3))(newline)
 
 
-(define-library (test lib) 
-  (export a b c)
-  (export x y z)
-  (begin
-    (define a 1)(define b 2)(define c 3)
-    (define x 3)(define y 4)(define z 5)
-    ))
-
-
-(import (test lib))
-
-(display "a: ")(write a)(newline)
-(display "b: ")(write b)(newline)
-(display "c: ")(write c)(newline)
-(display "x: ")(write x)(newline)
-(display "y: ")(write y)(newline)
-(display "z: ")(write z)(newline)

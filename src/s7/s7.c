@@ -10046,8 +10046,16 @@ static inline s7_pointer lookup_from(s7_scheme *sc, const s7_pointer symbol, s7_
 	if (slot_symbol(y) == symbol)
 	  return(slot_value(y));
     }
-  if (is_slot(global_slot(symbol)))
-    return(global_value(symbol));
+  if( is_slot(global_slot(symbol)) )                                        /* consider an undefined global variable as unbound */
+  {
+      s7_pointer value = global_value( symbol );
+
+      if( value == sc->undefined )
+      {    
+	  return( unbound_variable( sc, symbol ));	  
+      }
+      return( value );
+  }
 #if WITH_GCC
   return(NULL); /* much faster than various alternatives */
 #else
@@ -10743,7 +10751,8 @@ static s7_pointer g_is_defined(s7_scheme *sc, s7_pointer args)
 	return(sc->T);
       return((b == sc->T) ? sc->F : make_boolean(sc, is_slot(global_slot(sym))));
     }
-  return((is_global(sym)) ? sc->T : make_boolean(sc, is_slot(lookup_slot_from(sym, sc->curlet))));
+
+  return((is_global(sym)) ? sc->T : make_boolean(sc, is_slot(lookup_slot_from(sym, sc->curlet)) && (global_value(sym) != sc->undefined)));  /* undefined global variable should return false */
 }
 
 static s7_pointer g_is_defined_in_rootlet(s7_scheme *sc, s7_pointer args)

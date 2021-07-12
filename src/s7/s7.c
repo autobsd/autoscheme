@@ -10752,7 +10752,7 @@ static s7_pointer g_is_defined(s7_scheme *sc, s7_pointer args)
       return((b == sc->T) ? sc->F : make_boolean(sc, is_slot(global_slot(sym))));
     }
 
-  return((is_global(sym)) ? sc->T : make_boolean(sc, is_slot(lookup_slot_from(sym, sc->curlet)) && (global_value(sym) != sc->undefined)));  /* undefined global variable should return false */
+  return((is_global(sym) && (global_value(sym) != sc->undefined)) ? sc->T : make_boolean(sc, is_slot(lookup_slot_from(sym, sc->curlet)) && (global_value(sym) != sc->undefined)));  /* undefined global variables should return false */
 }
 
 static s7_pointer g_is_defined_in_rootlet(s7_scheme *sc, s7_pointer args)

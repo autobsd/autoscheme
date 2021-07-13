@@ -39,11 +39,11 @@
    
 
    (define-library (scheme base)
-     (export + - * /)
+     (export + - * / < <= = > >=)
      )
 
 
-   (cutlet (rootlet) '+ '- '* '/)
+   (cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
 
 
    )

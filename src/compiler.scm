@@ -31,22 +31,49 @@
 
 
 
-(let* ((program-includes (string-append 
-			  "#define _Bool int\n"
-			  "#include \"s7/s7.h\"\n"
-			  "int auto_argc; char **auto_argv;\n"
-			  "int program( s7_scheme *s7 );\n"
-			  ))
-       (main-function (string-append "int main( int argc, char **argv )\n"
-				     "{\n"
-				     "s7_scheme *s7 = s7_init();\n"
+(let* ((includes-template (string-append 
+			   "#define _Bool int\n"
+			   "#include \"s7/s7.h\"\n"
+			   ))
+       (declarations-template (string-append
+			       "int auto_argc; char **auto_argv;\n"
+			       "s7_scheme *auto_init( void );\n"
+			       "int program( s7_scheme *s7 );\n"
+			       ))
 
-				     "auto_argc = argc;\n"
-				     "auto_argv = argv;\n"
+       (functions-template (string-append
+			    "static s7_pointer command_line( s7_scheme *sc, s7_pointer args )\n"
+			    "{\n"
+			    "    if( !s7_is_null( sc, args ))\n"
+			    "	return s7_wrong_type_arg_error( sc, \"command-line\", 0, args, \"null\" );\n"
+			    "    else\n"
+			    "    {\n"
+			    "	s7_pointer arguments = s7_nil( sc );\n"
+			    "	int i;\n"
+			    "	for( i = auto_argc - 1; i >= 0; i-- )\n"
+			    "	{\n"
+			    "	    arguments = s7_cons( sc, s7_make_string( sc, auto_argv[i] ), arguments );\n"
+			    "	}\n"
+			    "	return arguments;\n"
+			    "    }\n"
+			    "}\n"
+			    "s7_scheme *auto_init()\n"
+			    "{\n"
+			    "    s7_scheme *s7 = s7_init();\n"
+			    "    s7_define_function( s7, \"command-line\", command_line, 0, 0, false, \"(command-line) returns a list of command-line arguments\" );\n"
+			    "    return s7;\n"
+			    "}\n"
 
-				     "return program( s7 );\n"
-				     "}\n"
-				     ))
+			    "int main( int argc, char **argv )\n"
+			    "{\n"
+			    "    s7_scheme *s7 = auto_init();\n"
+
+			    "    auto_argc = argc;\n"
+			    "    auto_argv = argv;\n"
+
+			    "    return program( s7 );\n"
+			    "}\n"
+			    ))
 
        (scheme (load "src/scheme.scm"))
 
@@ -67,9 +94,11 @@
 
   (close-input-port input-port)
 
-  (display program-includes output-port)
+  (display includes-template output-port)
+  (display declarations-template output-port)
+  (display functions-template output-port)
+
   (display-program-function program output-port)
-  (display main-function output-port)
   
   (close-output-port output-port)
 

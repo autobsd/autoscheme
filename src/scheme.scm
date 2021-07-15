@@ -46,4 +46,12 @@
    (cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
 
 
+   (define-library (scheme write)
+     (export display)
+     )
+
+
+   (cutlet (rootlet) 'display)
+
+
    )

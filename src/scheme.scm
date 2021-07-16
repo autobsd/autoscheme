@@ -42,14 +42,19 @@
      (export + - * / < <= = > >=)
      )
 
-
    (cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
+
+
+   (define-library (scheme read)
+     (export read)
+     )
+
+   (cutlet (rootlet) 'read)
 
 
    (define-library (scheme write)
      (export display)
      )
-
 
    (cutlet (rootlet) 'display)
 

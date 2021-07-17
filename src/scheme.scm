@@ -44,6 +44,12 @@
 
    (cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
 
+   (define-library (scheme eval)
+     (export eval)
+     )
+
+   (cutlet (rootlet) 'eval)
+
 
    (define-library (scheme read)
      (export read)

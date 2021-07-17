@@ -44,6 +44,14 @@
 
    (cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
 
+
+   (define-library (scheme cxr)
+     (export caaaar)
+     )
+
+   (cutlet (rootlet) 'caaaar)
+   
+
    (define-library (scheme eval)
      (export eval)
      )

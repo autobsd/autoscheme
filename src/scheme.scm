@@ -59,6 +59,13 @@
    (cutlet (rootlet) 'eval)
 
 
+   (define-library (scheme load)
+     (export load)
+     )
+
+   (cutlet (rootlet) 'load)
+
+
    (define-library (scheme read)
      (export read)
      )

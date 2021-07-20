@@ -59,6 +59,13 @@
    (cutlet (rootlet) 'eval)
 
 
+   (define-library (scheme inexact)
+     (export acos)
+     )
+
+   (cutlet (rootlet) 'acos)
+
+
    (define-library (scheme load)
      (export load)
      )

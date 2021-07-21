@@ -2,6 +2,23 @@
 (set! (*s7* 'print-length) 1024)
 
 
+(define expand
+  (lambda (expression env)
+    (cond ((not (pair? expression)) expression)
+	  (else (varlet env 'expression expression)
+		(with-let env (let* ((first (car expression))
+				     (expanded-first (cond ((not (pair? first)) first)
+							   ((and (equal? (car first) 'define-macro)) (eval first) #<unspecified>)
+							   ((and (symbol? (car first))(macro? (eval (car first)))) (expand (apply macroexpand (list first)) (sublet (curlet))))
+							   (else (cons (expand (car first) (sublet (curlet)))
+								       (expand (cdr first) (sublet (curlet)))))))
+				     )
+				(cons expanded-first
+				      (expand (cdr expression) (sublet (curlet)))
+				      ))))))
+  )
+
+
 (define display-program-function 
   (lambda (program port)
     (let* ((program-string (object->string program))
@@ -81,10 +98,12 @@
        (input-port (open-input-file input-file))
 
 
-       (program (append scheme (reverse (let read-program ((expressions '()))
-       					  (let ((next-expression (read input-port)))
-       					    (if (eof-object? next-expression) expressions
-       						(read-program (cons next-expression expressions))))))))
+       (program (expand (append scheme (reverse (let read-program ((expressions '()))
+						  (let ((next-expression (read input-port)))
+						    (if (eof-object? next-expression) expressions
+							(read-program (cons next-expression expressions)))))))
+			(sublet (curlet)))
+		)
 
        (output-file (string-append input-file ".c"))
        (output-port (open-output-file output-file))

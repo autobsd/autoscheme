@@ -9,7 +9,7 @@
 		(with-let env (let* ((first (car expression))
 				     (expanded-first (cond ((not (pair? first)) first)
 							   ((and (equal? (car first) 'define-macro)) (eval first) #<unspecified>)
-							   ((and (symbol? (car first))(macro? (eval (car first)))) (expand (apply macroexpand (list first)) (sublet (curlet))))
+							   ((and (symbol? (car first))(macro? (symbol->value (car first)))) (expand (apply macroexpand (list first)) (sublet (curlet))))
 							   (else (cons (expand (car first) (sublet (curlet)))
 								       (expand (cdr first) (sublet (curlet)))))))
 				     )
@@ -17,6 +17,7 @@
 				      (expand (cdr expression) (sublet (curlet)))
 				      ))))))
   )
+
 
 
 (define display-program-function 

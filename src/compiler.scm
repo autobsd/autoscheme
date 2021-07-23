@@ -18,34 +18,39 @@
 				      ))))))
   )
 
+(define module-prototype
+  (lambda (name)
+    (string-append "s7_pointer " name "_module( s7_scheme *s7 )")))
 
-
-(define display-program-function 
-  (lambda (program port)
-    (let* ((program-string (object->string program))
+(define display-module
+  (lambda (name module port)
+    (let* ((module-string (object->string module))
 	   )
 
 
-      (display (string-append "int program( s7_scheme *s7 )\n"
+      (display (string-append (module-prototype name) "\n"
 			      "{\n"
-			      "const char program_str[] = { " ) port)
+			      "const char module_str[] = { '\\'', '(', 'b', 'e', 'g', 'i', 'n', ' ', " ) port)
 
-      (with-input-from-string program-string (lambda ()
-					       (let read-chars ()
-						 (let ((c (read-char)))
-						   (cond ((eof-object? c) (display "'\\0'" port))
-							 ((equal? c #\') (display "'\\'', " port ) (read-chars))
-							 (else (display "'" port)(display c port)(display "', " port)(read-chars)))))))
+      (with-input-from-string module-string (lambda ()
+      					       (let read-chars ()
+      						 (let ((c (read-char)))
+      						   (cond ((eof-object? c) (display "" port))
+      							 ((equal? c #\') (display "'\\'', " port ) (read-chars))
+      							 (else (display "'" port)(display c port)(display "', " port)(read-chars)))))))
 
 
-      (display (string-append " };\n"
-			      "s7_eval_c_string( s7, program_str );\n"
+      (display (string-append " ')', '\\0' };\n"
 
-			      "return 0;\n"
+			      "return s7_eval_c_string( s7, module_str );\n"
+
+
 			      "}\n"
 
 			      ) port)
       )))
+
+
 
 
 
@@ -56,7 +61,8 @@
        (declarations-template (string-append
 			       "int auto_argc; char **auto_argv;\n"
 			       "s7_scheme *auto_init( void );\n"
-			       "int program( s7_scheme *s7 );\n"
+			       (module-prototype "scheme") ";\n"
+			       (module-prototype "program") ";\n"
 			       ))
 
        (functions-template (string-append
@@ -89,7 +95,10 @@
 			    "    auto_argc = argc;\n"
 			    "    auto_argv = argv;\n"
 
-			    "    return program( s7 );\n"
+			    "    s7_eval( s7, scheme_module( s7 ), s7_f( s7 ));\n"
+			    "    s7_eval( s7, program_module( s7 ), s7_f( s7 ));\n"
+
+			    "    return 0;\n"
 			    "}\n"
 			    ))
 
@@ -99,11 +108,17 @@
        (input-port (open-input-file input-file))
 
 
-       (program (expand (append scheme (reverse (let read-program ((expressions '()))
+       ;; (program (expand (append scheme (reverse (let read-program ((expressions '()))
+       ;; 						  (let ((next-expression (read input-port)))
+       ;; 						    (if (eof-object? next-expression) expressions
+       ;; 							(read-program (cons next-expression expressions)))))))
+       ;; 			(sublet (curlet)))
+       ;; 		)
+
+       (program (append '(begin) (reverse (let read-program ((expressions '()))
 						  (let ((next-expression (read input-port)))
 						    (if (eof-object? next-expression) expressions
 							(read-program (cons next-expression expressions)))))))
-			(sublet (curlet)))
 		)
 
        (output-file (string-append input-file ".c"))
@@ -118,7 +133,8 @@
   (display declarations-template output-port)
   (display functions-template output-port)
 
-  (display-program-function program output-port)
+  (display-module "scheme" scheme output-port)
+  (display-module "program" program output-port)
   
   (close-output-port output-port)
 

@@ -18,39 +18,42 @@
 				      ))))))
   )
 
+
+(define compile-number
+  (lambda (sc num)
+    (cond ((integer? num) (string-append "s7_make_integer(" sc "," (number->string num) ")"))
+	  (else (error "compile error - unknown number type: " num)))))
+
+(define compile
+  (lambda (sc expression)
+    (cond ((pair? expression) (string-append "s7_cons(" sc "," (compile sc (car expression)) "," (compile sc (cdr expression)) ")"))
+	  ((null? expression) (string-append "s7_nil(" sc ")"))
+
+	  ((symbol? expression) (string-append "s7_make_symbol(" sc ",\"" (symbol->string expression) "\")"))
+	  ((string? expression) (string-append "s7_make_string(" sc ",\"" expression "\")" ))
+	  ((number? expression) (compile-number sc expression))
+	  (else (error "compile error - unknown type: " expression))
+	  )))
+
+
 (define module-prototype
   (lambda (name)
     (string-append "s7_pointer " name "_module( s7_scheme *s7 )")))
 
+
 (define display-module
-  (lambda (name module port)
-    (let* ((module-string (object->string module))
+  (lambda (name expressions port)
+    (let* ((expression (cons 'begin expressions))
+	   (compiled-expression (compile "s7" expression))
 	   )
-
-
       (display (string-append (module-prototype name) "\n"
 			      "{\n"
-			      "const char module_str[] = { '\\'', '(', 'b', 'e', 'g', 'i', 'n', ' ', " ) port)
-
-      (with-input-from-string module-string (lambda ()
-      					       (let read-chars ()
-      						 (let ((c (read-char)))
-      						   (cond ((eof-object? c) (display "" port))
-      							 ((equal? c #\') (display "'\\'', " port ) (read-chars))
-      							 (else (display "'" port)(display c port)(display "', " port)(read-chars)))))))
-
-
-      (display (string-append " ')', '\\0' };\n"
-
-			      "return s7_eval_c_string( s7, module_str );\n"
-
-
+			      "return("
+			      compiled-expression
+			      ");\n"
 			      "}\n"
-
 			      ) port)
       )))
-
-
 
 
 
@@ -102,7 +105,7 @@
 			    "}\n"
 			    ))
 
-       (scheme (load "src/scheme.scm"))
+       (scheme-expressions (load "src/scheme.scm"))
 
        (input-file (cadr (command-line)))
        (input-port (open-input-file input-file))
@@ -115,11 +118,11 @@
        ;; 			(sublet (curlet)))
        ;; 		)
 
-       (program (append '(begin) (reverse (let read-program ((expressions '()))
-						  (let ((next-expression (read input-port)))
-						    (if (eof-object? next-expression) expressions
-							(read-program (cons next-expression expressions)))))))
-		)
+       (program-expressions (reverse (let read-program ((expressions '()))
+				       (let ((next-expression (read input-port)))
+					 (if (eof-object? next-expression) expressions
+					     (read-program (cons next-expression expressions)))))))
+
 
        (output-file (string-append input-file ".c"))
        (output-port (open-output-file output-file))
@@ -133,8 +136,8 @@
   (display declarations-template output-port)
   (display functions-template output-port)
 
-  (display-module "scheme" scheme output-port)
-  (display-module "program" program output-port)
+  (display-module "scheme" scheme-expressions output-port)
+  (display-module "program" program-expressions output-port)
   
   (close-output-port output-port)
 

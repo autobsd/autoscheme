@@ -1,4 +1,4 @@
-'(begin
+'(
 
    (define-macro (define-library name . declarations)
      (let ((export-declarations '())

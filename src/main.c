@@ -6,6 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+#include <limits.h>
+
+
 #define _Bool int
 #include "s7.h"
 
@@ -23,13 +27,27 @@ int interpret( s7_scheme *s7, char *file_name )
 {
     char *buffer;
     size_t buffer_size;
-    buffer_size = snprintf( NULL, 0, "(load \"%s\")", file_name ) + 1;
+    char *format_str;
+
+    char absolute_path[ PATH_MAX ]; 
+    realpath( file_name, absolute_path ); 
+
+    format_str = "(define *source* (inlet 'path \"%s\"))";
+    buffer_size = snprintf( NULL, 0, format_str, absolute_path ) + 1;
     buffer = malloc( buffer_size );
-    sprintf( buffer, "(load \"%s\")", file_name );
-
+    sprintf( buffer, format_str, absolute_path );
     s7_eval_c_string( s7, buffer );
-
     free( buffer );
+
+
+
+    format_str = "(load \"%s\")";
+    buffer_size = snprintf( NULL, 0, format_str , file_name ) + 1;
+    buffer = malloc( buffer_size );
+    sprintf( buffer, format_str, file_name );
+    s7_eval_c_string( s7, buffer );
+    free( buffer );
+
     return 0;
 }
 
@@ -49,7 +67,6 @@ int scheme( s7_scheme *s7 )
 	    buffer_size = snprintf( NULL, 0, "(begin %s)", response ) + 1;
 	    buffer = malloc( buffer_size );
 	    sprintf( buffer, "(begin %s)", response );
-	    snprintf( buffer, 1024, "(begin %s)", response );
 
 	    s7_eval_c_string( s7, buffer ); 
 	    free( buffer );
@@ -74,7 +91,6 @@ int repl( s7_scheme *s7 )
 	    buffer_size = snprintf( NULL, 0, "(begin %s)", response ) + 1;
 	    buffer = malloc( buffer_size );
 	    sprintf( buffer, "(write %s)", response );
-	    snprintf( buffer, 1024, "(write %s)", response );
 
 	    s7_eval_c_string( s7, buffer ); 
 	    free( buffer );

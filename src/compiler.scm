@@ -1,6 +1,45 @@
 (display "compiling file...")(newline)
 (set! (*s7* 'print-length) 1024)
 
+(varlet *source* 'directory
+  (lambda ()
+
+    (let ((pos -1)
+	  )
+      (do ((len (length (let-ref *source* 'path)))
+	   (i 0 (+ i 1)))
+	  ((= i len))
+	(if (char=? ((let-ref *source* 'path) i) #\/)
+	    (set! pos i)))
+      (if (positive? pos)
+	  (let ((directory-name (substring (let-ref *source* 'path) 0 pos)))
+	    directory-name)))))
+
+(varlet *source* 'absolute?
+  (lambda (path)
+    (char=? (path 0) #\/)))
+
+
+(varlet *source* 'make-absolute
+  (lambda (path)
+    (if ((let-ref *source* 'absolute?) path) path
+	(string-append ((let-ref *source* 'directory)) "/" path))))
+
+(varlet *source* 'previous #<undefined 'value #<undefined> )
+
+(define-macro (include . filenames)
+  (let ()
+    (cons 'begin (map (lambda (filename)
+			`(begin (let-set! *source* 'previous (let-ref *source* 'path))
+				(let-set! *source* 'path ,((let-ref *source* 'make-absolute) filename))
+				(let-set! *source* 'value (load ,(string-append ((let-ref *source* 'directory)) "/" filename)))
+				(let-set! *source* 'path (let-ref *source* 'pevious))
+				(let-ref *source* 'value)))
+				
+		      filenames)
+	  )))
+
+
 
 (define expand
   (lambda (expression env)

@@ -1,4 +1,27 @@
 (display "compiling file...")(newline)
+
+(define s7_object->string object->string)
+(define object->string
+  (lambda (obj)
+    (let ((str (s7_object->string obj)))
+      (if (string? obj) 
+	  (with-output-to-string (lambda ()
+				   (do ((i 0 (+ i 1)))
+				       ((= i (string-length str)) )      
+				     (cond ((member (str i) `(,("\n" 0) #\newline))(display "\\n"))
+					   (else (display (str i)))))))
+	  str
+	  ))))
+
+(define s7_write write)
+(define write
+  (lambda (obj . args)
+    (if (string? obj)
+	(apply display (cons (object->string obj) args))
+	(apply s7_write (cons obj args)))))
+
+
+
 (set! (*s7* 'print-length) 1024)
 
 (varlet *source* 'directory
@@ -67,9 +90,12 @@
   (lambda (sc expression)
     (cond ((pair? expression) (string-append "s7_cons(" sc "," (compile sc (car expression)) "," (compile sc (cdr expression)) ")"))
 	  ((null? expression) (string-append "s7_nil(" sc ")"))
-
+	  ((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
+	  ((char? expression) (string-append "s7_make_character(" sc "," (number->string (char->integer expression)) ")"))
 	  ((symbol? expression) (string-append "s7_make_symbol(" sc ",\"" (symbol->string expression) "\")"))
-	  ((string? expression) (string-append "s7_make_string(" sc ",\"" expression "\")" ))
+	  ((string? expression) (string-append "s7_make_string(" sc "," (object->string expression) ")" ))
+
+
 	  ((number? expression) (compile-number sc expression))
 	  (else (error "compile error - unknown type: " expression))
 	  )))
@@ -144,7 +170,7 @@
 			    "}\n"
 			    ))
 
-       (scheme-expressions (load "src/scheme.scm"))
+       (scheme-expressions (load "../../src/scheme.scm"))
 
        (input-file (cadr (command-line)))
        (input-port (open-input-file input-file))

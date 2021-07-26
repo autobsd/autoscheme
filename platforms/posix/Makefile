@@ -9,16 +9,38 @@ strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototype
 
 all: build
 
-build: $(obj_dir)/main.o $(obj_dir)/s7.o
+
+
+
+
+build: $(bin_dir)/autoscheme
+
+
+
+
+$(bin_dir)/autoscheme: $(src_dir)/autoscheme.scm.c 
+	cc $(strict_options) -IIsrc -o $(bin_dir)/autoscheme _obj/s7.o $(src_dir)/autoscheme.scm.c
+
+
+$(src_dir)/autoscheme.scm.c: $(bin_dir)/autoscheme-prime $(src_dir)/autoscheme.scm
+	$(bin_dir)/autoscheme-prime -i $(src_dir)/compiler.scm $(src_dir)/autoscheme.scm
+
+
+
+$(bin_dir)/autoscheme-prime: $(obj_dir)/main.o $(obj_dir)/s7.o
 
 	mkdir -p $(bin_dir)
-	cc -o $(bin_dir)/autoscheme -lm $(obj_dir)/s7.o $(obj_dir)/main.o
+	cc -o $(bin_dir)/autoscheme-prime -lm $(obj_dir)/s7.o $(obj_dir)/main.o
 
 
-$(obj_dir)/main.o: $(src_dir)/version.h $(src_dir)/main.c
+$(obj_dir)/main.o: $(src_dir)/main.c
 	mkdir -p $(obj_dir)
 	cc $(strict_options) -I$(src_dir)/s7 -o $(obj_dir)/main.o -c $(src_dir)/main.c
 
 $(obj_dir)/s7.o: $(s7_dir)/s7.h $(s7_dir)/s7.c
 	mkdir -p $(obj_dir)
 	cc -o $(obj_dir)/s7.o -c $(s7_dir)/s7.c
+
+
+clean:
+	rm $(src_dir)/autoscheme.scm.c

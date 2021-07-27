@@ -1,6 +1,6 @@
 (import (scheme write))
 (import (scheme base))
-(display "AutoScheme")(newline)
+
 
 
 ;; (define fold-left 
@@ -33,73 +33,160 @@
 (define option-optional-arg? (lambda (option) (let-ref option 'optional-arg?)))
 (define option-processor (lambda (option) (let-ref option 'processor)))
 
+(define args-fold-remainder
+  (lambda (remainder options unrecognized-option-proc operand-proc end-of-options . seeds)
+
+    (letrec* ((argument (if (pair? remainder) (car remainder) #f))
+	      (argument-length (string-length argument))
+
+	      (find-option (lambda (name) (call/cc (lambda (return) (for-each (lambda (opt) (if (member name (option-names opt)) (return opt))) options)(return #f)))))
+
+	      (process-option (lambda () (cond ((equal? (argument 1) #\-) (process-long-option)) (else (process-short-option)))))
+
+	      (process-short-option (lambda ()
+				      (let* ((opt-name (argument 1))
+					     (recognized-option (find-option opt-name))
+					     (opt-arg-allowed (or (not recognized-option) (option-required-arg? recognized-option) (option-optional-arg? recognized-option)))
+					     (opt-arg-string (if (> argument-length 2) (substring argument 2 (string-length argument)) #f))
+
+					     (updated-remainder (cdr remainder))
+
+					     (opt-arg (cond ((not opt-arg-string)
+							 (cond ((and opt-arg-allowed (pair? (cdr remainder)) (not (equal? ((cadr remainder) 0) #\-)))
+								(set! updated-remainder (cddr remainder)) (cadr remainder))
+							       (else #f)))
+
+							((or (not opt-arg-allowed) (find-option (opt-arg-string 0)))
+							 (set! updated-remainder (cons (string-append "-" opt-arg-string) (cdr remainder))) #f)
+
+							(else opt-arg-string)
+							))
+					     
+					     (result (if recognized-option 
+							 ((option-processor recognized-option) recognized-option opt-name opt-arg (apply values seeds))
+							 (unrecognized-option-proc recognized-option opt-name opt-arg (apply values seeds))))
+					     )
+
+					(args-fold-remainder updated-remainder options unrecognized-option-proc operand-proc end-of-options (apply values seeds ))
+					)
+				      
+				      ))
+
+	      (process-long-option (lambda ()
+				     (let* ((name-end (let find-end ((pos 2))
+						       (cond ((equal? (string-length argument) pos) pos)
+							     ((equal? (argument pos) #\=) pos)
+							     (else (find-end (+ pos 1))))))
+					    (opt-name (substring argument 2 name-end))
+					    (recognized-option (find-option opt-name))
+					    (opt-arg-string (if (< name-end (string-length argument))
+								(substring argument (+ name-end 1) (string-length argument))
+								#f))
+
+					    )
+				       (display "processing long - remainder: ")(write remainder)(newline)
+				       (display "opt-name: ")(write opt-name)(newline)
+				       (display "opt-arg-string: ")(write opt-arg-string)(newline)
+
+
+				       )))
+	      
+	      (process-operand (lambda ()
+				 (let ((result (list (operand-proc argument (apply values seeds)))))
+				   (args-fold-remainder (cdr remainder) options unrecognized-option-proc operand-proc end-of-options (apply values result )))))
+	      
+
+	   )
+
+      (cond ((not argument) (apply values seeds))
+	    (end-of-options (process-operand))
+	    ((equal? argument "--") (args-fold-remainder (cdr remainder) options unrecognized-option-proc operand-proc #t (apply values seeds)))
+	    ((<= (string-length argument) 1) (process-operand))
+	    ((equal? (argument 0) #\-) (process-option))
+	    (else (process-operand))
+	    )
+      
+      )))
+
 
 (define args-fold
   (lambda (args options unrecognized-option-proc operand-proc . seeds)
+    (args-fold-remainder args options unrecognized-option-proc operand-proc #f (apply values seeds))))
 
 
-    (letrec* ((process-remainder (lambda (remainder end-of-options . seeds)
-				   (cond ((null? remainder) (apply values seeds))
+(define display-version
+  (lambda ()
+    (display (string-append "AutoScheme version " "0.31.0 (rev 1627370131)"))(newline)
+    ))
 
-					 ((equal? (car remainder) "--") (process-remainder (cdr remainder) #t))
 
-					 (end-of-options (process-operand remainder))
-
-					 ((<= (string-length (car remainder)) 1)(process-operand remainder))
-					 ((not (equal? ((car remainder) 0) #\-)) (process-operand remainder))
-
-					 ((equal? ((car remainder) 0) #\-) (process-option))
-					 (else (display "unknow condition")(newline))
-					 )
-				   ))
-
-	      (process-option (lambda (remainder)
-				(cond ((not (equal? ((car remainder) 0) #\-)) (display "found an option: ")(write (car remainder))(newline))
-				      (else ))
-				(apply values seeds)))
-
-	      (process-operand (lambda (remainder)
-				 (display "found an operand: ") (write remainder)(newline)
-				 (cond ((not (equal? ((car remainder) 0) #\-)) (apply operand-proc (cons (car remainder) seeds)))
-
-				       (else (apply operand-proc (cons (car remainder) seeds))))
-				 (apply values seeds)))
-
-	      )
-	     ;; 
-	     (process-remainder args #f)
-	     )))
+(define display-usage
+  (lambda (opt-list)
+    (display "Usage: autoscheme [options...] [sources...]")(newline)
+    
+    ;; (write opt-list)(newline)
+    ))
 
 
 (define help-option
   (option 
    '(#\h "help") #f #f
    (lambda args
-     (display "-help message-")(newline)
+     (display-version)
+     (display-usage option-list)
+
      (exit) )))
+
+(define version-option
+  (option 
+   '(#\V "version") #f #f
+   (lambda args
+     (display-version)
+     (exit) )))
+
+(define option-list (list help-option 
+			  version-option))
+
+
+
 
 (define unrecognized-processor 
   (lambda (option name arg . seeds)
-    (display "unrecognized argument")(newline)
-    (exit) ))
+    (let ((name-string (if (char? name) 
+			   (string-append "-" (string name))
+			   (string-append "--" name)))
+	  )
+
+      (display (string-append "autoscheme: unrecognized option " name-string))(newline)
+      ;; (display (string-append "autoscheme: try 'autoscheme --help' for more information"))(newline)
+      (display-usage option-list)
+      (exit 1) )))
 
 
 (define operand-processor 
   (lambda (operand . seeds)
-    (display "inside operand processor")(newline)
-    (exit) ))
+    (let ((options (car seeds))
+	  (source-files (cadr seeds)))
+
+      (values options (cons operand source-files)))))
 
 
-(display "args-fold: ")
-(write (list
-  (args-fold (cdr (command-line) )
-	     `(help-option)
-	     unrecognized-processor
-	     operand-processor
-	     0 "seed2"
-	     ))
+
+(let* ((seeds (list (inlet) '()))
+       (result (list (args-fold (cdr (command-line) )
+				option-list
+				unrecognized-processor
+				operand-processor
+				(apply values seeds)
+				)))
+       (options (car result))
+       (source-files (reverse (cadr result)))
        )
-(newline)
+  (display "options: ")(write options)(newline)
+  (display "source-files: ")(write source-files)(newline)
+  )
+  
+
 
 
 (newline)

@@ -95,8 +95,11 @@
 	  ((symbol? expression) (string-append "s7_make_symbol(" sc ",\"" (symbol->string expression) "\")"))
 	  ((string? expression) (string-append "s7_make_string(" sc "," (object->string expression) ")" ))
 
-
 	  ((number? expression) (compile-number sc expression))
+
+	  ((equal? expression #<undefined>) (string-append "s7_undefined(" sc ")"))
+	  ((equal? expression #<unspecified>) (string-append "s7_unspecified(" sc ")"))
+
 	  (else (error "compile error - unknown type: " expression))
 	  )))
 

@@ -247,6 +247,7 @@
 		       (,(option '(#\l "link-modules") #f #f recognized-processor) "Link modules")
 		       (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
 		       (,(option '(#\n "module-name") #f #f recognized-processor) "Specify compiled module name")
+		       (,(option '(#\o "output-file") #t #f recognized-processor) "Specify output file")
 		       (,(option '(#\r "repl") #f #f version-processor) "Enter interactive REPL")
 		       (,(option '(#\s "shell") #f #f version-processor) "Enter command line shell")
 		       (,(option '(#\V "version") #f #f version-processor) "Display version information")
@@ -256,8 +257,9 @@
 
 
 (define compile-program 
-  (lambda (source-files)
+  (lambda (source-files output-file)
     (display "compiling program with files: ")(write source-files)(newline)
+    (display "output-file: ")(write output-file)(newline)
     (define s7_object->string object->string)
     (define object->string
       (lambda (obj)
@@ -451,7 +453,8 @@
 						 (read-program (cons next-expression expressions)))))))
 
 
-	   (output-file (string-append input-file ".c"))
+	   (output-file (if output-file output-file "program.c"))
+	   ;; (output-file (string-append input-file ".c"))
 	   (output-port (open-output-file output-file))
 
 	   )
@@ -493,10 +496,12 @@
 				      #f))))
 
        (compile-selected (option-selected? "compile" options))
+       (output-file-selected (option-selected? "output-file" options))
        
+       (output-file (if output-file-selected (caddr output-file-selected) #f))
        )
 
-  (cond (compile-selected (compile-program source-files))
+  (cond (compile-selected (compile-program source-files output-file))
 	)
   
   )

@@ -1,3 +1,4 @@
-bin/
+gen/
 _obj/
-*.scm.c
+bin/
+tmp/

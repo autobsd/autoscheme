@@ -2,6 +2,24 @@
 (import (scheme base))
 
 
+(define string-join
+  (lambda (string-list . rest)
+
+    (let ((delimeter (if (pair? rest) (car rest) " "))
+	  (grammar (if (and (pair? rest)(pair? (cdr rest))) (cadr rest) 'infix))
+	  )
+
+      (if (and (equal? grammar 'strict-infix) (null? string-list)) (error "cannot join with 'strict-infix" string-list))
+
+      (let join-strings ((remainder string-list)
+			 )
+	(cond ((null? remainder) "")
+	      ((equal? grammar 'suffix) (string-append (car remainder) delimeter (join-strings (cdr remainder))))
+	      ((equal? grammar 'prefix) (string-append delimeter (car remainder) (join-strings (cdr remainder))))
+
+ 	      ((pair? (cdr remainder)) (string-append (car remainder) delimeter (join-strings (cdr remainder))))
+	      (else (car remainder)))))))
+
 
 ;; (define fold-left 
 ;;   (lambda (f init seq) 
@@ -37,7 +55,7 @@
   (lambda (remainder options unrecognized-option-proc operand-proc end-of-options . seeds)
 
     (letrec* ((argument (if (pair? remainder) (car remainder) #f))
-	      (argument-length (string-length argument))
+	      (argument-length (if argument (string-length argument)))
 
 	      (find-option (lambda (name) (call/cc (lambda (return) (for-each (lambda (opt) (if (member name (option-names opt)) (return opt))) options)(return #f)))))
 
@@ -62,12 +80,12 @@
 							(else opt-arg-string)
 							))
 					     
-					     (result (if recognized-option 
-							 ((option-processor recognized-option) recognized-option opt-name opt-arg (apply values seeds))
-							 (unrecognized-option-proc recognized-option opt-name opt-arg (apply values seeds))))
+					     (result (list (if recognized-option 
+							       ((option-processor recognized-option) recognized-option opt-name opt-arg (apply values seeds))
+							       (unrecognized-option-proc recognized-option opt-name opt-arg (apply values seeds)))))
 					     )
 
-					(args-fold-remainder updated-remainder options unrecognized-option-proc operand-proc end-of-options (apply values seeds ))
+					(args-fold-remainder updated-remainder options unrecognized-option-proc operand-proc end-of-options (apply values result))
 					)
 				      
 				      ))
@@ -83,12 +101,15 @@
 								(substring argument (+ name-end 1) (string-length argument))
 								#f))
 
+					    (updated-remainder (cdr remainder))
+					    (opt-arg opt-arg-string)
+					    
+					    (result (list (if recognized-option 
+							      ((option-processor recognized-option) recognized-option opt-name opt-arg (apply values seeds))
+							      (unrecognized-option-proc recognized-option opt-name opt-arg (apply values seeds)))))
 					    )
-				       (display "processing long - remainder: ")(write remainder)(newline)
-				       (display "opt-name: ")(write opt-name)(newline)
-				       (display "opt-arg-string: ")(write opt-arg-string)(newline)
 
-
+				       (args-fold-remainder updated-remainder options unrecognized-option-proc operand-proc end-of-options (apply values result ))
 				       )))
 	      
 	      (process-operand (lambda ()
@@ -114,38 +135,88 @@
     (args-fold-remainder args options unrecognized-option-proc operand-proc #f (apply values seeds))))
 
 
+
+
+
+
+
+(define display-usage
+  (lambda (opt-tab)
+    (display "Usage: autoscheme [options...] [sources...]")(newline)
+
+    (let* ((max-short 0)
+	   (max-long 0)
+	   ;; (max-description 0)
+
+	   (opt-strings (map (lambda (row)
+			       (let* ((opt (car row))
+				      (names (option-names opt))
+				      
+				      (short-names (apply append (map (lambda (name) (if (char? name) (list name) '())) names)))
+				      (long-names (apply append (map (lambda (name) (if (string? name) (list name) '())) names)))
+
+				      (name-delimiter (if (or (null? short-names)(null? long-names)) "  " ", "))
+
+				      (short-string (string-join (map (lambda (short-name) (string-append "-" (string short-name))) short-names) ", " ))
+				      (long-string (string-join (map (lambda (long-name) (string-append "--" long-name)) long-names) ", " ))
+				      (description (cadr row))
+
+				      (short-length (string-length short-string))
+				      (long-length (string-length long-string))
+				      ;; (description-length (string-length description))
+				      )
+				 (cond ((> short-length max-short) (set! max-short short-length))
+				       ((> long-length max-long) (set! max-long long-length))
+				       ;; ((> description-length max-description) (set! max-description description-length))
+				       )
+
+				 (list short-string name-delimiter long-string description)
+
+				 ))
+			     opt-tab)
+			)
+	   )
+      (map (lambda (row)
+	     (let* ((short-string (car row))
+		    (delimiter (cadr row))
+		    (long-string (caddr row))
+		    (description (cadddr row))
+		    (padding-short (make-string (- max-short (string-length short-string)) #\space))
+		    (padding-long (make-string (- max-long (string-length long-string)) #\space))
+		    
+		    )
+	       (display (string-append " " padding-short short-string delimiter long-string padding-long "  " description))(newline)
+
+	       ))
+	   opt-strings)
+
+      )
+    ))
+
 (define display-version
   (lambda ()
     (display (string-append "AutoScheme version " "0.31.0 (rev 1627370131)"))(newline)
     ))
 
+(define help-processor
+  (lambda args
+    (display-version)
+    (display-usage option-table)
+    (exit) ))
 
-(define display-usage
-  (lambda (opt-list)
-    (display "Usage: autoscheme [options...] [sources...]")(newline)
-    
-    ;; (write opt-list)(newline)
-    ))
-
-
-(define help-option
-  (option 
-   '(#\h "help") #f #f
+(define version-processor
    (lambda args
      (display-version)
-     (display-usage option-list)
+     (exit) ))
 
-     (exit) )))
+(define recognized-processor 
+  (lambda (option name arg . seeds)
+    (let ((options (car seeds))
+	  (source-files (cadr seeds)))
 
-(define version-option
-  (option 
-   '(#\V "version") #f #f
-   (lambda args
-     (display-version)
-     (exit) )))
+      (values (cons (list option name arg) options) source-files)
 
-(define option-list (list help-option 
-			  version-option))
+      )))
 
 
 
@@ -158,8 +229,7 @@
 	  )
 
       (display (string-append "autoscheme: unrecognized option " name-string))(newline)
-      ;; (display (string-append "autoscheme: try 'autoscheme --help' for more information"))(newline)
-      (display-usage option-list)
+      (display-usage option-table)
       (exit 1) )))
 
 
@@ -171,10 +241,21 @@
       (values options (cons operand source-files)))))
 
 
+(define option-table `((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources with linked modules")
+		       (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources with linked modules")
+		       (,(option '(#\l "link-modules") #f #f recognized-processor) "Link modules")
+		       (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
+		       (,(option '(#\n "module-name") #f #f recognized-processor) "Specify compiled module name")
+		       (,(option '(#\r "repl") #f #f version-processor) "Enter interactive REPL")
+		       (,(option '(#\s "shell") #f #f version-processor) "Enter command line shell")
+		       (,(option '(#\V "version") #f #f version-processor) "Display version information")
+		       (,(option '(#\h "help") #f #f help-processor) "Show this message")
+		       ))
 
-(let* ((seeds (list (inlet) '()))
+
+(let* ((seeds (list '() '()))
        (result (list (args-fold (cdr (command-line) )
-				option-list
+				(map car option-table)
 				unrecognized-processor
 				operand-processor
 				(apply values seeds)

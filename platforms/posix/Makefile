@@ -2,12 +2,23 @@ project_dir = ../..
 prime_dir = $(project_dir)/prime
 src_dir = $(project_dir)/src
 s7_dir = $(src_dir)/s7
+lib_dir = $(src_dir)/libraries
 gen_dir = $(project_dir)/gen
 bin_dir = bin
 
 obj_dir = _obj
 
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
+
+autoscheme_lib_sources = \
+	$(lib_dir)/auto/scheme/base/definition.scm \
+	$(lib_dir)/scheme/load/definition.scm \
+	$(lib_dir)/scheme/read/definition.scm \
+	$(lib_dir)/auto/scheme/write/definition.scm \
+	$(lib_dir)/auto/srfi/13/definition.scm \
+	$(lib_dir)/srfi/37/definition.scm
+
+autoscheme_sources = $(src_dir)/scheme.scm $(autoscheme_lib_sources) $(src_dir)/version.scm $(src_dir)/compiler.scm $(src_dir)/autoscheme.scm 
 
 all: build
 
@@ -23,9 +34,9 @@ $(bin_dir)/autoscheme: $(gen_dir)/autoscheme.c
 
 
 
-$(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(src_dir)/autoscheme.scm
+$(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -c $(src_dir)/autoscheme.scm -o $(gen_dir)/autoscheme.c
+	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c
 
 
 

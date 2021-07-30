@@ -154,12 +154,12 @@
       <Command>cd ..\..\.. &amp;&amp; platforms\windows\x64\Debug\autoscheme-prime.exe -h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
+  <!-- <ItemGroup> -->
+  <!--   <ClCompile Include="../../../src/version.h" /> -->
+  <!-- </ItemGroup> -->
   <ItemGroup>
-    <ClCompile Include="../../../src/version.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="../../../src/main.c" />
-    <ClCompile Include="../../../src/s7/s7.c" />
+    <!-- <ClCompile Include="../../../src/main.c" /> -->
+    <!-- <ClCompile Include="../../../src/s7/s7.c" /> -->
     <!-- <ClCompile Include="autoscheme.cpp" /> -->
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

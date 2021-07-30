@@ -1,6 +1,6 @@
 project_dir = ../..
-prime_dir = $(project_dir)/prime
 src_dir = $(project_dir)/src
+prime_dir = $(src_dir)/prime
 s7_dir = $(src_dir)/s7
 lib_dir = $(src_dir)/libraries
 gen_dir = $(project_dir)/gen

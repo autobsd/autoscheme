@@ -1,7 +1,4 @@
-(define compile-program 
-  (lambda (source-files output-file)
-
-    (define compile-number
+ (define compile-number
       (lambda (sc num)
 	(cond ((integer? num) (string-append "s7_make_integer(" sc "," (number->string num) ")"))
 	      (else (error "compile error - unknown number type: " num)))))
@@ -28,7 +25,7 @@
 
     (define module-prototype
       (lambda (name)
-	(string-append "s7_pointer " name "_module( s7_scheme *s7 )")))
+	(string-append "s7_pointer " "autoscheme_module__" name "( s7_scheme *s7 )")))
 
 
     (define get-expressions-from-file
@@ -58,7 +55,40 @@
 	  )))
 
 
-    (let* ((includes-template (string-append 
+(define compile-module 
+  (lambda (source-files module-name output-file)
+    (display "compiling module...")(newline)
+    (display "module-name:")(write module-name)(newline)
+    (display "output-file:")(write output-file)(newline)
+    (let* ((module-name (or module-name "module"))
+	   (output-file (or output-file "module.c"))
+
+	   (includes-template (string-append 
+			       "#define _Bool int\n"
+			       "#include \"s7/s7.h\"\n"
+			       ))
+	   (declarations-template (string-append
+				   (module-prototype module-name) ";\n"))
+	   (output-port (open-output-file output-file))
+	   )
+      (display includes-template output-port)
+
+      (display declarations-template output-port)
+      (display-module module-name source-files output-port)
+      
+      (close-output-port output-port)
+      )))
+
+(define compile-program 
+  (lambda (source-files link-modules output-file)
+
+   
+
+    (let* ((linked-module-list (if link-modules 
+				   (list link-modules)
+				   '()))
+
+	   (includes-template (string-append 
 			       "#define _Bool int\n"
 			       "#include \"s7/s7.h\"\n"
 			       ))
@@ -70,6 +100,11 @@
 
 				   "s7_scheme *auto_init( void );\n"
 				   ;; (module-prototype "scheme") ";\n"
+				   
+				   (apply string-append (map (lambda (name)
+							       (string-append (module-prototype name) ";\n"))
+							     linked-module-list))
+
 				   (module-prototype "program") ";\n"
 				   ))
 
@@ -108,10 +143,14 @@
 				"    auto_argv = argv;\n"
 
 
+				(apply string-append (map (lambda (name)
+							    (string-append " s7_eval( s7, autoscheme_module__" name "( s7 ), mod_env );\n"))
+							  linked-module-list))
+
 
 
 				;; "    s7_eval( s7, scheme_module( s7 ), s7_f( s7 ));\n"
-				"    s7_eval( s7, program_module( s7 ), mod_env );\n"
+				"    s7_eval( s7, autoscheme_module__program( s7 ), mod_env );\n"
 
 
 "s7_gc_unprotect_at( s7, mod_env_loc );\n"

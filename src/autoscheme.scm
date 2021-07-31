@@ -109,9 +109,9 @@
 
 (define option-table `((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources with linked modules")
 		       (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources with linked modules")
-		       (,(option '(#\l "link-modules") #f #f recognized-processor) "Link modules")
+		       (,(option '(#\l "link-modules") #t #f recognized-processor) "Link modules")
 		       (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
-		       (,(option '(#\n "module-name") #f #f recognized-processor) "Specify compiled module name")
+		       (,(option '(#\n "module-name") #t #f recognized-processor) "Specify compiled module name")
 		       (,(option '(#\o "output-file") #t #f recognized-processor) "Specify output file")
 		       (,(option '(#\r "repl") #f #f version-processor) "Enter interactive REPL")
 		       (,(option '(#\s "shell") #f #f version-processor) "Enter command line shell")
@@ -138,15 +138,27 @@
 						selected-options)
 				      #f))))
 
+       (get-selected-arg (lambda (name)
+			   (let ((selected-option (option-selected? name options)))
+			     (if selected-option (caddr selected-option) #f))))
+
        (compile-selected (option-selected? "compile" options))
-       (output-file-selected (option-selected? "output-file" options))
-       (output-file (if output-file-selected (caddr output-file-selected) #f))
+       (output-file (get-selected-arg "output-file"))
+
+       (compile-module-selected (option-selected? "compile-module" options))
+       (module-name (get-selected-arg "module-name"))
+
+       (link-modules (get-selected-arg "link-modules"))
+
 
        (interpret-selected (option-selected? "interpret" options))
-       
-       )
 
-  (cond (compile-selected (compile-program source-files output-file))
+
+       )
+(display "link-modules: ")(write link-modules)(newline)
+
+  (cond (compile-selected (compile-program source-files link-modules output-file))
+	(compile-module-selected (compile-module source-files module-name output-file))
 	(interpret-selected (interpret-program source-files))
 	)
   

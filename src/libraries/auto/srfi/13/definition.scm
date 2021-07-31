@@ -31,16 +31,27 @@
     (define string-prefix?
       (lambda (s1 s2 . rest)
 
-    	(let ((start1 (if (pair? rest) (car rest) 0))
-    	      (end1 (if (and (pair? rest)
-    			     (pair? (cdr rest))) (cadr rest) (string-length s1)))
-    	      (start2 (if (and (pair? rest)
+    	(let ((start1 (or (and (pair? rest) 
+			       (car rest)) 
+			  0))
+
+    	      (end1 (or (and (pair? rest)
+    			     (pair? (cdr rest))
+			     (cadr rest))
+			(string-length s1)))
+
+    	      (start2 (or (and (pair? rest)
     			       (pair? (cdr rest))
-    			       (pair? (cddr rest))) (caddr rest) 0))
-    	      (end2 (if (and (pair? rest)
+    			       (pair? (cddr rest))
+			       (caddr rest))
+			  0))
+
+    	      (end2 (or (and (pair? rest)
 			     (pair? (cdr rest))
 			     (pair? (cddr rest))
-			     (pair? (cdddr rest))) (cadddr rest) (string-length s2)))
+			     (pair? (cdddr rest))
+			     (cadddr rest))
+			(string-length s2)))
     	      )
 
 	  (equal? (substring s1 start1 end1) 

@@ -140,11 +140,14 @@
 
        (compile-selected (option-selected? "compile" options))
        (output-file-selected (option-selected? "output-file" options))
-       
        (output-file (if output-file-selected (caddr output-file-selected) #f))
+
+       (interpret-selected (option-selected? "interpret" options))
+       
        )
 
   (cond (compile-selected (compile-program source-files output-file))
+	(interpret-selected (interpret-program source-files))
 	)
   
   )

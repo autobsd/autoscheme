@@ -64,6 +64,10 @@
 			       ))
 	   (declarations-template (string-append
 				   "int auto_argc; char **auto_argv;\n"
+
+"s7_int mod_env_loc;\n"
+"s7_pointer mod_env;\n"
+
 				   "s7_scheme *auto_init( void );\n"
 				   ;; (module-prototype "scheme") ";\n"
 				   (module-prototype "program") ";\n"
@@ -88,6 +92,10 @@
 				"s7_scheme *auto_init()\n"
 				"{\n"
 				"    s7_scheme *s7 = s7_init();\n"
+
+"mod_env = s7_inlet( s7, s7_f( s7 ));\n"
+"mod_env_loc = s7_gc_protect( s7, mod_env );\n"
+
 				"    s7_define_function( s7, \"command-line\", command_line, 0, 0, false, \"(command-line) returns a list of command-line arguments\" );\n"
 				"    return s7;\n"
 				"}\n"
@@ -99,8 +107,14 @@
 				"    auto_argc = argc;\n"
 				"    auto_argv = argv;\n"
 
+
+
+
 				;; "    s7_eval( s7, scheme_module( s7 ), s7_f( s7 ));\n"
-				"    s7_eval( s7, program_module( s7 ), s7_f( s7 ));\n"
+				"    s7_eval( s7, program_module( s7 ), mod_env );\n"
+
+
+"s7_gc_unprotect_at( s7, mod_env_loc );\n"
 
 				"    return 0;\n"
 				"}\n"

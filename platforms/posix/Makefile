@@ -18,7 +18,7 @@ autoscheme_lib_sources = \
 	$(lib_dir)/auto/srfi/13/definition.scm \
 	$(lib_dir)/srfi/37/definition.scm
 
-autoscheme_sources = $(src_dir)/scheme.scm $(autoscheme_lib_sources) $(src_dir)/version.scm $(src_dir)/compiler.scm $(src_dir)/autoscheme.scm 
+autoscheme_sources = $(src_dir)/scheme.scm $(autoscheme_lib_sources) $(src_dir)/version.scm $(src_dir)/compiler.scm $(src_dir)/interpreter.scm $(src_dir)/autoscheme.scm 
 
 all: build
 

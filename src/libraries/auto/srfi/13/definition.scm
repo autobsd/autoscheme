@@ -1,8 +1,12 @@
 (define-library (auto srfi 13)
 
-  (export string-join)
+  (export string-join
+	  string-prefix? 
+	  string-map 
+	  )
 
   (begin 
+
 
     (define string-join
       (lambda (string-list . rest)
@@ -21,5 +25,54 @@
 
 		  ((pair? (cdr remainder)) (string-append (car remainder) delimeter (join-strings (cdr remainder))))
 		  (else (car remainder)))))))
+
+
+    
+    (define string-prefix?
+      (lambda (s1 s2 . rest)
+
+    	(let ((start1 (if (pair? rest) (car rest) 0))
+    	      (end1 (if (and (pair? rest)
+    			     (pair? (cdr rest))) (cadr rest) (string-length s1)))
+    	      (start2 (if (and (pair? rest)
+    			       (pair? (cdr rest))
+    			       (pair? (cddr rest))) (caddr rest) 0))
+    	      (end2 (if (and (pair? rest)
+			     (pair? (cdr rest))
+			     (pair? (cddr rest))
+			     (pair? (cdddr rest))) (cadddr rest) (string-length s2)))
+    	      )
+
+	  (equal? (substring s1 start1 end1) 
+		  (substring s2 start2 end2)))))
+    
+
+
+    (define string-map
+      (lambda (proc . strings)
+
+	(let sub-char ((pos 0))
+
+	  (let* ((char-list (call/cc (lambda (return)
+				       (map (lambda (s)
+					      (if (< pos (string-length s)) 
+						  (string-ref s pos) 
+						  (return #f)))
+					    strings))))
+		 (result (if char-list 
+			     (apply proc char-list)
+			     #f))
+
+		 (result-string (if (char? result) 
+				    (string result) 
+				    result))
+		 )
+
+	    (if char-list 
+		(string-append result-string (sub-char (+ pos 1)))
+		"")))))
+
+
+
 
     ))

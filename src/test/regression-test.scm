@@ -1,6 +1,9 @@
-(import (s-markup xml))
+;; (import (s-markup xml))
 
-(display-xml '((html (body (h1 "headline")))))(newline)
+;; (display-xml '((html (body (h1 "headline")))))(newline)
+
+(import (auto scheme write))
+(display "test message")(newline)
 
 ;; (import (auto scheme base))
 ;; (import (auto scheme write))

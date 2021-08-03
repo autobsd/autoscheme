@@ -1,1 +1,1 @@
-(define *version* (lambda () "0.40.0"))
+(define *version* (lambda () "0.41.0"))

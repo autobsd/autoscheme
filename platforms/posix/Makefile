@@ -7,6 +7,8 @@ gen_dir = $(project_dir)/gen
 bin_dir = bin
 obj_dir = _obj
 
+install_dir = /usr/local/bin
+
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
 
 autoscheme_lib_sources = \
@@ -53,6 +55,13 @@ $(obj_dir)/s7.o: $(s7_dir)/s7.h $(s7_dir)/s7.c
 	cc -o $(obj_dir)/s7.o -c $(s7_dir)/s7.c
 
 
+
+
+install: $(bin_dir)/autoscheme
+	cp $(bin_dir)/autoscheme $(install_dir)/
+
+uninstall: 
+	rm $(install_dir)/autoscheme
 
 clean:
 	rm -rf $(gen_dir)

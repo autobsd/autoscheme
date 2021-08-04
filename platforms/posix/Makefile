@@ -13,13 +13,22 @@ strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototype
 
 autoscheme_lib_sources = \
 	$(lib_dir)/auto/scheme/base/definition.scm \
+	$(lib_dir)/auto/scheme/eval/definition.scm \
 	$(lib_dir)/scheme/load/definition.scm \
 	$(lib_dir)/scheme/read/definition.scm \
+	$(lib_dir)/scheme/repl/definition.scm \
 	$(lib_dir)/auto/scheme/write/definition.scm \
 	$(lib_dir)/auto/srfi/13/definition.scm \
 	$(lib_dir)/srfi/37/definition.scm
 
-autoscheme_sources =  $(autoscheme_lib_sources) $(src_dir)/version.scm $(src_dir)/compiler.scm $(src_dir)/interpreter.scm $(src_dir)/autoscheme.scm 
+autoscheme_sources =  \
+	$(autoscheme_lib_sources) \
+	$(src_dir)/version.scm \
+	$(src_dir)/usage.scm \
+	$(src_dir)/compiler.scm \
+	$(src_dir)/interpreter.scm \
+	$(src_dir)/repl.scm \
+	$(src_dir)/autoscheme.scm 
 
 all: build
 

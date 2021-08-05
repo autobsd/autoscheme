@@ -1,6 +1,7 @@
 (import (scheme load))
 (import (scheme read))
 (import (scheme repl))
+(import (scheme cxr))
 (import (auto scheme write))
 (import (auto scheme base))
 (import (auto scheme eval))

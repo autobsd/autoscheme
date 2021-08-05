@@ -63,7 +63,8 @@
   (export load)
   (export read)
   (export display write)
-
+  (export caaaar caaar caaddr cadaar cadar cadddr cdaaar cdaar cdaddr cddaar cddar cddddr
+	caaadr caadar caadr cadadr caddar caddr cdaadr cdadar cdadr cddadr cdddar cdddr)
   )
 
 
@@ -74,8 +75,8 @@
 (cutlet (rootlet) 'read)
 (cutlet (rootlet) 'load)
 (cutlet (rootlet) 'display 'write)
-
-
+(cutlet (rootlet) 'caaaar 'caaar 'caaddr 'cadaar 'cadar 'cadddr 'cdaaar 'cdaar 'cdaddr 'cddaar 'cddar 'cddddr
+	'caaadr 'caadar 'caadr 'cadadr 'caddar 'caddr 'cdaadr 'cdadar 'cdadr 'cddadr 'cdddar 'cdddr)
 
 ;; (varlet *source* 'directory
 ;; 	    (lambda ()

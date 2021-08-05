@@ -17,6 +17,7 @@ autoscheme_lib_sources = \
 	$(lib_dir)/scheme/load/definition.scm \
 	$(lib_dir)/scheme/read/definition.scm \
 	$(lib_dir)/scheme/repl/definition.scm \
+	$(lib_dir)/scheme/cxr/definition.scm \
 	$(lib_dir)/auto/scheme/write/definition.scm \
 	$(lib_dir)/auto/srfi/13/definition.scm \
 	$(lib_dir)/srfi/37/definition.scm

@@ -11,25 +11,25 @@ install_dir = /usr/local/bin
 
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
 
-autoscheme_lib_sources = \
-	$(lib_dir)/auto/scheme/base/definition.scm \
-	$(lib_dir)/auto/scheme/eval/definition.scm \
-	$(lib_dir)/scheme/load/definition.scm \
-	$(lib_dir)/scheme/read/definition.scm \
-	$(lib_dir)/scheme/repl/definition.scm \
-	$(lib_dir)/scheme/cxr/definition.scm \
-	$(lib_dir)/auto/scheme/write/definition.scm \
-	$(lib_dir)/auto/srfi/13/definition.scm \
-	$(lib_dir)/srfi/37/definition.scm
+library_sources = \
+	$(lib_dir)/auto/scheme/base/library.scm \
+	$(lib_dir)/auto/scheme/eval/library.scm \
+	$(lib_dir)/scheme/load/library.scm \
+	$(lib_dir)/scheme/read/library.scm \
+	$(lib_dir)/scheme/repl/library.scm \
+	$(lib_dir)/scheme/cxr/library.scm \
+	$(lib_dir)/auto/scheme/write/library.scm \
+	$(lib_dir)/auto/srfi/13/library.scm \
+	$(lib_dir)/srfi/37/library.scm
 
 autoscheme_sources =  \
-	$(autoscheme_lib_sources) \
+	$(library_sources) \
 	$(src_dir)/version.scm \
 	$(src_dir)/usage.scm \
 	$(src_dir)/compiler.scm \
 	$(src_dir)/interpreter.scm \
 	$(src_dir)/repl.scm \
-	$(src_dir)/autoscheme.scm 
+	$(src_dir)/program.scm 
 
 all: build
 

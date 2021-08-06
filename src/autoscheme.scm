@@ -1,12 +1,12 @@
-(import (scheme load))
-(import (scheme read))
-(import (scheme repl))
-(import (scheme cxr))
-(import (auto scheme write))
-(import (auto scheme base))
-(import (auto scheme eval))
-(import (auto srfi 13))
-(import (srfi 37))
+(import (scheme load)
+	(scheme read)
+	(scheme repl)
+	(scheme cxr)
+	(auto scheme write)
+	(auto scheme base)
+	(auto scheme eval)
+	(auto srfi 13)
+	(srfi 37))
 
 
 
@@ -66,8 +66,8 @@
       (values options (cons operand source-files)))))
 
 
-(define option-table `((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources with linked modules")
-		       (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources with linked modules")
+(define option-table `((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources")
+		       (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources")
 		       (,(option '(#\l "link-modules") #t #f recognized-processor) "Link modules")
 		       (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
 		       (,(option '(#\n "module-name") #t #f recognized-processor) "Specify compiled module name")
@@ -114,11 +114,12 @@
 
 
        )
-(display "link-modules: ")(write link-modules)(newline)
+
 
   (cond (compile-selected (compile-program source-files link-modules output-file))
 	(compile-module-selected (compile-module source-files module-name output-file))
 	(interpret-selected (interpret-program source-files))
+	(else (help-processor))
 	)
   
   )

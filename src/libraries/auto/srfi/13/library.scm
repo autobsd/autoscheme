@@ -3,10 +3,10 @@
   (export string-join
 	  string-prefix? 
 	  string-map 
+	  string-tokenize
 	  )
 
   (begin 
-
 
     (define string-join
       (lambda (string-list . rest)
@@ -84,6 +84,21 @@
 		"")))))
 
 
+
+    (define string-tokenize
+      (lambda (s)
+
+	(let get-tokens ((current '())
+			 (remainder (string->list s))
+			 )
+
+	  (cond ((null? remainder) (list (list->string (reverse current))))
+
+		((equal? (car remainder) #\space) (cons (list->string (reverse current)) (get-tokens '() (cdr remainder))))
+
+		(else (get-tokens (cons (car remainder) current) (cdr remainder) ))))
+	))
+    
 
 
     ))

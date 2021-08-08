@@ -37,25 +37,33 @@ build: $(bin_dir)/autoscheme
 
 
 
-$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_scheme.c $(gen_dir)/autoscheme.c 
+$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c 
 	mkdir -p $(bin_dir)
-	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_scheme.c $(gen_dir)/autoscheme.c
+	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c
 
 
 $(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c -l mod_scheme
+	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c --link-modules="mod_scheme_macros mod_s7_library"
 
 
-$(gen_dir)/mod_scheme.c: $(bin_dir)/autoscheme-prime $(src_dir)/scheme.scm
+
+$(gen_dir)/mod_s7_library.c: $(bin_dir)/autoscheme-prime $(lib_dir)/s7/library.scm
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -m $(src_dir)/scheme.scm -n mod_scheme -o $(gen_dir)/mod_scheme.c
+	$(bin_dir)/autoscheme-prime -m $(lib_dir)/s7/library.scm -n mod_s7_library -o $(gen_dir)/mod_s7_library.c
 
 
 
-$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/mod_scheme.c $(prime_dir)/autoscheme.c
+$(gen_dir)/mod_scheme_macros.c: $(bin_dir)/autoscheme-prime $(lib_dir)/scheme/macros.scm
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime -m $(lib_dir)/scheme/macros.scm -n mod_scheme_macros -o $(gen_dir)/mod_scheme_macros.c
+
+
+
+
+$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c
 	mkdir -p $(bin_dir)
-	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/mod_scheme.c $(prime_dir)/autoscheme.c 
+	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c 
 
 
 

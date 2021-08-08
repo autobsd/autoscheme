@@ -113,10 +113,11 @@
        (interpret-selected (option-selected? "interpret" options))
 
 
+       (module-list (if link-modules (string-tokenize link-modules) '()))
        )
 
 
-  (cond (compile-selected (compile-program source-files link-modules output-file))
+  (cond (compile-selected (compile-program source-files module-list output-file))
 	(compile-module-selected (compile-module source-files module-name output-file))
 	(interpret-selected (interpret-program source-files))
 	(else (help-processor))

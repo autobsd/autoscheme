@@ -37,14 +37,14 @@ build: $(bin_dir)/autoscheme
 
 
 
-$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c 
+$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c 
 	mkdir -p $(bin_dir)
-	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c
+	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c
 
 
 $(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c --link-modules="mod_scheme_macros mod_s7_library"
+	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c --link-modules="mod_scheme_macros mod_auto_scheme_environment_procedures mod_s7_library"
 
 
 
@@ -54,9 +54,16 @@ $(gen_dir)/mod_s7_library.c: $(bin_dir)/autoscheme-prime $(lib_dir)/s7/library.s
 
 
 
+$(gen_dir)/mod_auto_scheme_environment_procedures.c: $(bin_dir)/autoscheme-prime $(lib_dir)/auto/scheme/environment/procedures.scm
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime -m $(lib_dir)/auto/scheme/environment/procedures.scm -n mod_auto_scheme_environment_procedures -o $(gen_dir)/mod_auto_scheme_environment_procedures.c
+
+
 $(gen_dir)/mod_scheme_macros.c: $(bin_dir)/autoscheme-prime $(lib_dir)/scheme/macros.scm
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime -m $(lib_dir)/scheme/macros.scm -n mod_scheme_macros -o $(gen_dir)/mod_scheme_macros.c
+
+
 
 
 

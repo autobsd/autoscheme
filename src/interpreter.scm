@@ -4,7 +4,11 @@
     ;; (with-let (inlet 'source-files source-files)
 	      ;; (for-each load source-files)
 	      ;; )
-    (let ((interaction-env (inlet 'import import
+    (let ((interaction-env (inlet
+			    'environment-import! environment-import!
+			    'current-environment current-environment
+
+			    'import import
 				  
 				  (symbol (object->string '(auto scheme write)))
 				  (symbol->value (symbol (object->string '(auto scheme write))))

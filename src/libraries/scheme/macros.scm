@@ -1,5 +1,3 @@
-
-
 (define-macro (define-library name . declarations)
   (let ((export-declarations '())
 	(import-declarations '())
@@ -33,87 +31,43 @@
 
 
 
-
-
-
-
-
 (define-macro (import . sets)
+  (letrec ((import-bindings
+	    (lambda (set)
+	      (cond ((not (pair? set)) (error "improper import-set:" set))
+		    ((equal? (car set) 'only) (apply import-only (cdr set)))
+		    ((equal? (car set) 'except) (apply import-except (cdr set)))
+		    ((equal? (car set) 'prefix) (apply import-prefix (cdr set)))
+		    ((equal? (car set) 'rename) (apply import-rename (cdr set)))
+		    (else (import-library set))
+		    )
+	      ))
 
-  (let ()
+	   (import-library
+	    (lambda (set)
+	      `((current-environment) (symbol ,(object->string set)))))
 
-    (define import-bindings
-      (lambda (set)
-	(cond ((not (pair? set)) (error "improper import-set:" set))
-	      ((equal? (car set) 'only) (apply import-only (cdr set)))
-	      ((equal? (car set) 'except) (apply import-except (cdr set)))
-	      ;; ((equal? (car set) 'prefix) (apply import-prefix (cadr set)))
-	      ;; ((equal? (car set) 'rename) (apply import-rename (cdr set)))
-	      (else `(let-ref (curlet) (symbol ,(object->string set))))
-	      )
+	   (import-only
+	    (lambda (set . identifiers)
+	      `(environment-only ,(import-bindings (list (car set))) '(,@identifiers))))
 
-	))
+	   (import-except
+	    (lambda (set . identifiers)
+	      `(environment-except ,(import-bindings (list (car set))) '(,@identifiers))))
 
-    (define import-only
-      (lambda (set . identifiers)
-	`(apply inlet ,(cons 'list (map (lambda (identifier)
-					  `(cons ',identifier (let-ref ,(import-bindings set) ',identifier))
-					  )
-					identifiers)))
-	))
+	   (import-prefix
+	    (lambda (set identifier)
+	      `(environment-prefix ,(import-bindings (list (car set))) ',identifier)))
 
-    (define import-except
-      (lambda (set . identifiers)
-	`(apply cutlet (cons (apply inlet (let->list ,(import-bindings set))) ,identifiers))
-	))
+	   (import-rename
+	    (lambda (set . rename-list)
+	      
+	      `(environment-rename ,(import-bindings (list (car set))) '(,@(map (lambda (rename) (cons (car rename) (cadr rename))) rename-list)))))
+	   )
 
-    ;; (define import-prefix
-    ;;   (lambda (set identifier)
-
-
-    ;;     ;; `(apply inlet ,(cons 'list (map (lambda (identifier)
-    ;;     ;; 				      `(cons ',identifier (let-ref ,(import-bindings set) ',identifier))
-    ;;     ;; 				      )
-    ;;     ;; 				    identifiers)))
-
-    ;;     ))
-
-    ;; (define import-rename
-    ;;   (lambda (set . modifiers)
-    ;; 	(display "import-renaming...")(newline)
-    ;; 	(display "set: ")(write set)(newline)
-    ;; 	(display "modifiers: ")(write modifiers)(newline)
-
-    ;; 	(write
-
-	 
-    ;; 	 `(let ((env-only ,(apply import-only (cons set (map car modifiers))))
-    ;; 		(env-except ,(apply import-except (cons set (map car modifiers))))
-    ;; 		)
-
-    ;; 	    (apply varlet (cons env-except ,(cons 'list (map (lambda (modifier)
-    ;; 							       `(cons ',(cadr modifier) (let-ref ,(import-bindings set) ',(car modifier)))
-    ;; 							       )
-    ;; 							     modifiers))))
-
-
-	    
-    ;; 	    env
-    ;; 	    )
-
-    ;; 	 )(newline)
-    ;; 	  (import-bindings set)
-
-    ;; 	  ))
-
-
-
-
-    (cons 'begin (map (lambda (set)
-			`(apply varlet (cons (curlet) (let->list ,(import-bindings set))))
-			)
-		      sets))
-
+    `(environment-import! (current-environment) ,(cons 'list (map (lambda (set)
+								    (import-bindings set))
+								  sets)))
     )
   )
 

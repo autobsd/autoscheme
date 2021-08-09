@@ -2,32 +2,38 @@
   (let ((export-declarations '())
 	(import-declarations '())
 	(begin-declarations '())
-	(export-symbols '())
+
+	(export-only '())
+	(export-rename '())
 	)
 
-    (map (lambda (declaration)
-	   (cond ((eq? (car declaration) 'export) (set! export-declarations (cons declaration export-declarations)))
-		 ((eq? (car declaration) 'import) (set! import-declarations (cons declaration import-declarations)))
-		 ((eq? (car declaration) 'begin) (set! begin-declarations (cons declaration begin-declarations)))
-		 (else (error 'define-library "unknown declaration type:" (car declaration)))))
-	 (reverse declarations))
+    (for-each (lambda (declaration)
+		(cond ((eq? (car declaration) 'export) (set! export-declarations (cons declaration export-declarations)))
+		      ((eq? (car declaration) 'import) (set! import-declarations (cons declaration import-declarations)))
+		      ((eq? (car declaration) 'begin) (set! begin-declarations (cons declaration begin-declarations)))
+		      (else (error 'define-library "unknown declaration type:" (car declaration)))))
+	      (reverse declarations))
 
-    (map (lambda (declaration)
-	   (set! export-symbols (append export-symbols (cdr declaration))))
-	 export-declarations)
+    (for-each (lambda (declaration)
+		(for-each (lambda (spec)
+			    (cond ((symbol? spec) (set! export-only (cons spec export-only)))
+				  ((and (list? spec) (= (length spec) 3) (equal? (car spec) 'rename)) 
+				   (set! export-only (cons (cadr spec) export-only))
+				   (set! export-rename (cons (cons (cadr spec) (caddr spec)) export-rename)))
+				  (else (error 'define-library "unknown export spec:" spec)))
+			    )
+			  (cdr declaration))
+		)
+	      export-declarations)
 
-    (let* ((exported-env-expression (cons 'inlet (map (lambda (sym)
-							``(,',sym . ,,sym))
-						      export-symbols)))
-	   (block `(let ()
-		     ,@import-declarations
-		     ,@begin-declarations
-		     ,exported-env-expression
-		     )))
-
-      `(varlet (curlet) `(,(symbol (object->string ',name)) . ,,block)))
+    `(environment-update! (current-environment) ',(symbol (object->string name)) 
+			  (let ()
+			    ,@import-declarations
+			    ,@begin-declarations	   
+			    (environment-rename (environment-only (current-environment) ',export-only) ',export-rename)
+			    )
+			  )
     ))
-
 
 
 

@@ -4,9 +4,9 @@
 	  (else (error "compile error - unknown number type: " num)))))
 
 
-(define compile
+(define compile-expression
   (lambda (sc expression)
-    (cond ((pair? expression) (string-append "s7_cons(" sc "," (compile sc (car expression)) "," (compile sc (cdr expression)) ")"))
+    (cond ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression)) "," (compile-expression sc (cdr expression)) ")"))
 	  ((null? expression) (string-append "s7_nil(" sc ")"))
 	  ((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
 	  ((char? expression) (string-append "s7_make_character(" sc "," (number->string (char->integer expression)) ")"))
@@ -19,7 +19,7 @@
 	  ((equal? expression #<unspecified>) (string-append "s7_unspecified(" sc ")"))
 
 
-	  (else (error "compile error - unknown type: " expression))
+	  (else (error "compile error - unknown expression type: " expression))
 	  )))
 
 
@@ -42,14 +42,25 @@
 
 (define display-module
   (lambda (name sources port)
-    (let* ((expression (cons 'begin (apply append (map get-expressions-from-file sources))))
-	   (compiled-expression (compile "s7" expression))
-	   )
+    (let ((sc "s7")
+	  )
       (display (string-append (module-prototype name) "\n"
 			      "{\n"
-			      "return("
-			      compiled-expression
-			      ");\n"
+			      "return(s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
+			      ) port)
+
+      (let display-expressions ((remainder sources)
+				 )
+      	(cond ((null? remainder) (display (string-append "s7_nil(" sc ")" ) port))
+
+      	      (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder)))) ",") port)
+		    (display-expressions (cdr remainder))
+		    (display ")" port)
+		    )
+	      )
+	)
+
+      (display (string-append "));\n"
 			      "}\n"
 			      ) port)
       )))

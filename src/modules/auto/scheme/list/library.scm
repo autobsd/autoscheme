@@ -1,4 +1,5 @@
-(define-library (auto srfi 1)
+;; (srfi 1) (scheme list)
+(define-library (auto scheme list)
 
   (export fold fold-right)
   

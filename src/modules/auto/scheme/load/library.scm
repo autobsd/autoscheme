@@ -1,0 +1,5 @@
+;; (scheme load)
+(define-library (auto scheme load)
+  (export load)
+  (import (s7))
+  )

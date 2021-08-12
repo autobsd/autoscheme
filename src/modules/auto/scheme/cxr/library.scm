@@ -1,4 +1,5 @@
-(define-library (scheme cxr)
+;; (scheme cxr)
+(define-library (auto scheme cxr)
   (export caaaar
 	  caaar
 	  caaddr

@@ -1,16 +1,16 @@
-(import (scheme load)
-	(scheme read)
-	(scheme repl)
-	(scheme cxr)
+(import (auto scheme load)
+	(auto scheme read)
+	(auto scheme repl)
+	(auto scheme cxr)
 	(auto scheme write)
 	(auto scheme base)
 	(auto scheme eval)
-	(auto srfi 13)
-	(srfi 37))
+	(auto scheme string)
+	(auto scheme args-fold)
+	)
 
 
 (define program-version (include "../version.txt"))
-
 
 (define display-version
   (lambda ()

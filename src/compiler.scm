@@ -1,37 +1,9 @@
+(import (auto scheme path))
+
 (define compile-number
   (lambda (sc num)
     (cond ((integer? num) (string-append "s7_make_integer(" sc "," (number->string num) ")"))
 	  (else (error "compile error - unknown number type: " num)))))
-
-
-(define get-parent-directory
-  (lambda (path)
-    (let ((pos -1)
-	  )
-      (do ((len (length path))
-	   (i 0 (+ i 1)))
-	  ((= i len))
-	(if (char=? (path i) #\/)
-	    (set! pos i)))
-
-      (if (positive? pos) 
-	  (substring path 0 pos)))))
-
-
-(define path-absolute?
-  (lambda (path)
-    (char=? (path 0) #\/)))
-
-
-(define make-absolute
-  (lambda (path . rest)
-    (if (path-absolute? path) 
-	path
-	(let ((parent-dir (if (pair? rest) 
-			      (car rest)
-			      (current-directory)))
-	      )
-	  (string-append parent-dir "/" path)))))
 
 
 (define compile-expression
@@ -47,7 +19,7 @@
 
 
 	  ((and (pair? expression) (equal? (car expression) 'include) (zero? quote-level)) 
-	   (let* ((included-source (make-absolute (cadr expression) (get-parent-directory source)))
+	   (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
 		  (included-expressions (get-expressions-from-file included-source))
 		  )
 	     (compile-expression sc (cons 'begin included-expressions) included-source quote-level)
@@ -100,7 +72,7 @@
 				 )
       	(cond ((null? remainder) (display (string-append "s7_nil(" sc ")" ) port))
 
-      	      (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (make-absolute (car remainder)) 0) ",") port)
+      	      (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ",") port)
 		    (display-expressions (cdr remainder))
 		    (display ")" port)
 		    )

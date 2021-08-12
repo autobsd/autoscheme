@@ -1,4 +1,5 @@
-(define-library (auto srfi 13)
+;; (srfi 13)
+(define-library (auto scheme string)
 
   (export string-join
 	  string-prefix? 

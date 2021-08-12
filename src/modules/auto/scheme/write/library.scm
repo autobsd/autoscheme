@@ -1,3 +1,4 @@
+;; (scheme write)
 (define-library (auto scheme write)
 
   (export display write)

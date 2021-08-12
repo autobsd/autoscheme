@@ -1,4 +1,5 @@
-(define-library (scheme repl)
+;; (scheme repl)
+(define-library (auto scheme repl)
   (export interaction-environment)
   (import (s7))
   (begin 

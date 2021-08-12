@@ -24,7 +24,6 @@ library_sources = \
 
 autoscheme_sources =  \
 	$(library_sources) \
-	$(src_dir)/version.scm \
 	$(src_dir)/usage.scm \
 	$(src_dir)/compiler.scm \
 	$(src_dir)/interpreter.scm \
@@ -37,9 +36,9 @@ build: $(bin_dir)/autoscheme
 
 
 
-$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c 
+$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c 
 	mkdir -p $(bin_dir)
-	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c
+	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/mod_auto_scheme_environment_procedures.c $(gen_dir)/mod_scheme_macros.c $(gen_dir)/mod_s7_library.c $(gen_dir)/autoscheme.c
 
 
 $(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
@@ -68,9 +67,9 @@ $(gen_dir)/mod_scheme_macros.c: $(bin_dir)/autoscheme-prime $(lib_dir)/scheme/ma
 
 
 
-$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c
+$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/mod_auto_scheme_environment_procedures.c $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c
 	mkdir -p $(bin_dir)
-	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c 
+	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/mod_auto_scheme_environment_procedures.c $(prime_dir)/mod_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c 
 
 
 

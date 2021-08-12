@@ -9,11 +9,12 @@
 	(srfi 37))
 
 
+(define program-version (include "../version.txt"))
 
 
 (define display-version
   (lambda ()
-    (display (string-append "AutoScheme version " (*version*)))(newline)
+    (display (string-append "AutoScheme version " program-version))(newline)
     ))
 
 (define help-processor

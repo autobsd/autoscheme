@@ -9,6 +9,9 @@
 (display "test message")(newline)
 (write "test message")(newline)
 
+(include "file1.scm")
+
+
 ;; (import (auto scheme base))
 ;; (import (auto scheme write))
 

@@ -4,9 +4,56 @@
 	  (else (error "compile error - unknown number type: " num)))))
 
 
+(define get-parent-directory
+  (lambda (path)
+    (let ((pos -1)
+	  )
+      (do ((len (length path))
+	   (i 0 (+ i 1)))
+	  ((= i len))
+	(if (char=? (path i) #\/)
+	    (set! pos i)))
+
+      (if (positive? pos) 
+	  (substring path 0 pos)))))
+
+
+(define path-absolute?
+  (lambda (path)
+    (char=? (path 0) #\/)))
+
+
+(define make-absolute
+  (lambda (path . rest)
+    (if (path-absolute? path) 
+	path
+	(let ((parent-dir (if (pair? rest) 
+			      (car rest)
+			      (current-directory)))
+	      )
+	  (string-append parent-dir "/" path)))))
+
+
 (define compile-expression
-  (lambda (sc expression)
-    (cond ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression)) "," (compile-expression sc (cdr expression)) ")"))
+  (lambda (sc expression source quote-level)
+    (cond ((and (pair? expression) (equal? (car expression) 'quote) (zero? quote-level))
+	   (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quote\")," (compile-expression sc (cdr expression) source -1) ")"))
+
+	  ((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
+	   (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quasiquote\")," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+
+	  ((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
+	   (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"unquote\")," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
+
+
+	  ((and (pair? expression) (equal? (car expression) 'include) (zero? quote-level)) 
+	   (let* ((included-source (make-absolute (cadr expression) (get-parent-directory source)))
+		  (included-expressions (get-expressions-from-file included-source))
+		  )
+	     (compile-expression sc (cons 'begin included-expressions) included-source quote-level)
+	     ))
+
+	  ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 	  ((null? expression) (string-append "s7_nil(" sc ")"))
 	  ((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
 	  ((char? expression) (string-append "s7_make_character(" sc "," (number->string (char->integer expression)) ")"))
@@ -53,7 +100,7 @@
 				 )
       	(cond ((null? remainder) (display (string-append "s7_nil(" sc ")" ) port))
 
-      	      (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder)))) ",") port)
+      	      (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (make-absolute (car remainder)) 0) ",") port)
 		    (display-expressions (cdr remainder))
 		    (display ")" port)
 		    )
@@ -98,6 +145,16 @@
     (let* ((includes-template (string-append 
 			       "#define _Bool int\n"
 			       "#include \"s7/s7.h\"\n"
+
+"#include <stdio.h>\n"
+"/*#define WINDOWS*/\n"
+"#ifdef WINDOWS\n"
+"#include <direct.h>\n"
+"#define GetCurrentDir _getcwd\n"
+"#else\n"
+"#include <unistd.h>\n"
+"#define GetCurrentDir getcwd\n"
+"#endif\n"
 			       ))
 	   (declarations-template (string-append
 				   "int auto_argc; char **auto_argv;\n"
@@ -131,6 +188,18 @@
 				"	return arguments;\n"
 				"    }\n"
 				"}\n"
+
+"static s7_pointer current_directory( s7_scheme *sc, s7_pointer args )\n"
+"{\n"
+"    if( !s7_is_null( sc, args ))\n"
+"	return s7_wrong_type_arg_error( sc, \"current-directory\", 0, args, \"null\" );\n"
+"    {\n"
+"       char buff[FILENAME_MAX];\n"
+"       GetCurrentDir( buff, FILENAME_MAX );\n"
+"       return s7_make_string( sc, buff );\n"
+"    }\n"
+"}\n"
+
 				"s7_scheme *auto_init()\n"
 				"{\n"
 				"    s7_scheme *s7 = s7_init();\n"
@@ -139,6 +208,7 @@
 				"mod_env_loc = s7_gc_protect( s7, mod_env );\n"
 
 				"    s7_define_function( s7, \"command-line\", command_line, 0, 0, false, \"(command-line) returns a list of command-line arguments\" );\n"
+				"    s7_define_function( s7, \"current-directory\", current_directory, 0, 0, false, \"(current-directory) returns the current working directory\" );\n"
 				"    return s7;\n"
 				"}\n"
 

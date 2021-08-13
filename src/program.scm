@@ -7,7 +7,9 @@
 	(auto scheme eval)
 	(auto scheme string)
 	(auto scheme args fold)
+	(auto scheme compile)
 	)
+
 
 
 (define program-version (include "../version.txt"))

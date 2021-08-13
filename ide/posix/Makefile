@@ -21,12 +21,12 @@ library_sources = \
 	$(mod_dir)/auto/scheme/path/module.scm \
 	$(mod_dir)/auto/scheme/write/module.scm \
 	$(mod_dir)/auto/scheme/string/module.scm \
-	$(mod_dir)/auto/scheme/args/fold/module.scm
+	$(mod_dir)/auto/scheme/args/fold/module.scm \
+	$(mod_dir)/auto/scheme/compile/module.scm 
 
 autoscheme_sources =  \
 	$(library_sources) \
 	$(src_dir)/usage.scm \
-	$(src_dir)/compiler.scm \
 	$(src_dir)/interpreter.scm \
 	$(src_dir)/repl.scm \
 	$(src_dir)/program.scm 

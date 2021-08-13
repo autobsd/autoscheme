@@ -7,7 +7,9 @@
 	(auto scheme eval)
 	(auto scheme string)
 	(auto scheme args fold)
+	(auto scheme args)
 	(auto scheme compile)
+	(auto scheme interpret)
 	)
 
 
@@ -22,7 +24,7 @@
 (define help-processor
   (lambda args
     (display-version)
-    (display-usage option-table)
+    (args-usage option-table)
     (exit) ))
 
 (define version-processor
@@ -57,7 +59,7 @@
 	  )
 
       (display (string-append "autoscheme: unrecognized option " name-string))(newline)
-      (display-usage option-table)
+      (args-usage option-table)
       (exit 1) )))
 
 

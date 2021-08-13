@@ -21,7 +21,7 @@ library_sources = \
 	$(mod_dir)/auto/scheme/path/module.scm \
 	$(mod_dir)/auto/scheme/write/module.scm \
 	$(mod_dir)/auto/scheme/string/module.scm \
-	$(mod_dir)/auto/scheme/args-fold/module.scm
+	$(mod_dir)/auto/scheme/args/fold/module.scm
 
 autoscheme_sources =  \
 	$(library_sources) \
@@ -37,14 +37,14 @@ build: $(bin_dir)/autoscheme
 
 
 
-$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/auto_scheme_module.c $(gen_dir)/s7_module.c $(gen_dir)/autoscheme.c 
+$(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/s7_module.c $(gen_dir)/program.c 
 	mkdir -p $(bin_dir)
-	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/auto_scheme_module.c $(gen_dir)/s7_module.c $(gen_dir)/autoscheme.c
+	cc $(strict_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/s7_module.c $(gen_dir)/program.c
 
 
-$(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
+$(gen_dir)/program.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c --link-modules="auto_scheme auto_scheme_environment s7"
+	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/program.c --link-modules="auto_scheme_environment s7"
 
 
 
@@ -59,18 +59,15 @@ $(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(mod_d
 	$(bin_dir)/autoscheme-prime -m $(mod_dir)/auto/scheme/environment/module.scm -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment_module.c
 
 
-$(gen_dir)/auto_scheme_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/auto/scheme/module.scm
-	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -m $(mod_dir)/auto/scheme/module.scm -n auto_scheme -o $(gen_dir)/auto_scheme_module.c
 
 
 
 
 
 
-$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/mod_auto_scheme_environment_procedures.c $(prime_dir)/mod_auto_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c
+$(bin_dir)/autoscheme-prime: $(obj_dir)/s7.o $(prime_dir)/auto_scheme_environment_module.c $(prime_dir)/s7_module.c $(prime_dir)/program.c
 	mkdir -p $(bin_dir)
-	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/mod_auto_scheme_environment_procedures.c $(prime_dir)/mod_auto_scheme_macros.c $(prime_dir)/mod_s7_library.c $(prime_dir)/autoscheme.c 
+	cc -I$(src_dir) -o $(bin_dir)/autoscheme-prime $(obj_dir)/s7.o $(prime_dir)/auto_scheme_environment_module.c $(prime_dir)/s7_module.c $(prime_dir)/program.c 
 
 
 

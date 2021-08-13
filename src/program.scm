@@ -6,7 +6,7 @@
 	(auto scheme base)
 	(auto scheme eval)
 	(auto scheme string)
-	(auto scheme args-fold)
+	(auto scheme args fold)
 	)
 
 

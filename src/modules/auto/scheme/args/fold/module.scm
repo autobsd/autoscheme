@@ -1,5 +1,5 @@
 ;; (srfi 37)
-(define-library (auto scheme args-fold)
+(define-library (auto scheme args fold)
   (export option option-names option-required-arg? option-optional-arg? option-processor args-fold)
 
   (begin

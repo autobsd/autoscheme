@@ -10,7 +10,8 @@
 (write "test message")(newline)
 
 (include "file1.scm")
-
+(newline)
+(display (include-string "../../version.txt"))(newline)
 
 ;; (import (auto scheme base))
 ;; (import (auto scheme write))

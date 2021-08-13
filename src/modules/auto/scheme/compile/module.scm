@@ -31,6 +31,19 @@
 		 (compile-expression sc (cons 'begin included-expressions) included-source quote-level)
 		 ))
 
+	      ((and (pair? expression) (equal? (car expression) 'include-string) (zero? quote-level)) 
+	       (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
+		      (included-string (with-input-from-file included-source 
+					 (lambda () 
+					   (let get-string((s (read-string 5)))
+					     (if (eof-object? s) 
+						 ""
+						 (string-append s (get-string (read-string 5)))))
+					   )))
+		      )
+		 (compile-expression sc included-string source quote-level)
+		 )) 
+
 	      ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 	      ((null? expression) (string-append "s7_nil(" sc ")"))
 	      ((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
@@ -65,31 +78,36 @@
 	  expressions)))
 
 
-    (define display-module
-      (lambda (name sources port)
+
+
+    (define compile-module-function
+      (lambda (name sources)
 	(let ((sc "s7")
 	      )
-	  (display (string-append (module-prototype name) "\n"
-				  "{\n"
-				  "s7_eval(" sc ",s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
-				  ) port)
+	  (string-append (module-prototype name) "\n"
+			 "{\n"
+			 "s7_eval(" sc ",s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
 
-	  (let display-expressions ((remainder sources)
+
+	  (let get-expressions ((remainder sources)
 				    )
-	    (cond ((null? remainder) (display (string-append "s7_nil(" sc ")" ) port))
+	    (cond ((null? remainder) (string-append "s7_nil(" sc ")" ))
 
-		  (else (display (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ",") port)
-			(display-expressions (cdr remainder))
-			(display ")" port)
-			)
+		  (else (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ","
+				       (get-expressions (cdr remainder))
+				       ")"
+			))
 		  )
 	    )
 
-	  (display (string-append "),env);\n"
-				  "return 0;" 
-				  "}\n"
-				  ) port)
-	  )))
+	  "),env);\n"
+	  "return 0;" 
+	  "}\n"
+	
+	  ))))
+
+
+
 
 
     (define compile-module 
@@ -106,20 +124,21 @@
 				   ))
 	       (declarations-template (string-append
 				       (module-prototype module-name) ";\n"))
+	       
+	       (module-function (compile-module-function module-name source-files))
+
 	       (output-port (open-output-file output-file))
 	       )
-	  (display includes-template output-port)
 
+	  (display includes-template output-port)
 	  (display declarations-template output-port)
-	  (display-module module-name source-files output-port)
-	  
+	  (display module-function output-port)
+
 	  (close-output-port output-port)
 	  )))
 
     (define compile-program 
       (lambda (source-files module-list output-file)
-
-	
 
 	(let* ((includes-template (string-append 
 				   "#define _Bool int\n"
@@ -152,32 +171,9 @@
 				       ))
 
 	       (functions-template (string-append
-				    "static s7_pointer command_line( s7_scheme *sc, s7_pointer args )\n"
-				    "{\n"
-				    "    if( !s7_is_null( sc, args ))\n"
-				    "	return s7_wrong_type_arg_error( sc, \"command-line\", 0, args, \"null\" );\n"
-				    "    else\n"
-				    "    {\n"
-				    "	s7_pointer arguments = s7_nil( sc );\n"
-				    "	int i;\n"
-				    "	for( i = auto_argc - 1; i >= 0; i-- )\n"
-				    "	{\n"
-				    "	    arguments = s7_cons( sc, s7_make_string( sc, auto_argv[i] ), arguments );\n"
-				    "	}\n"
-				    "	return arguments;\n"
-				    "    }\n"
-				    "}\n"
 
-				    "static s7_pointer current_directory( s7_scheme *sc, s7_pointer args )\n"
-				    "{\n"
-				    "    if( !s7_is_null( sc, args ))\n"
-				    "	return s7_wrong_type_arg_error( sc, \"current-directory\", 0, args, \"null\" );\n"
-				    "    {\n"
-				    "       char buff[FILENAME_MAX];\n"
-				    "       GetCurrentDir( buff, FILENAME_MAX );\n"
-				    "       return s7_make_string( sc, buff );\n"
-				    "    }\n"
-				    "}\n"
+				    (include-string "command-line.c")
+				    (include-string "current-directory.c")
 
 				    "s7_scheme *auto_init()\n"
 				    "{\n"
@@ -217,16 +213,17 @@
 				    "}\n"
 				    ))
 
+	       (module-function (compile-module-function "program" source-files))
+
 	       (output-file (if output-file output-file "program.c"))
 	       (output-port (open-output-file output-file))
-
 	       )
 
 	  (display includes-template output-port)
 	  (display declarations-template output-port)
 	  (display functions-template output-port)
-	  (display-module "program" source-files output-port)
-	  
+	  (display module-function output-port)
+
 	  (close-output-port output-port)
 
 	  )

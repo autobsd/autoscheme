@@ -44,7 +44,7 @@
 
 (define module-prototype
   (lambda (name)
-    (string-append "s7_pointer " "autoscheme_module__" name "( s7_scheme *s7 )")))
+    (string-append "int " "autoscheme_module__" name "( s7_scheme *s7, s7_pointer env )")))
 
 
 (define get-expressions-from-file
@@ -65,7 +65,7 @@
 	  )
       (display (string-append (module-prototype name) "\n"
 			      "{\n"
-			      "return(s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
+			      "s7_eval(" sc ",s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
 			      ) port)
 
       (let display-expressions ((remainder sources)
@@ -79,7 +79,8 @@
 	      )
 	)
 
-      (display (string-append "));\n"
+      (display (string-append "),env);\n"
+			      "return 0;" 
 			      "}\n"
 			      ) port)
       )))
@@ -193,13 +194,15 @@
 
 
 				(apply string-append (map (lambda (name)
-							    (string-append " s7_eval( s7, autoscheme_module__" name "( s7 ), mod_env );\n"))
+							    ;; (string-append " s7_eval( s7, autoscheme_module__" name "( s7 ), mod_env );\n"))
+							    (string-append " autoscheme_module__" name "( s7, mod_env );\n"))
 							  module-list))
 
 
 
 				;; "    s7_eval( s7, scheme_module( s7 ), s7_f( s7 ));\n"
-				"    s7_eval( s7, autoscheme_module__program( s7 ), mod_env );\n"
+				;; "    s7_eval( s7, autoscheme_module__program( s7 ), mod_env );\n"
+				"    autoscheme_module__program( s7, mod_env );\n"
 
 
 				"s7_gc_unprotect_at( s7, mod_env_loc );\n"

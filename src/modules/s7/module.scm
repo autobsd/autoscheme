@@ -15,7 +15,7 @@
 
 (define-library (s7)
 
-  (export + - * / < <= = > >=)                           
+  (export + - * / < <= = > >= read-string)                           
   (export caaaar)
   (export eval)
   (export acos)
@@ -27,7 +27,7 @@
   )
 
 
-(cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>=)
+(cutlet (rootlet) '+ '- '* '/ '< '<= '= '> '>= 'read-string)
 (cutlet (rootlet) 'caaaar)
 (cutlet (rootlet) 'eval)
 (cutlet (rootlet) 'acos)

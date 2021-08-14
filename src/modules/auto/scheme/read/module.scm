@@ -1,5 +1,5 @@
 ;; (scheme read)
 (define-library (auto scheme read)
   (export read)
-  (import (s7))
+  (import (only (s7) read))
   )

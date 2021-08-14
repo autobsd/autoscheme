@@ -3,7 +3,7 @@
 
   (export display write)
 
-  (import (s7))
+  (import (only (s7) display write))
 
   (begin
     (define s7_write write)

@@ -1,4 +1,4 @@
-(define-library (auto scheme args )
+(define-library (auto scheme args)
   (export args-usage)
 
   (begin

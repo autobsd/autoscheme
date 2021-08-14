@@ -1,5 +1,5 @@
 ;; (scheme eval)
 (define-library (auto scheme eval)
   (export eval)
-  (import (s7))
+  (import (only (s7) eval))
   )

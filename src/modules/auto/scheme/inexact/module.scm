@@ -1,5 +1,5 @@
 ;; (scheme inexact)
 (define-library (auto scheme inexact)
   (export acos)
-  (import (s7))
+  (import (only (s7) acos))
   )

@@ -2,7 +2,9 @@
   (export compile-module
 	  compile-program)
 
-  (import (auto scheme path))
+  (import (auto scheme path)
+	  (auto scheme base)
+	  )
 
   (begin
 
@@ -12,37 +14,40 @@
 	      (else (error "compile error - unknown number type: " num)))))
 
 
+
+    (define compile-time-macros
+      `((quote . ,(lambda (sc expression source quote-level)
+		    (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quote\")," (compile-expression sc (cdr expression) source -1) ")"))
+	       )
+
+	(include . ,(lambda (sc expression source quote-level)
+		      (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
+			     (included-expressions (get-expressions-from-file included-source))
+			     )
+			(compile-expression sc (cons 'begin included-expressions) included-source quote-level)
+			)))
+
+	(include-string . ,(lambda (sc expression source quote-level)
+			     (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
+				    (included-string (with-input-from-file included-source read-string))
+				    )
+			       (compile-expression sc included-string source quote-level)
+			       )))
+	))
+
+
+
     (define compile-expression
       (lambda (sc expression source quote-level)
-	(cond ((and (pair? expression) (equal? (car expression) 'quote) (zero? quote-level))
-	       (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quote\")," (compile-expression sc (cdr expression) source -1) ")"))
-
-	      ((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
+	(cond ((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
 	       (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quasiquote\")," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
 
 	      ((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
 	       (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"unquote\")," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
 
+	      ((and (zero? quote-level) (pair? expression) (assoc (car expression) compile-time-macros))
+	       ((cdr (assoc (car expression) compile-time-macros)) sc expression source quote-level))
 
-	      ((and (pair? expression) (equal? (car expression) 'include) (zero? quote-level)) 
-	       (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
-		      (included-expressions (get-expressions-from-file included-source))
-		      )
-		 (compile-expression sc (cons 'begin included-expressions) included-source quote-level)
-		 ))
-
-	      ((and (pair? expression) (equal? (car expression) 'include-string) (zero? quote-level)) 
-	       (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
-		      (included-string (with-input-from-file included-source 
-					 (lambda () 
-					   (let get-string((s (read-string 5)))
-					     (if (eof-object? s) 
-						 ""
-						 (string-append s (get-string (read-string 5)))))
-					   )))
-		      )
-		 (compile-expression sc included-string source quote-level)
-		 )) 
 
 	      ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 	      ((null? expression) (string-append "s7_nil(" sc ")"))

@@ -1,7 +1,25 @@
 ;; (scheme base)
 (define-library (auto scheme base)
-  (export + - * / < <= = > >=)
-  (import (s7))
+  (export + - * / < <= = > >= read-string)
+  (import (only (s7) + - * / < <= = > >= read-string))
+
+  (begin
+
+    (define read-string 
+      (let ((s7_read-string read-string))
+	(lambda args
+	  (let ((k (if (null? args) #f (car args)))
+		(rest (if (pair? args) (cdr args) '()))
+		)
+	    (if (not k)
+		(let ((s (apply s7_read-string (cons 64 rest))))
+		  (if (eof-object? s) 
+		      ""
+		      (string-append s (apply read-string (cons #f rest)))))
+		(apply s7_read-string args))
+	    ))))
+
+    )
   )
 
 

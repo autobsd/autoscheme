@@ -6,6 +6,8 @@
 (import (auto scheme write))
 ;; (import (except (auto scheme write) display))
 
+(foreign-initialization_ "printf( \"this is a foreign initialization\\n\" );\n")
+
 (display "test message")(newline)
 (write "test message")(newline)
 

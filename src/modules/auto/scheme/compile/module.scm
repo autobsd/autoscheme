@@ -14,6 +14,8 @@
 	      (else (error "compile error - unknown number type: " num)))))
 
 
+    (define *foreign-intializations* '()) 
+
 
     (define compile-time-macros
       `((quote . ,(lambda (sc expression source quote-level)
@@ -32,6 +34,13 @@
 				    (included-string (with-input-from-file included-source read-string))
 				    )
 			       (compile-expression sc included-string source quote-level)
+			       )))
+
+	(foreign-initialization_ . ,(lambda (sc expression source quote-level)
+			     (let* ((included-string (car expression))
+				    )
+			       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
+			       (compile-expression sc #<unspecified> source quote-level)
 			       )))
 	))
 
@@ -219,7 +228,7 @@
 				    ))
 
 	       (module-function (compile-module-function "program" source-files))
-
+	       
 	       (output-file (if output-file output-file "program.c"))
 	       (output-port (open-output-file output-file))
 	       )

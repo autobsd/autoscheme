@@ -14,7 +14,9 @@
 	      (else (error "compile error - unknown number type: " num)))))
 
 
-    (define *foreign-intializations* '()) 
+    (define *foreign-intializations* #<unspecified>) 
+    (define *foreign-definitions* #<unspecified>) 
+    (define *foreign-declartions* #<unspecified>) 
 
 
     (define compile-time-macros
@@ -36,12 +38,26 @@
 			       (compile-expression sc included-string source quote-level)
 			       )))
 
-	(foreign-initialization_ . ,(lambda (sc expression source quote-level)
-			     (let* ((included-string (car expression))
-				    )
-			       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
-			       (compile-expression sc #<unspecified> source quote-level)
-			       )))
+	(foreign-initialization . ,(lambda (sc expression source quote-level)
+				     (let* ((included-string (apply string-append (cdr expression)))
+					    )
+				       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
+				       (compile-expression sc #<unspecified> source quote-level)
+				       )))
+
+	(foreign-definition . ,(lambda (sc expression source quote-level)
+				 (let* ((included-string (apply string-append (cdr expression)))
+					)
+				   (set! *foreign-definitions* (cons included-string *foreign-definitions*))
+				   (compile-expression sc #<unspecified> source quote-level)
+				   )))
+
+	(foreign-declaration . ,(lambda (sc expression source quote-level)
+				  (let* ((included-string (apply string-append (cdr expression)))
+					 )
+				    (set! *foreign-declartions* (cons included-string *foreign-declartions*))
+				    (compile-expression sc #<unspecified> source quote-level)
+				    )))
 	))
 
 
@@ -96,29 +112,37 @@
 
     (define compile-module-function
       (lambda (name sources)
-	(let ((sc "s7")
-	      )
+	(let* ((sc "s7")
+	       (evaluated-expressions (string-append  "s7_eval(" sc ",s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
+						      (let get-expressions ((remainder sources)
+									    )
+							(cond ((null? remainder) (string-append "s7_nil(" sc ")" ))
+
+							      (else (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ","
+										   (get-expressions (cdr remainder))
+										   ")"
+										   ))
+							      )
+							)
+
+						      "),env);\n"))
+	       
+
+	       )
+
 	  (string-append (module-prototype name) "\n"
 			 "{\n"
-			 "s7_eval(" sc ",s7_cons(" sc ",s7_make_symbol(" sc ",\"begin\")," 
 
 
-	  (let get-expressions ((remainder sources)
-				    )
-	    (cond ((null? remainder) (string-append "s7_nil(" sc ")" ))
+			 (apply string-append *foreign-intializations*)
+			 
 
-		  (else (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ","
-				       (get-expressions (cdr remainder))
-				       ")"
-			))
-		  )
-	    )
+			 evaluated-expressions
 
-	  "),env);\n"
-	  "return 0;" 
-	  "}\n"
-	
-	  ))))
+			 "return 0;" 
+			 "}\n"
+			 
+			 ))))
 
 
 
@@ -126,9 +150,11 @@
 
     (define compile-module 
       (lambda (source-files module-name output-file)
-	(display "compiling module...")(newline)
-	(display "module-name:")(write module-name)(newline)
-	(display "output-file:")(write output-file)(newline)
+
+	(set! *foreign-intializations* '()) 
+	(set! *foreign-definitions* '()) 
+	(set! *foreign-declartions* '()) 
+
 	(let* ((module-name (or module-name "module"))
 	       (output-file (or output-file "module.c"))
 
@@ -146,6 +172,10 @@
 
 	  (display includes-template output-port)
 	  (display declarations-template output-port)
+
+	  (display (apply string-append *foreign-declartions*) output-port)
+	  (display (apply string-append *foreign-definitions*) output-port)
+
 	  (display module-function output-port)
 
 	  (close-output-port output-port)
@@ -153,6 +183,10 @@
 
     (define compile-program 
       (lambda (source-files module-list output-file)
+
+	(set! *foreign-intializations* '()) 
+	(set! *foreign-definitions* '()) 
+	(set! *foreign-declartions* '()) 
 
 	(let* ((includes-template (string-append 
 				   "#define _Bool int\n"
@@ -175,7 +209,6 @@
 				       "s7_pointer mod_env;\n"
 
 				       "s7_scheme *auto_init( void );\n"
-				       ;; (module-prototype "scheme") ";\n"
 				       
 				       (apply string-append (map (lambda (name)
 								   (string-append (module-prototype name) ";\n"))
@@ -186,9 +219,6 @@
 
 	       (functions-template (string-append
 
-				    (include-string "command-line.c")
-				    (include-string "current-directory.c")
-
 				    "s7_scheme *auto_init()\n"
 				    "{\n"
 				    "    s7_scheme *s7 = s7_init();\n"
@@ -196,8 +226,6 @@
 				    "mod_env = s7_inlet( s7, s7_f( s7 ));\n"
 				    "mod_env_loc = s7_gc_protect( s7, mod_env );\n"
 
-				    "    s7_define_function( s7, \"command-line\", command_line, 0, 0, false, \"(command-line) returns a list of command-line arguments\" );\n"
-				    "    s7_define_function( s7, \"current-directory\", current_directory, 0, 0, false, \"(current-directory) returns the current working directory\" );\n"
 				    "    return s7;\n"
 				    "}\n"
 
@@ -208,18 +236,11 @@
 				    "    auto_argc = argc;\n"
 				    "    auto_argv = argv;\n"
 
-
 				    (apply string-append (map (lambda (name)
-								;; (string-append " s7_eval( s7, autoscheme_module__" name "( s7 ), mod_env );\n"))
 								(string-append " autoscheme_module__" name "( s7, mod_env );\n"))
 							      module-list))
 
-
-
-				    ;; "    s7_eval( s7, scheme_module( s7 ), s7_f( s7 ));\n"
-				    ;; "    s7_eval( s7, autoscheme_module__program( s7 ), mod_env );\n"
 				    "    autoscheme_module__program( s7, mod_env );\n"
-
 
 				    "s7_gc_unprotect_at( s7, mod_env_loc );\n"
 
@@ -236,6 +257,10 @@
 	  (display includes-template output-port)
 	  (display declarations-template output-port)
 	  (display functions-template output-port)
+
+	  (display (apply string-append *foreign-declartions*) output-port)
+	  (display (apply string-append *foreign-definitions*) output-port)
+
 	  (display module-function output-port)
 
 	  (close-output-port output-port)
@@ -245,4 +270,4 @@
 	))
 
 
-))
+    ))

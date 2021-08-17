@@ -22,6 +22,7 @@ library_sources = \
 	$(mod_dir)/auto/scheme/write/module.scm \
 	$(mod_dir)/auto/scheme/string/module.scm \
 	$(mod_dir)/auto/scheme/args/fold/module.scm \
+	$(mod_dir)/auto/scheme/process/context/module.scm \
 	$(mod_dir)/auto/scheme/compile/module.scm \
 	$(mod_dir)/auto/scheme/interpret/module.scm \
 	$(mod_dir)/auto/scheme/repl/module.scm \

@@ -6,14 +6,15 @@
 (import (auto scheme write))
 ;; (import (except (auto scheme write) display))
 
-(foreign-initialization_ "printf( \"this is a foreign initialization\\n\" );\n")
 
 (display "test message")(newline)
-(write "test message")(newline)
 
 (include "file1.scm")
 (newline)
 (display (include-string "../../version.txt"))(newline)
+
+(display (command-line))(newline)
+(display (current-directory))(newline)
 
 ;; (import (auto scheme base))
 ;; (import (auto scheme write))

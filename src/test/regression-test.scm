@@ -13,6 +13,7 @@
 (newline)
 (display (include-string "../../version.txt"))(newline)
 
+(import (auto scheme process context))
 (display (command-line))(newline)
 (display (current-directory))(newline)
 

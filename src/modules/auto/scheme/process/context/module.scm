@@ -39,3 +39,8 @@
 		    "}\n")
 
 
+(define-library (auto scheme process context)
+  (export command-line current-directory)
+  )
+
+(cutlet (rootlet) 'command-line 'current-directory)

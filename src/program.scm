@@ -9,6 +9,7 @@
 	(auto scheme args fold)
 	(auto scheme args)
 
+	(auto scheme process context)
 	(auto scheme compile)
 	(auto scheme interpret)
 	)

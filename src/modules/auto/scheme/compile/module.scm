@@ -20,76 +20,86 @@
     (define *foreign-declartions* #<unspecified>) 
 
 
-    (define compile-time-macros
-      `((quote . ,(lambda (sc expression source quote-level)
-		    (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quote\")," (compile-expression sc (cdr expression) source -1) ")"))
-	       )
-
-	(include . ,(lambda (sc expression source quote-level)
-		      (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
-			     (included-expressions (get-expressions-from-file included-source))
-			     )
-			(compile-expression sc (cons 'begin included-expressions) included-source quote-level)
-			)))
-
-	(include-string . ,(lambda (sc expression source quote-level)
-			     (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
-				    (included-string (with-input-from-file included-source read-string))
-				    )
-			       (compile-expression sc included-string source quote-level)
-			       )))
-
-	(foreign-initialization . ,(lambda (sc expression source quote-level)
-				     (let* ((included-string (apply string-append (cdr expression)))
-					    )
-				       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
-				       (compile-expression sc #<unspecified> source quote-level)
-				       )))
-
-	(foreign-definition . ,(lambda (sc expression source quote-level)
-				 (let* ((included-string (apply string-append (cdr expression)))
-					)
-				   (set! *foreign-definitions* (cons included-string *foreign-definitions*))
-				   (compile-expression sc #<unspecified> source quote-level)
-				   )))
-
-	(foreign-declaration . ,(lambda (sc expression source quote-level)
-				  (let* ((included-string (apply string-append (cdr expression)))
-					 )
-				    (set! *foreign-declartions* (cons included-string *foreign-declartions*))
-				    (compile-expression sc #<unspecified> source quote-level)
-				    )))
-	))
-
 
 
     (define compile-expression
       (lambda (sc expression source quote-level)
-	(cond ((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
-	       (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quasiquote\")," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
-
-	      ((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
-	       (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"unquote\")," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
-
-	      ((and (zero? quote-level) (pair? expression) (assoc (car expression) compile-time-macros))
-	       ((cdr (assoc (car expression) compile-time-macros)) sc expression source quote-level))
 
 
-	      ((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
-	      ((null? expression) (string-append "s7_nil(" sc ")"))
-	      ((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
-	      ((char? expression) (string-append "s7_make_character(" sc "," (number->string (char->integer expression)) ")"))
-	      ((symbol? expression) (string-append "s7_make_symbol(" sc ",\"" (symbol->string expression) "\")"))
-	      ((string? expression) (string-append "s7_make_string(" sc "," (object->string expression) ")" ))
+	(letrec ((compile-time-macros `((include . ,(lambda (form)
+						      (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
+							     (included-expressions (get-expressions-from-file included-source))
+							     )
+							(cons 'begin included-expressions)
+							)))
 
-	      ((number? expression) (compile-number sc expression))
+					(include-string . ,(lambda (form)
+							     (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
+								    (included-string (with-input-from-file included-source read-string))
+								    )
+							       included-string
+							       )))
 
-	      ((equal? expression #<undefined>) (string-append "s7_undefined(" sc ")"))
-	      ((equal? expression #<unspecified>) (string-append "s7_unspecified(" sc ")"))
+					(foreign-declaration . ,(lambda (form)
+								  (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+									 )
+								    (set! *foreign-declartions* (cons included-string *foreign-declartions*))
+								    #<unspecified>
+								    )))
+
+					(foreign-definition . ,(lambda (form)
+								 (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+									)
+								   (set! *foreign-definitions* (cons included-string *foreign-definitions*))
+								   #<unspecified> 
+								   )))
+
+					(foreign-initialization . ,(lambda (form)
+								     (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+									    )
+								       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
+								       #<unspecified> 
+								       )))
+					))
+		 (compile-time-macro? (lambda (form)
+					(and (pair? form) (symbol? (car form)) (assoc (car form) compile-time-macros))))
+
+		 (expand-compile-time-macro (lambda (form)
+					      (if (compile-time-macro? form)
+						  ((cdr (assoc (car form) compile-time-macros)) form)
+						  form)))
+		 
+		 )
 
 
-	      (else (error "compile error - unknown expression type: " expression))
-	      )))
+	  (cond ((and (pair? expression) (equal? (car expression) 'quote) (not (negative? quote-level)))
+		 (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quote\")," (compile-expression sc (cdr expression) source -1) ")"))
+
+		((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
+		 (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"quasiquote\")," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+
+		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
+		 (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"unquote\")," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
+
+		((and (zero? quote-level) (compile-time-macro? expression))
+		 (compile-expression sc (expand-compile-time-macro expression) source quote-level)
+		 )
+
+		((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
+		((null? expression) (string-append "s7_nil(" sc ")"))
+		((boolean? expression) (if expression (string-append "s7_t(" sc ")") (string-append "s7_f(" sc ")")))
+		((char? expression) (string-append "s7_make_character(" sc "," (number->string (char->integer expression)) ")"))
+		((symbol? expression) (string-append "s7_make_symbol(" sc ",\"" (symbol->string expression) "\")"))
+		((string? expression) (string-append "s7_make_string(" sc "," (object->string expression) ")" ))
+
+		((number? expression) (compile-number sc expression))
+
+		((equal? expression #<undefined>) (string-append "s7_undefined(" sc ")"))
+		((equal? expression #<unspecified>) (string-append "s7_unspecified(" sc ")"))
+
+
+		(else (error "compile error - unknown expression type: " expression))
+		))))
 
 
     (define module-prototype

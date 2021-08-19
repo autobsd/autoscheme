@@ -51,7 +51,7 @@
 
 	   (import-library
 	    (lambda (set)
-	      `((current-environment) (symbol ,(object->string set)))))
+	      `(environment-ref (current-environment) (symbol ,(object->string set)))))
 
 	   (import-only
 	    (lambda (set . identifiers)

@@ -1,4 +1,4 @@
-;; (set! (*s7* 'print-length) 1024)
+(set! (*s7* 'print-length) 1024)
 
 (define s7_object->string object->string)
 (define object->string

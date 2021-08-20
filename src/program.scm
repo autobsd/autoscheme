@@ -16,7 +16,6 @@
 
 
 
-
 (define program-version (include "../version.txt"))
 
 (define display-version
@@ -127,7 +126,7 @@
 
   (cond (compile-selected (compile-program source-files module-list output-file))
 	(compile-module-selected (compile-module source-files module-name output-file))
-	(interpret-selected (interpret-program source-files))
+	(interpret-selected (interpret source-files))
 	(else (help-processor))
 	)
   

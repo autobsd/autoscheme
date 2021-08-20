@@ -1,6 +1,7 @@
 ;; (scheme base)
 (define-library (auto scheme base)
   (export + - * / < <= = > >= read-string)
+  (export vector-for-each)
   (import (only (s7) + - * / < <= = > >= read-string))
 
   (begin
@@ -18,6 +19,19 @@
 		      (string-append s (apply read-string (cons #f rest)))))
 		(apply s7_read-string args))
 	    ))))
+
+
+    (define vector-for-each
+      (lambda (proc . vectors)
+	(let* ((min-length (apply min (map length vectors)))
+	       )
+	  (do ((i 0 (+ i 1)))
+	      ((= i min-length) i)
+	    (apply proc (map (lambda (v)
+			       (vector-ref v i))
+			     vectors))
+	    ))
+	))
 
     )
   )

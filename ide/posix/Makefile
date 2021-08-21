@@ -11,6 +11,12 @@ install_dir = /usr/local/bin
 
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
 
+module_deps = \
+	$(mod_dir)/auto/scheme/environment/library.scm \
+	$(mod_dir)/auto/scheme/environment/macros.scm \
+	$(mod_dir)/auto/scheme/environment/procedures.scm
+
+
 library_sources = \
 	$(mod_dir)/auto/scheme/base/module.scm \
 	$(mod_dir)/auto/scheme/eval/module.scm \
@@ -55,7 +61,7 @@ $(gen_dir)/s7_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/s7/module.scm
 
 
 
-$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/auto/scheme/environment/module.scm
+$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/auto/scheme/environment/module.scm $(module_deps)
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime -m $(mod_dir)/auto/scheme/environment/module.scm -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment_module.c
 

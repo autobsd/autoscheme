@@ -9,40 +9,30 @@
 
 	(let ((env (make-environment)))
 
-
 	  (environment-import! env 
 			       (list (symbol->value (symbol (object->string '(auto scheme environment))))))
 
-	  ;; (for-each (lambda (l)
-	  ;; 	      (environment-update! env
-	  ;; 				   (symbol (object->string l))
-	  ;; 				   (symbol->value (symbol (object->string l)))))
-	  ;; 	    '((auto scheme write))
-	  ;; 	    )
+	  (vector-for-each (lambda (sym) 
 
-	  (environment-update! env (symbol (object->string '(auto scheme write))) (symbol->value (symbol (object->string '(auto scheme write)))))
-
-	  (display "---->: ")(write (let->list (symbol->value (symbol (object->string '(auto scheme repl))))))(newline)
-	  (exit)
-	  ;; (vector-for-each (lambda (sym) 
-
-	  ;; 		     (cond ((equal? ((symbol->string sym) 0) #\()
-	  ;; 			    (display sym)(newline)
+	  		     (cond ((equal? ((symbol->string sym) 0) #\()
+	  			    ;; (display sym)(newline)
 				    
-	  ;; 			    ;; (environment-update! env sym (symbol->value sym))
+	  			    (environment-update! env sym (symbol->value sym))
 				    
-	  ;; 			    )
-	  ;; 			   )
-	  ;; 		     )
-	  ;; 		   (symbol-table))
+	  			    )
+	  			   )
+	  		     )
+	  		   (symbol-table))
 
 
-	  (display "env: ")(write (let->list env))(newline)
+	  
 
+	  ;; (display "env: ")(write (map car (let->list env)))(newline)
 
 	  (for-each (lambda (file)
-		      (load file env))
-		    source-files)
+	  	      (load file env)
+		      )
+	  	    source-files)
 	  
 	  )
 

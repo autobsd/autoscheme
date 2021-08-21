@@ -24,10 +24,10 @@
 
 (define environment-only
   (lambda (environment symbol-list)
-    (apply make-environment (cons environment (map (lambda (symbol)
-						     (cons symbol (environment symbol))
-						     )
-						   symbol-list)))))
+    (apply make-environment (map (lambda (symbol)
+				   (cons symbol (environment symbol))
+				   )
+				 symbol-list))))
 
 
 (define environment-except

@@ -3,7 +3,8 @@
 ;; (display-xml '((html (body (h1 "headline")))))(newline)
 
 ;; (import (rename (auto scheme write) (display my-display) (write my-write)))
-(import (auto scheme write))
+(import (auto scheme base)
+	(auto scheme write))
 ;; (import (except (auto scheme write) display))
 
 

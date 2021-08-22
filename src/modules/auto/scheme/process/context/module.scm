@@ -5,7 +5,12 @@
 
 
 (define-library (auto scheme process context)
+  (import (only (s7) exit emergency-exit))
+  (export exit emergency-exit)
+
   (export command-line current-directory)
   )
 
-(cutlet (rootlet) 'command-line 'current-directory)
+(let ()
+  (import (only (s7) rootlet))
+  (environment-remove! (rootlet) 'command-line 'current-directory))

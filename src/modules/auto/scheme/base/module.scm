@@ -1,8 +1,24 @@
 ;; (scheme base)
 (define-library (auto scheme base)
-  (export + - * / < <= = > >= read-string)
+  (import (only (s7) 
+          + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? emergency-exit exit for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string? substring symbol->string symbol? values vector-ref zero?))
+
+  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? emergency-exit exit for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string? substring symbol->string symbol? values vector-ref zero?)
+
+  (export (rename _begin begin)
+	  (rename _list list) 
+	  (rename _if if)
+	  (rename _cond cond)
+	  (rename _else else)
+	  (rename _and and)
+	  
+	  )
+
+  
+
+
   (export vector-for-each)
-  (import (only (s7) + - * / < <= = > >= read-string))
+
 
   (begin
 

@@ -1,6 +1,8 @@
 ;; (srfi 13)
 (define-library (auto scheme string)
 
+  (import (only (s7) list->string string->list))
+
   (export string-join
 	  string-prefix? 
 	  string-map 

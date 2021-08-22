@@ -1,21 +1,22 @@
 ;; (srfi 37)
 (define-library (auto scheme args fold)
+  
   (export option option-names option-required-arg? option-optional-arg? option-processor args-fold)
 
   (begin
 
     (define option 
       (lambda (names required-arg? optional-arg? processor)
-	(inlet 'names names
-	       'required-arg? required-arg?
-	       'optional-arg? optional-arg?
-	       'processor processor)
+	(make-environment 'names names
+			  'required-arg? required-arg?
+			  'optional-arg? optional-arg?
+			  'processor processor)
 	))
 
-    (define option-names (lambda (option) (let-ref option 'names)))
-    (define option-required-arg? (lambda (option) (let-ref option 'required-arg?)))
-    (define option-optional-arg? (lambda (option) (let-ref option 'optional-arg?)))
-    (define option-processor (lambda (option) (let-ref option 'processor)))
+    (define option-names (lambda (option) (environment-ref option 'names)))
+    (define option-required-arg? (lambda (option) (environment-ref option 'required-arg?)))
+    (define option-optional-arg? (lambda (option) (environment-ref option 'optional-arg?)))
+    (define option-processor (lambda (option) (environment-ref option 'processor)))
 
     (define args-fold-remainder
       (lambda (remainder options unrecognized-option-proc operand-proc end-of-options . seeds)

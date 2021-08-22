@@ -1,4 +1,6 @@
 (define-library (auto scheme compile)
+  (import (only (s7) object->string))
+
   (export compile-module
 	  compile-program)
 

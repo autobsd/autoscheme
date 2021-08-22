@@ -1,19 +1,22 @@
-(import (auto scheme load)
+(import (auto scheme base)
+	(auto scheme load)
 	(auto scheme read)
 	(auto scheme repl)
 	(auto scheme cxr)
 	(auto scheme write)
-	(auto scheme base)
 	(auto scheme eval)
 	(auto scheme string)
+	(auto scheme file)
 	(auto scheme args fold)
 	(auto scheme args)
 
 	(auto scheme process context)
 	(auto scheme compile)
 	(auto scheme interpret)
-	)
 
+
+	
+	)
 
 
 (define program-version (include "../version.txt"))

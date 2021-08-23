@@ -1,7 +1,6 @@
 (define-library (auto scheme interpret)
-
-  (export interpret)
   
+  (export interpret)
   (begin
     
     (define interpret
@@ -10,32 +9,30 @@
 	(let ((env (make-environment)))
 
 	  (environment-import! env 
-			       (list (symbol->value (symbol (object->string '(auto scheme environment))))))
+			       (list (environment-ref (current-environment) (symbol "(auto scheme environment)"))))
 
-	  (vector-for-each (lambda (sym) 
+	  (environment-update! env '_list _list)
 
-	  		     (cond ((equal? ((symbol->string sym) 0) #\()
-	  			    ;; (display sym)(newline)
-				    
-	  			    (environment-update! env sym (symbol->value sym))
-				    
-	  			    )
-	  			   )
+	  (for-each (lambda (sym) 
+
+	  	      (cond ((equal? ((symbol->string sym) 0) #\()
+	  		     ;; (display sym)(newline)
+			     
+	  		     (environment-update! env sym (environment-ref (current-environment) sym))
+			     
 	  		     )
-	  		   (symbol-table))
+	  		    )
+	  	      )
+	  	    (environment-defined (current-environment)))
 
-
-	  
-
-	  ;; (display "env: ")(write (map car (let->list env)))(newline)
+	  ;; (display "env: ")(write (environment-defined env))(newline)
 
 	  (for-each (lambda (file)
 	  	      (load file env)
-		      )
+	  	      )
 	  	    source-files)
 	  
 	  )
-
 	))
     ))
 

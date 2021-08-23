@@ -3,14 +3,30 @@
 (define environment-ref let-ref)
 (define environment-remove! cutlet)
 
+;; (define environment-defined
+;;   (lambda (environment)
+;;     (let get-defined((remainder (let->list environment))
+;; 		     )
+;;       (cond ((null? remainder) '())
+;; 	    ((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
+;; 	    (else (cons (caar remainder) (get-defined (cdr remainder))))
+;; 	    ))))
+
 (define environment-defined
   (lambda (environment)
-    (let get-defined((remainder (let->list environment))
-		     )
-      (cond ((null? remainder) '())
-	    ((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
-	    (else (cons (caar remainder) (get-defined (cdr remainder))))
-	    ))))
+    (let ((bindings (let get-bindings((env environment))
+		      (let ((env-bindings (let->list env)))
+			(cond ((equal? env (rootlet)) env-bindings)
+			      (else (append env-bindings (get-bindings (outlet env)))))))
+		    ))
+
+      (let get-defined((remainder bindings)
+		       )
+	(cond ((null? remainder) '())
+	      ((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
+	      (else (cons (caar remainder) (get-defined (cdr remainder))))
+	      )))))
+
 
 (define environment-defined? 
   (lambda (environment symbol)

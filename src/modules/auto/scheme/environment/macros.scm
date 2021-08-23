@@ -55,15 +55,15 @@
 
 	   (import-only
 	    (lambda (set . identifiers)
-	      `(environment-only ,(import-bindings (_list (car set))) '(,@identifiers))))
+	      `(environment-only ,(import-bindings set) '(,@identifiers))))
 
 	   (import-except
 	    (lambda (set . identifiers)
-	      `(environment-except ,(import-bindings (_list (car set))) '(,@identifiers))))
+	      `(environment-except ,(import-bindings set) '(,@identifiers))))
 
 	   (import-prefix
 	    (lambda (set identifier)
-	      `(environment-prefix ,(import-bindings (_list (car set))) ',identifier)))
+	      `(environment-prefix ,(import-bindings set) ',identifier)))
 
 	   (import-rename
 	    (lambda (set . rename-list)

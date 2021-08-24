@@ -3,15 +3,6 @@
 (define environment-ref let-ref)
 (define environment-remove! cutlet)
 
-;; (define environment-defined
-;;   (lambda (environment)
-;;     (let get-defined((remainder (let->list environment))
-;; 		     )
-;;       (cond ((null? remainder) '())
-;; 	    ((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
-;; 	    (else (cons (caar remainder) (get-defined (cdr remainder))))
-;; 	    ))))
-
 (define environment-defined
   (lambda (environment)
     (let ((bindings (let get-bindings((env environment))
@@ -28,48 +19,53 @@
 	      )))))
 
 
+
 (define environment-defined? 
   (lambda (environment symbol)
     (not (equal? (environment-ref environment symbol) #<undefined>))))
+
+
 
 (define environment-update! 
   (lambda (environment symbol val)
     (varlet environment symbol val)))
 
 
+
 (define environment-import! 
   (let ((_for-each for-each))
-    (lambda (target environment-list)
+    (lambda (target . environments)
       (_for-each (lambda (e)
 		   (_for-each (lambda (binding)
 				(environment-update! target (car binding) (cdr binding))
 				)
 			      (let->list e))
 		   )
-		 environment-list))))
+		 environments))))
+
 
 
 (define environment-only
-  (lambda (environment symbol-list)
+  (lambda (environment . symbols)
     (apply make-environment (map (lambda (symbol)
 				   (cons symbol (environment symbol))
 				   )
-				 symbol-list))))
+				 symbols))))
+
 
 
 (define environment-except
   (let ((_for-each for-each))
-    (lambda (environment symbol-list)
+    (lambda (environment . symbols)
       (let ((target (make-environment))
 	    (bindings (let->list environment))
 	    )
 	(_for-each (lambda (binding)
-		     (if (not (member (car binding) symbol-list))
+		     (if (not (member (car binding) symbols))
 			 (environment-update! target (car binding) (cdr binding)))
 		     )
 		   bindings)
 	target))))
-
 
 
 
@@ -90,7 +86,7 @@
 
 (define environment-rename
   (let ((_for-each for-each))
-    (lambda (environment association-list)
+    (lambda (environment . association-list)
       (let ((target (make-environment))
 	    (bindings (let->list environment))
 	    )

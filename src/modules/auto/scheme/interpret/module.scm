@@ -9,9 +9,9 @@
 	(let ((env (make-environment)))
 
 	  (environment-import! env 
-			       (list (environment-ref (current-environment) (symbol "(auto scheme environment)"))))
+			       (environment-ref (current-environment) (symbol "(auto scheme environment)")))
 
-	  (environment-update! env '_list _list)
+	  ;; (environment-update! env '_list _list)
 
 	  (for-each (lambda (sym) 
 

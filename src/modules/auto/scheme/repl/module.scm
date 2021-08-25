@@ -1,21 +1,40 @@
-;; (scheme repl)
 (define-library (auto scheme repl)
+
   (export interaction-environment repl)
-  (import (s7))
+
+  (import (only (s7) catch))
+
   (begin 
+    
     (define interaction-environment
       (lambda ()
-	  (let ((env (inlet 'import import
-				  
-			    (symbol (object->string '(s7)))
-			    (symbol->value (symbol (object->string '(s7))))
+	(let ((env (make-environment)))
 
-			    )
-		     )
-		)
-	    env
-	    )
-	  ))
+	  (for-each (lambda (sym) 
+
+	  	      (cond ((equal? ((symbol->string sym) 0) #\()
+			     
+	  		     (environment-update! env sym (environment-ref (current-environment) sym))
+			     
+	  		     )
+	  		    )
+	  	      )
+	  	    (environment-defined (current-environment)))
+
+	  (for-each (lambda (sym) 
+		      (let ((sym-str (symbol->string sym)))
+
+			(cond ((and (char=? (sym-str 0) #\() (not (string=? sym-str "(s7)")))
+
+			       (environment-import! env 
+						    (environment-ref (current-environment) sym))
+			       )
+			      )
+			))
+	  	    (environment-defined env))
+	  env)
+	))
+
 
     (define repl 
       (lambda (env)

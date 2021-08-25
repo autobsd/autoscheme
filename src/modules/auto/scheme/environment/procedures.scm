@@ -4,19 +4,20 @@
 (define environment-remove! cutlet)
 
 (define environment-defined
-  (lambda (environment)
-    (let ((bindings (let get-bindings((env environment))
-		      (let ((env-bindings (let->list env)))
-			(cond ((equal? env (rootlet)) env-bindings)
-			      (else (append env-bindings (get-bindings (outlet env)))))))
-		    ))
+  (let ((cond cond))
+    (lambda (environment)
+      (let ((bindings (let get-bindings((env environment))
+			(let ((env-bindings (let->list env)))
+			  (cond ((equal? env (rootlet)) env-bindings)
+				(else (append env-bindings (get-bindings (outlet env)))))))
+		      ))
 
-      (let get-defined((remainder bindings)
-		       )
-	(cond ((null? remainder) '())
-	      ((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
-	      (else (cons (caar remainder) (get-defined (cdr remainder))))
-	      )))))
+	(let get-defined((remainder bindings)
+			 )
+	  (cond ((null? remainder) '())
+		((equal? (cdar remainder) #<undefined>) (get-defined (cdr remainder)))
+		(else (cons (caar remainder) (get-defined (cdr remainder))))
+		))))))
 
 
 

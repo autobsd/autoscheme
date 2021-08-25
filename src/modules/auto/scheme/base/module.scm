@@ -1,9 +1,18 @@
 ;; (scheme base)
 (define-library (auto scheme base)
   (import (only (s7) 
-          + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? emergency-exit exit for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string? substring symbol->string symbol? values vector-ref zero?))
+          + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
 
-  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? emergency-exit exit for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string? substring symbol->string symbol? values vector-ref zero?)
+  (import (only (s7) 
+		_begin
+		_list
+		_if
+		_cond
+		_else
+		_and
+		))
+
+  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?)
 
   (export (rename _begin begin)
 	  (rename _list list) 

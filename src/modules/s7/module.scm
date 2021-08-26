@@ -56,6 +56,9 @@
 				   ))
 
 (define prime-identifiers '(list-values 
+			    apply-values
+rootlet
+outlet
 			    symbol
 			    ;; begin
 			    ))

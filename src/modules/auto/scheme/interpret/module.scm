@@ -1,5 +1,6 @@
 (define-library (auto scheme interpret)
   
+  (import (only (auto scheme path) path-make-absolute))
   (export interpretive-environment interpret)
 
   (begin
@@ -29,8 +30,8 @@
     (define interpret
       (lambda (source-files)
 
-
 	(for-each (lambda (file)
+		    (set! *source-path* (path-make-absolute file))
 		    (load file (interpretive-environment))
 		    )
 		  source-files)

@@ -29,11 +29,12 @@
 
 
 	(letrec ((compile-time-macros `((include . ,(lambda (form)
-						      (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
-							     (included-expressions (get-expressions-from-file included-source))
-							     )
-							(cons 'begin included-expressions)
-							)))
+						      (if (null? (cdr form)) form
+							  (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
+								 (included-expressions (with-input-from-file included-source read-list))
+								 )
+							    (cons 'begin included-expressions)
+							    ))))
 
 					(include-string . ,(lambda (form)
 							     (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
@@ -84,8 +85,10 @@
 		 (string-append "s7_cons(" sc ",s7_make_symbol(" sc ",\"unquote\")," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
 
 		((and (zero? quote-level) (compile-time-macro? expression))
-		 (compile-expression sc (expand-compile-time-macro expression) source quote-level)
-		 )
+		 (let* ((expanded-expression (expand-compile-time-macro expression))
+			(_quote-level (if (equal? expanded-expression expression) -1 quote-level)))
+		   (compile-expression sc expanded-expression source _quote-level)
+		 ))
 
 		((pair? expression) (string-append "s7_cons(" sc "," (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 		((null? expression) (string-append "s7_nil(" sc ")"))
@@ -109,19 +112,6 @@
 	(string-append "int " "autoscheme_module__" name "( s7_scheme *s7, s7_pointer env )")))
 
 
-    (define get-expressions-from-file
-      (lambda (input-file)
-	(let* ((input-port (open-input-file input-file))
-	       (expressions (reverse (let read-expressions ((expressions '()))
-				       (let ((next-expression (read input-port)))
-					 (if (eof-object? next-expression) expressions
-					     (read-expressions (cons next-expression expressions)))))))
-	       )
-	  (close-input-port input-port)
-	  expressions)))
-
-
-
 
     (define compile-module-function
       (lambda (name sources)
@@ -131,7 +121,7 @@
 									    )
 							(cond ((null? remainder) (string-append "s7_nil(" sc ")" ))
 
-							      (else (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (get-expressions-from-file (car remainder))) (path-make-absolute (car remainder)) 0) ","
+							      (else (string-append "s7_cons(" sc "," (compile-expression sc (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ","
 										   (get-expressions (cdr remainder))
 										   ")"
 										   ))

@@ -1,7 +1,7 @@
 ;; (scheme base)
 (define-library (auto scheme base)
   (import (only (s7) 
-          + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
+		+ - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
 
   (import (only (s7) 
 		_begin
@@ -10,9 +10,11 @@
 		_cond
 		_else
 		_and
+		rootlet
 		))
 
-  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?)
+
+  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?)
 
   (export (rename _begin begin)
 	  (rename _list list) 
@@ -26,7 +28,9 @@
   
 
 
-  (export vector-for-each)
+  (export vector-for-each
+	  (rename _include include)
+	  )
 
 
   (begin
@@ -58,69 +62,38 @@
 	    ))
 	))
 
+
+    (define _include 
+      (begin 
+	(environment-update! (rootlet) '*source-path* #f)
+
+	(macro files
+	  (import (auto scheme path))
+	  (display "including files: ")(write files)(newline)
+	  (let* ((prev_*source-path* *source-path*)
+
+		 (included-source (path-make-absolute (car files) (path-directory *source-path*)))
+		 (included-expressions (with-input-from-file included-source read-list))
+		 )
+	    
+	    ;; (cons 'begin included-expressions)
+	    
+
+	    `(dynamic-wind 
+		 (lambda () (environment-update! (rootlet) '*source-path* ,included-source)
+		    (display "inside before")(newline))
+
+		 (lambda () (with-let (outlet (current-environment)) ,@included-expressions))
+
+		 (lambda () (environment-update! (rootlet) '*source-path* ,prev_*source-path*)
+		    (display "inside after")(newline))
+	       )
+
+
+	    )
+	  )
+	)
+      )
     )
+
   )
-
-
-
-;; (varlet *source* 'directory
-;; 	    (lambda ()
-
-;; 	      (let ((pos -1)
-;; 		    )
-;; 		(do ((len (length (let-ref *source* 'path)))
-;; 		     (i 0 (+ i 1)))
-;; 		    ((= i len))
-;; 		  (if (char=? ((let-ref *source* 'path) i) #\/)
-;; 		      (set! pos i)))
-;; 		(if (positive? pos)
-;; 		    (let ((directory-name (substring (let-ref *source* 'path) 0 pos)))
-;; 		      directory-name)))))
-
-;; (varlet *source* 'absolute?
-;; 	    (lambda (path)
-;; 	      (char=? (path 0) #\/)))
-
-
-;; (varlet *source* 'make-absolute
-;; 	    (lambda (path)
-;; 	      (if ((let-ref *source* 'absolute?) path) path
-;; 		  (string-append ((let-ref *source* 'directory)) "/" path))))
-
-;; (varlet *source* 'previous #<undefined> 'value #<undefined> )
-
-;; (define-macro (include . filenames)
-;;   (let ()
-;; 	(cons 'begin (map (lambda (filename)
-;; 			    `(begin (let-set! *source* 'previous (let-ref *source* 'path))
-;; 				    (let-set! *source* 'path ,((let-ref *source* 'make-absolute) filename))
-;; 				    (let-set! *source* 'value (load ,(string-append ((let-ref *source* 'directory)) "/" filename)))
-;; 				    (let-set! *source* 'path (let-ref *source* 'pevious))
-;; 				    (let-ref *source* 'value)))
-
-;; 			  filenames)
-;; 	      )))
-
-
-
-;; (define expand
-;;   (lambda (expression env)
-;; 	(cond ((not (pair? expression)) expression)
-;; 	      (else (varlet env 'expression expression)
-;; 		    (with-let env (let* ((first (car expression))
-;; 					 (expanded-first (cond ((not (pair? first)) first)
-;; 							       ((and (equal? (car first) 'define-macro)) (eval first) #<unspecified>)
-;; 							       ((and (symbol? (car first))(macro? (symbol->value (car first)))) (expand (apply macroexpand (list first)) (sublet (curlet))))
-;; 							       (else (cons (expand (car first) (sublet (curlet)))
-;; 									   (expand (cdr first) (sublet (curlet)))))))
-;; 					 )
-;; 				    (cons expanded-first
-;; 					  (expand (cdr expression) (sublet (curlet)))
-;; 					  ))))))
-;;   )
-
-
-
-
-
-

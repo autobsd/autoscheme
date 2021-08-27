@@ -6,3 +6,4 @@ AutoScheme is a cross-platform R7RS compliant wrapper for the 's7' Scheme implem
 - an interactive REPL
 - a command-line shell
 - extensions to the R7RS standard
+- multithreading

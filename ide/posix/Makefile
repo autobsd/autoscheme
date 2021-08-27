@@ -19,6 +19,7 @@ module_deps = \
 
 
 library_sources = \
+	$(mod_dir)/auto/scheme/thread/module.scm \
 	$(mod_dir)/auto/scheme/base/module.scm \
 	$(mod_dir)/auto/scheme/eval/module.scm \
 	$(mod_dir)/auto/scheme/load/module.scm \

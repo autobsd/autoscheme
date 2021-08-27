@@ -1,7 +1,8 @@
-;; (scheme base)
 (define-library (auto scheme base)
-  (import (only (s7) 
-		+ - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
+  (import (only (s7) + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length make-string map member min negative? newline not null? number? number->string pair? positive? read-string reverse string string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
+
+  (export            + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length make-string map member min negative? newline not null? number? number->string pair? positive? read-string reverse string string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?)
+
 
   (import (only (s7) 
 		_begin
@@ -12,9 +13,6 @@
 		_and
 		rootlet
 		))
-
-
-  (export + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? for-each integer? length map member min negative? newline not null? number? number->string pair? positive? read-string reverse string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?)
 
   (export (rename _begin begin)
 	  (rename _list list) 
@@ -43,7 +41,7 @@
 		)
 	    (if (not k)
 		(let ((s (apply s7_read-string (cons 64 rest))))
-		  (if (eof-object? s) 
+		  (if (or (eof-object? s) (zero? (string-length s)))
 		      ""
 		      (string-append s (apply read-string (cons #f rest)))))
 		(apply s7_read-string args))

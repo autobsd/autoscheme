@@ -13,9 +13,9 @@ strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototype
 compile_options = -fbracket-depth=10000 $(strict_options) 
 
 module_deps = \
-	$(mod_dir)/auto/scheme/environment/library.scm \
-	$(mod_dir)/auto/scheme/environment/macros.scm \
-	$(mod_dir)/auto/scheme/environment/procedures.scm
+	$(mod_dir)/auto/scheme/thread/declarations.h \
+	$(mod_dir)/auto/scheme/thread/definitions.c \
+	$(mod_dir)/auto/scheme/thread/initialization.c
 
 
 library_sources = \
@@ -52,7 +52,7 @@ $(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module
 	cc $(compile_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/s7_module.c $(gen_dir)/program.c
 
 
-$(gen_dir)/program.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources)
+$(gen_dir)/program.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources) $(module_deps)
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/program.c --link-modules="auto_scheme_environment s7"
 
@@ -64,7 +64,7 @@ $(gen_dir)/s7_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/s7/module.scm
 
 
 
-$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/auto/scheme/environment/module.scm $(module_deps)
+$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(mod_dir)/auto/scheme/environment/module.scm 
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime -m $(mod_dir)/auto/scheme/environment/module.scm -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment_module.c
 

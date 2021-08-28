@@ -14,6 +14,7 @@
     (define compile-number
       (lambda (sc num)
 	(cond ((integer? num) (string-append "s7_make_integer(" sc "," (number->string num) ")"))
+	      ((real? num) (string-append "s7_make_real(" sc "," (number->string num) ")"))
 	      (else (error "compile error - unknown number type: " num)))))
 
 
@@ -246,6 +247,8 @@
 				    "    autoscheme_module__program( s7, mod_env );\n"
 
 				    "s7_gc_unprotect_at( s7, mod_env_loc );\n"
+
+				    "s7_free( s7 );\n"
 
 				    "    return 0;\n"
 				    "}\n"

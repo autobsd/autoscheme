@@ -27,6 +27,38 @@ static s7_pointer free_thread( s7_scheme *sc, s7_pointer arg )
     (void)sc;
 }
 
+static void *run_thread( void *ptr )
+{
+    thread *obj = (thread *)ptr;
+
+    obj->sc = s7_init();
+    s7_gc_protect( obj->sc, mod_env );
+
+    obj->proc_loc = s7_gc_protect( obj->sc, obj->proc );
+
+    s7_call( obj->sc, obj->proc, s7_nil( obj->sc ));
+    s7_gc_unprotect_at( obj->sc, obj->proc_loc );
+    s7_free( obj->sc );
+
+    return NULL;
+}
+static s7_pointer thread_start( s7_scheme *sc, s7_pointer args )
+{
+    thread *obj = (thread *)s7_c_object_value( s7_car( args ));
+    obj->proc_loc = s7_gc_protect( sc, obj->proc );
+    pthread_create( &(obj->t) , NULL, run_thread, (void *)obj );
+
+    return( (s7_pointer)obj );
+
+    (void)sc;
+}
+static s7_pointer _sleep(s7_scheme *sc, s7_pointer args)
+{
+  int seconds = s7_integer( s7_car(args));
+  sleep( seconds );
+  return( s7_unspecified( sc ));
+}
+
 
 static s7_pointer mark_thread( s7_scheme *sc, s7_pointer arg )
 {
@@ -111,5 +143,6 @@ static s7_pointer set_thread_name( s7_scheme *sc, s7_pointer args )
 
     (void)sc;
 }
+
 
 

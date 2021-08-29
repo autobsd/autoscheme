@@ -3,9 +3,11 @@
 
 #include <pthread.h>
 
+s7_pointer mod_env;
 
 typedef struct {
     s7_pointer proc;
+    s7_int proc_loc;
     s7_pointer name;
     s7_scheme *sc;
     pthread_t t;
@@ -35,3 +37,5 @@ static s7_pointer thread_name( s7_scheme *sc, s7_pointer args );
 
 static s7_pointer set_thread_name( s7_scheme *sc, s7_pointer args );
 
+
+static s7_pointer thread_start( s7_scheme *sc, s7_pointer args );

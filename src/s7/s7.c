@@ -1,3 +1,6 @@
+/* Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ * SPDX-License-Identifier: BSD-2-Clause 
+ */
 /* s7, a Scheme interpreter
  *
  *   derived from TinyScheme 1.39, but not a single byte of that code remains

@@ -1,3 +1,16 @@
+<!--
+s7, a Scheme interpreter
+
+  derived from TinyScheme 1.39, but not a single byte of that code remains
+  SPDX-License-Identifier: 0BSD
+
+Bill Schottstaedt, bil@ccrma.stanford.edu
+
+Mike Scholz provided the FreeBSD support (complex trig funcs, etc)
+Rick Taube, Andrew Burnson, Donny Ward, and Greg Santucci provided the MS Visual C++ support
+Kjetil Matheussen provided the mingw support
+chai xiaoxiang provided the msys2 support
+-->
 # s7
 
 s7 is a Scheme interpreter.

@@ -1,3 +1,7 @@
+/*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
+ */
 #define _Bool int
 #include "s7/s7.h"
 int autoscheme_module__s7( s7_scheme *s7, s7_pointer env );

@@ -1,3 +1,7 @@
+<!-- The content of this file has not been modified. 
+     It is included with its original attribution as 
+     part of the 'AutoScheme' project.
+-->
 <!--
 s7, a Scheme interpreter
 

@@ -1,3 +1,7 @@
+;;  This file is part of the 'AutoScheme' project.
+;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+;;  SPDX-License-Identifier: BSD-2-Clause
+
 (define-library (auto scheme base)
   (import (only (s7) + - * / < <= = > >= append apply assoc boolean? car caar cadr call-with-current-continuation call/cc cdar cddr cdr char->integer char=? char? close-input-port close-output-port cons dynamic-wind eof-object? equal? error for-each integer? length make-string map member min negative? newline not null? number? number->string pair? positive? read-string real? reverse string string->symbol string-append string-length string=? string? substring symbol->string symbol? values vector-ref zero?))
 

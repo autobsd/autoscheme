@@ -1,3 +1,7 @@
+REM  The content of this file has not been modified. 
+REM  It is included with its original attribution as 
+REM  part of the 'AutoScheme' project.
+
 REM  This software is released under the MIT License.
 
 REM  Copyright (c) 2015 Tatsuya Watanabe

@@ -1,5 +1,6 @@
-/* Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
- * SPDX-License-Identifier: BSD-2-Clause 
+/*  This file has been modified as part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
  */
 /* s7, a Scheme interpreter
  *

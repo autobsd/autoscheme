@@ -6,7 +6,7 @@ project_dir = ../..
 src_dir = $(project_dir)/src
 prime_dir = $(src_dir)/prime
 s7_dir = $(src_dir)/s7
-mod_dir = $(src_dir)/modules
+mod_dir = $(src_dir)/mod
 gen_dir = $(project_dir)/gen
 bin_dir = bin
 obj_dir = _obj
@@ -43,11 +43,24 @@ library_sources = \
 
 autoscheme_sources =  \
 	$(library_sources) \
-	$(src_dir)/program.scm 
+	$(src_dir)/app/program.scm 
 
 all: build
 
-build: $(bin_dir)/autoscheme
+build: $(bin_dir)/autoscheme $(bin_dir)/minischeme
+
+
+
+$(bin_dir)/minischeme: $(obj_dir)/bignum.o $(obj_dir)/minischeme.o
+	$(CC) $(CFLAGS) -o $(bin_dir)/minischeme $(obj_dir)/minischeme.o $(obj_dir)/bignum.o -lm
+
+
+$(obj_dir)/minischeme.o: $(src_dir)/lib/minischeme.c $(src_dir)/lib/minischeme.h
+	$(CC) $(CFLAGS) -c $(src_dir)/lib/minischeme.c -o $(obj_dir)/minischeme.o
+
+$(obj_dir)/bignum.o: $(src_dir)/lib/bignum.c $(src_dir)/lib/bignum.h
+	$(CC) $(CFLAGS) -c $(src_dir)/lib/bignum.c -o $(obj_dir)/bignum.o
+
 
 
 

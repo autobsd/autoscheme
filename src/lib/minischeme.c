@@ -52,7 +52,7 @@
  *--
  */
 
-#include "miniscm.h"
+#include "minischeme.h"
 #include "bignum.h"
 
 /*--

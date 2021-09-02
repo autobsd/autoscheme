@@ -62,18 +62,18 @@ build: $(bin_dir)/autoscheme $(bin_dir)/scheme
 
 
 
-$(bin_dir)/scheme: $(src_dir)/library/main.c $(lib_dir)/libminischeme.a
-	$(CC) -o $(bin_dir)/scheme  $(src_dir)/library/main.c -lminischeme -L$(lib_dir)
+$(bin_dir)/scheme: $(src_dir)/library/main.c $(lib_dir)/libautoscheme.a
+	$(CC) -o $(bin_dir)/scheme  $(src_dir)/library/main.c -lautoscheme -L$(lib_dir)
 
 
-$(lib_dir)/libminischeme.a: $(obj_dir)/bignum.o $(obj_dir)/minischeme.o 
+$(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/autoscheme.o 
 	mkdir -p $(lib_dir)	
-	ar cr $(lib_dir)/libminischeme.a $(obj_dir)/bignum.o $(obj_dir)/minischeme.o 
+	ar cr $(lib_dir)/libautoscheme.a $(obj_dir)/bignum.o $(obj_dir)/autoscheme.o 
 
 
 
-$(obj_dir)/minischeme.o: $(src_dir)/library/minischeme.c $(src_dir)/library/minischeme.h
-	$(CC) -c $(src_dir)/library/minischeme.c -o $(obj_dir)/minischeme.o
+$(obj_dir)/autoscheme.o: $(src_dir)/library/autoscheme.c $(src_dir)/library/autoscheme.h
+	$(CC) -c $(src_dir)/library/autoscheme.c -o $(obj_dir)/autoscheme.o
 
 $(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
 	$(CC) -c $(src_dir)/library/bignum.c -o $(obj_dir)/bignum.o

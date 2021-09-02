@@ -52,8 +52,8 @@
  *--
  */
 
-#ifndef MINISCHEME_H
-#define MINISCHEME_H
+#ifndef AUTOSCHEME_H
+#define AUTOSCHEME_H
 
 #include <stdio.h>
 #include <inttypes.h>
@@ -272,4 +272,4 @@ pointer scheme_apply1(const char *procname, pointer argslist);
 }
 #endif
 
-#endif /* MINISCHEME_H */
+#endif /* AUTOSCHEME_H */

@@ -52,7 +52,7 @@
  *--
  */
 
-#include "minischeme.h"
+#include "autoscheme.h"
 #include "bignum.h"
 
 /*--
@@ -7341,7 +7341,7 @@ void init_procs(void)
 }
 
 
-/* initialization of Mini-Scheme */
+/* initialization of AutoScheme */
 void scheme_init(void)
 {
 	alloc_cellseg();
@@ -7533,7 +7533,7 @@ void FatalError(char *s)
 
 /* ========== Main ========== */
 
-#define banner "Hello, This is Mini-Scheme Interpreter Version 0.85w12.\n"
+#define banner "Hello, This is AutoScheme.\n"
 #define InitFile "init.scm"
 
 int start(int argc, char *argv[])

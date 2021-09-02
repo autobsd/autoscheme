@@ -1,6 +1,6 @@
-/*  The content of this file has not been modified. 
- *  It is included with its original attribution as 
- *  part of the 'AutoScheme' project.
+/*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
  */
 /*  This version has been modified by Tatsuya WATANABE.
  *	current version is 0.85w12 (2020)
@@ -63,12 +63,12 @@
 extern "C" {
 #endif
 
+int start( int argc, char **argv );
+
 /*
  * Define or undefine following symbols as you need.
  */
-#ifndef STANDALONE
-#define STANDALONE 1	/* define 0 if you want to build as a Library */
-#endif
+
 /* #define USE_SCHEME_STACK */	/* define this if you want original-Stack */
 #define USE_COPYING_GC	/* undef this if you do not want to use Copying GC */
 

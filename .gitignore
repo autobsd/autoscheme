@@ -1,4 +1,5 @@
 gen/
 _obj/
 bin/
+lib/
 tmp/

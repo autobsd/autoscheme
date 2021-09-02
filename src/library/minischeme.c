@@ -1,6 +1,6 @@
-/*  The content of this file has not been modified. 
- *  It is included with its original attribution as 
- *  part of the 'AutoScheme' project.
+/*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
  */
 /*  This version has been modified by Tatsuya WATANABE.
  *	current version is 0.85w12 (2020)
@@ -62,10 +62,8 @@
  */
 #define BACKQUOTE '`'
 
-#if STANDALONE
-#define banner "Hello, This is Mini-Scheme Interpreter Version 0.85w12.\n"
-#define InitFile "init.scm"
-#endif
+
+
 
 #include <ctype.h>
 
@@ -7535,9 +7533,10 @@ void FatalError(char *s)
 
 /* ========== Main ========== */
 
-#if STANDALONE
+#define banner "Hello, This is Mini-Scheme Interpreter Version 0.85w12.\n"
+#define InitFile "init.scm"
 
-int main(int argc, char *argv[])
+int start(int argc, char *argv[])
 {
 	int ret;
 	FILE *fin;
@@ -7568,4 +7567,5 @@ int main(int argc, char *argv[])
 	return ret;
 }
 
-#endif
+
+

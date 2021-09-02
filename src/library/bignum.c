@@ -1,6 +1,6 @@
-/*  The content of this file has not been modified. 
- *  It is included with its original attribution as 
- *  part of the 'AutoScheme' project.
+/*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
  */
 /*  This software is released under the MIT License.
  *

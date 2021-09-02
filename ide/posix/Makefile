@@ -11,6 +11,7 @@ gen_dir = $(project_dir)/gen
 bin_dir = bin
 obj_dir = _obj
 lib_dir = lib
+include_dir = include
 
 install_dir = /usr/local/bin
 
@@ -62,9 +63,13 @@ build: $(bin_dir)/autoscheme $(bin_dir)/scheme
 
 
 
-$(bin_dir)/scheme: $(src_dir)/library/main.c $(lib_dir)/libautoscheme.a
-	$(CC) -o $(bin_dir)/scheme  $(src_dir)/library/main.c -lautoscheme -L$(lib_dir)
+$(bin_dir)/scheme: $(lib_dir)/libautoscheme.a $(include_dir)/autoscheme.h $(src_dir)/application/main.c
+	$(CC) -o $(bin_dir)/scheme $(src_dir)/application/main.c -lautoscheme -L$(lib_dir) -I$(include_dir)
 
+
+$(include_dir)/autoscheme.h: $(src_dir)/library/autoscheme.h
+	mkdir -p $(include_dir)	
+	cp $(src_dir)/library/autoscheme.h $(include_dir)/autoscheme.h
 
 $(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/autoscheme.o 
 	mkdir -p $(lib_dir)	
@@ -133,6 +138,7 @@ clean:
 	rm -rf $(gen_dir)
 	rm -rf $(obj_dir)
 	rm -rf $(bin_dir)
+	rm -rf $(include_dir)
 	rm -rf $(lib_dir)
 
 	rm -rf tmp

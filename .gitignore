@@ -1,5 +1,6 @@
 gen/
 _obj/
 bin/
+include/
 lib/
 tmp/

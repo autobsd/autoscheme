@@ -267,6 +267,7 @@ int scheme_load_string(const char *cmd);
 void scheme_register_foreign_func(const char *name, foreign_func ff);
 pointer scheme_apply0(const char *procname);
 pointer scheme_apply1(const char *procname, pointer argslist);
+pointer scheme_eval(pointer obj);
 
 #ifdef __cplusplus
 }

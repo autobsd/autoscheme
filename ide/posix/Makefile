@@ -48,23 +48,27 @@ autoscheme_sources =  \
 	$(src_dir)/application/program.scm 
 
 
-# UNAME := $(shell uname)
 
-# ifeq ($(UNAME), Darwin)
-# TARGET = libhello.so
-# else
-# TARGET = hello.dll
-# endif
 
 all: build
 
-build: $(bin_dir)/autoscheme $(bin_dir)/scheme
+build: $(bin_dir)/scheme 
+
+
+$(bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_dir)/scheme.c
+	$(CC) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
+
+
+$(gen_dir)/scheme.c: $(bin_dir)/autoscheme $(src_dir)/application/scheme.scm
+	mkdir -p $(gen_dir)
+	echo "making $(gen_dir)/scheme.c"
+	cd ../../src/application && pwd && ls
+	$(bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c 
 
 
 
 
-$(bin_dir)/scheme: $(lib_dir)/libautoscheme.a $(include_dir)/autoscheme.h $(src_dir)/application/main.c
-	$(CC) -o $(bin_dir)/scheme $(src_dir)/application/main.c -lautoscheme -L$(lib_dir) -I$(include_dir)
+
 
 
 $(include_dir)/autoscheme.h: $(src_dir)/library/autoscheme.h
@@ -78,9 +82,11 @@ $(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/autoscheme.o
 
 
 $(obj_dir)/autoscheme.o: $(src_dir)/library/autoscheme.c $(src_dir)/library/autoscheme.h
+	mkdir -p $(obj_dir)
 	$(CC) -c $(src_dir)/library/autoscheme.c -o $(obj_dir)/autoscheme.o
 
 $(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
+	mkdir -p $(obj_dir)
 	$(CC) -c $(src_dir)/library/bignum.c -o $(obj_dir)/bignum.o
 
 

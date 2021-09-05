@@ -28,14 +28,6 @@
 
 
 
-;; (define alist-delete!
-;;   (lambda (alist key)
-;;     (let delete!((remainder alist)
-;; 		 )
-;;       (cond ((null? remainder) '())
-;; 	    ((assoc symbol (car remainder)))
-;; 	    (else (lookup (cdr remainder)))))))
-    
 
 ;; (define environment-delete!
 ;;   (lambda (environment symbol)
@@ -45,6 +37,11 @@
 ;;       (cond ((null? remainder) #f)
 ;; 	    ((assoc symbol (car remainder)))
 ;; 	    (else (lookup (cdr remainder)))))))
+
+
+
+
+
 
 
 (define x 1)

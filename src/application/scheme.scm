@@ -21,8 +21,6 @@
 (define environment-bound?
   (lambda (environment symbol)
     (defined? symbol environment)))
-    ;; (if (environment-binding environment symbol) #t
-    ;; 	#f)))
 
 (define environment-ref
   (lambda (environment symbol)

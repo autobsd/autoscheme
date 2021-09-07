@@ -28,19 +28,24 @@
 
 
 
-
-;; (define environment-delete!
-;;   (lambda (environment symbol)
-
-;;     (let delete!((remainder environment)
-;; 		 )
-;;       (cond ((null? remainder) #f)
-;; 	    ((assoc symbol (car remainder)))
-;; 	    (else (lookup (cdr remainder)))))))
+(define alist-delete
+  (lambda (alist key)
+    (cond ((null? alist) '())
+	  ((equal? (caar alist) key) (alist-delete (cdr alist) key))
+	  (else (cons (car alist) (alist-delete (cdr alist) key))))))
 
 
+(define environment-delete!
+  (lambda (environment symbol)
+    (let ((binding-lists (map (lambda (l)
+				(alist-delete l symbol)
+				)
+			      environment)))
 
-
+      (set-car! environment (car binding-lists))
+      (set-cdr! environment (cdr binding-lists))
+		
+      )))
 
 
 
@@ -49,6 +54,7 @@
   (define bindings '((a . 10) (b . 20) (c . 30)))
   (define env (apply make-environment bindings))
   (write env)(newline)
+  (write (environment-delete! env 'b))(newline)
   (display (environment? env))(newline)
   (display (defined? 'env))(newline)
 

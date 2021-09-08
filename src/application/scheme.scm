@@ -4,49 +4,26 @@
 
 (display "inside AutoScheme application...\n")
 
-
-(foreign-declaration (include-string "declarations.h"))
-(foreign-definition (include-string "definitions.c"))
-
-(foreign-initialization "scheme_register_foreign_func( \"make-environment\", mk_environment );\n")
-
-(define environment-binding 
-  (lambda (environment symbol)
-    (let lookup((remainder environment)
-		)
-      (cond ((null? remainder) #f)
-	    ((assoc symbol (car remainder)))
-	    (else (lookup (cdr remainder)))))))
-
-(define environment-bound?
-  (lambda (environment symbol)
-    (defined? symbol environment)))
-
-(define environment-ref
-  (lambda (environment symbol)
-    (cdr (environment-binding environment symbol))))
+(include "list.scm")
+(include "environment.scm")
 
 
 
-(define alist-delete
-  (lambda (alist key)
-    (cond ((null? alist) '())
-	  ((equal? (caar alist) key) (alist-delete (cdr alist) key))
-	  (else (cons (car alist) (alist-delete (cdr alist) key))))))
 
 
-(define environment-delete!
-  (lambda (environment symbol)
-    (let ((binding-lists (map (lambda (l)
-				(alist-delete l symbol)
-				)
-			      environment)))
 
-      (set-car! environment (car binding-lists))
-      (set-cdr! environment (cdr binding-lists))
-		
-      )))
 
+(define-macro (add1 x)
+
+  (quasiquote (+ ,x 1))
+  )
+
+(write (macro? add1))(newline)
+(write (macro-expand '(add1 5)))(newline)
+
+(display "(add1 5): ")(write (add1 5))(newline)
+
+;; (write (map car (car (current-environment))))(newline)
 
 
 (define x 1)
@@ -54,21 +31,33 @@
   (define bindings '((a . 10) (b . 20) (c . 30)))
   (define env (apply make-environment bindings))
   (write env)(newline)
+  (environment-update! env 'a 9)
+  (environment-update! env 'd 99)
   (write (environment-delete! env 'b))(newline)
+
+  (write (environment-only env 'a))(newline)
+  (write (environment-except env 'a))(newline)
+  (write (environment-rename env '(d . e)))(newline)
+  (write (environment-prefix env 'pre-))(newline)
+
+  ;; (write (environment-symbols (current-environment)))(newline)
+
+
+
   (display (environment? env))(newline)
   (display (defined? 'env))(newline)
 
-  (display (environment-binding (current-environment) 'env))(newline)
-  (display (environment-binding (current-environment) 'x))(newline)
-  (display (environment-binding (current-environment) 'y))(newline)
+  (display (environment-assoc (current-environment) 'env))(newline)
+  (display (environment-assoc (current-environment) 'x))(newline)
+  (display (environment-assoc (current-environment) 'y))(newline)
 
   (display "x: ")(write (environment-ref (current-environment) 'x))(newline)
   (display "y: ")(write (environment-ref (current-environment) 'y))(newline)
   (display "list?: ")(write (list? '(a . ())))(newline)
   
   (display (defined? 'b env))(newline)
-  (display (environment-binding env 'b))(newline)
-  (display (environment-bound? env 'b))(newline)
+  (display (environment-assoc env 'b))(newline)
+
 ;;  (display "a: ")(write a)(newline)
 )
 

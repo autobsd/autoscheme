@@ -89,7 +89,7 @@
 		 (string-append "cons( mk_symbol(\"quasiquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
-		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression sc (cdr expression) source (1 quote-level 1)) ")"))
+		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
 
 		((and (zero? quote-level) (compile-time-macro? expression))
 		 (let* ((expanded-expression (expand-compile-time-macro expression))

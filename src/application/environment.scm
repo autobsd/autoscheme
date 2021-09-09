@@ -7,6 +7,11 @@
 (foreign-definition (include-string "definitions.c"))
 (foreign-initialization "scheme_register_foreign_func( \"make-environment\", mk_environment );\n")
 
+(define environment-symbols
+  (lambda (environment)
+    (map car (apply append environment))))
+
+
 (define environment-assoc 
   (lambda (environment symbol)
     (let lookup((remainder environment)
@@ -14,11 +19,6 @@
       (cond ((null? remainder) #f)
 	    ((assoc symbol (car remainder)))
 	    (else (lookup (cdr remainder)))))))
-
-
-(define environment-symbols
-  (lambda (environment)
-    (map car (apply append environment))))
 
 
 (define environment-ref

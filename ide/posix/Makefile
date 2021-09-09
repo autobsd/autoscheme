@@ -59,7 +59,7 @@ $(bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_
 	$(CC) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
 
 
-$(gen_dir)/scheme.c: $(bin_dir)/autoscheme $(src_dir)/application/scheme.scm   $(src_dir)/application/environment.scm $(src_dir)/application/list.scm $(src_dir)/application/definitions.c
+$(gen_dir)/scheme.c: $(bin_dir)/autoscheme $(src_dir)/application/scheme.scm   $(src_dir)/application/environment.scm $(src_dir)/application/macros.scm $(src_dir)/application/list.scm $(src_dir)/application/definitions.c
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls

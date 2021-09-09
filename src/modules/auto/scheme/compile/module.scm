@@ -101,6 +101,12 @@
 		((null? expression) (string-append "NIL"))
 		((boolean? expression) (if expression (string-append "T") (string-append "F")))
 		((char? expression) (string-append "mk_character(" (number->string (char->integer expression)) ")"))
+
+		((equal? expression '_quote) (string-append "mk_symbol(\"quote\" )"))
+		((equal? expression '_quasiquote) (string-append "mk_symbol(\"quasiquote\" )"))
+		((equal? expression '_unquote) (string-append "mk_symbol(\"unquote\" )"))
+		((equal? expression '_unquote-splicing) (string-append "mk_symbol(\"unquote-splicing\" )"))
+
 		((symbol? expression) (string-append "mk_symbol(\"" (symbol->string expression) "\" )"))
 		((string? expression) (string-append "mk_string(" (object->string expression) " )" ))
 

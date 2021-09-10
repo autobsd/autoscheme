@@ -4,20 +4,13 @@
 
 (display "inside AutoScheme application...\n")
 
-(define object->string
-  (lambda (object)
-    (let ((string-port (open-output-string)))
-      (write object string-port)
-      (let ((output-string (get-output-string string-port)))
-	(close-output-port string-port)
-	output-string))
-    ))
 
-(include "list.scm")
-(include "environment.scm")
 
-(include "macros.scm")
+(include "../modules/auto/scheme/environment/module.scm")
+(include "../modules/auto/scheme/list/module.scm")
 
+
+ 
 
 ;; (define x 1)
 (let ((y 2))
@@ -34,7 +27,6 @@
   ;; (write (environment-prefix env 'pre-))(newline)
 
   ;; ;; (write (environment-symbols (current-environment)))(newline)
-
 
 
   ;; (write '(env))(newline)
@@ -78,7 +70,7 @@
 
   (display "myvar: ")(write myvar)(newline)
   (display "myvar4: ")(write myvar4)(newline)
-
+  (environment-delete! (current-environment) 'myvar4)
   (quit)
 
   ;; (display (environment? env))(newline)

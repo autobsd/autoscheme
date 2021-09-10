@@ -2,6 +2,16 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+(define object->string
+  (lambda (object)
+    (let ((string-port (open-output-string)))
+      (write object string-port)
+      (let ((output-string (get-output-string string-port)))
+	(close-output-port string-port)
+	output-string))
+    ))
+
+
 (define-macro (define-library name . declarations)
   (let ((export-declarations '())
 	(import-declarations '())
@@ -9,6 +19,8 @@
 
 	(export-only '())
 	(export-rename '())
+
+	(name-string (object->string name))
 	)
 
     (for-each (lambda (declaration)
@@ -30,7 +42,7 @@
 		)
 	      export-declarations)
 
-    (_quasiquote (environment-update! (current-environment) ',(string->symbol (object->string name)) 
+    (_quasiquote (environment-update! (current-environment) (string->symbol ,name-string) 
 				      (let ()
 					(unquote-splicing import-declarations)
 					(unquote-splicing begin-declarations)	   
@@ -80,7 +92,7 @@
 	   )
 
     (_quasiquote (environment-import! (current-environment) (_unquote-splicing (map (lambda (set)
-								     (import-bindings set))
-								   sets) )))
+										      (import-bindings set))
+										    sets) )))
     )
   )

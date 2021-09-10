@@ -6,7 +6,8 @@ project_dir = ../..
 src_dir = $(project_dir)/src
 prime_dir = $(src_dir)/prime
 s7_dir = $(src_dir)/s7
-modules_dir = $(src_dir)/_modules
+_modules_dir = $(src_dir)/_modules
+modules_dir = $(src_dir)/modules
 gen_dir = $(project_dir)/gen
 bin_dir = bin
 obj_dir = _obj
@@ -18,35 +19,38 @@ install_dir = /usr/local/bin
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
 compile_options = -fbracket-depth=10000 $(strict_options) 
 
-modules_deps = \
-	$(modules_dir)/auto/scheme/thread/declarations.h \
-	$(modules_dir)/auto/scheme/thread/definitions.c \
-	$(modules_dir)/auto/scheme/thread/initialization.c
-
 
 library_sources = \
-	$(modules_dir)/auto/scheme/thread/module.scm \
-	$(modules_dir)/auto/scheme/base/module.scm \
-	$(modules_dir)/auto/scheme/eval/module.scm \
-	$(modules_dir)/auto/scheme/load/module.scm \
-	$(modules_dir)/auto/scheme/read/module.scm \
-	$(modules_dir)/auto/scheme/repl/module.scm \
-	$(modules_dir)/auto/scheme/cxr/module.scm \
-	$(modules_dir)/auto/scheme/path/module.scm \
-	$(modules_dir)/auto/scheme/write/module.scm \
-	$(modules_dir)/auto/scheme/string/module.scm \
-	$(modules_dir)/auto/scheme/file/module.scm \
-	$(modules_dir)/auto/scheme/args/fold/module.scm \
-	$(modules_dir)/auto/scheme/process/context/module.scm \
-	$(modules_dir)/auto/scheme/compile/module.scm \
-	$(modules_dir)/auto/scheme/interpret/module.scm \
-	$(modules_dir)/auto/scheme/repl/module.scm \
-	$(modules_dir)/auto/scheme/args/module.scm
+	$(_modules_dir)/auto/scheme/thread/module.scm \
+	$(_modules_dir)/auto/scheme/base/module.scm \
+	$(_modules_dir)/auto/scheme/eval/module.scm \
+	$(_modules_dir)/auto/scheme/load/module.scm \
+	$(_modules_dir)/auto/scheme/read/module.scm \
+	$(_modules_dir)/auto/scheme/repl/module.scm \
+	$(_modules_dir)/auto/scheme/cxr/module.scm \
+	$(_modules_dir)/auto/scheme/path/module.scm \
+	$(_modules_dir)/auto/scheme/write/module.scm \
+	$(_modules_dir)/auto/scheme/string/module.scm \
+	$(_modules_dir)/auto/scheme/file/module.scm \
+	$(_modules_dir)/auto/scheme/args/fold/module.scm \
+	$(_modules_dir)/auto/scheme/process/context/module.scm \
+	$(_modules_dir)/auto/scheme/compile/module.scm \
+	$(_modules_dir)/auto/scheme/interpret/module.scm \
+	$(_modules_dir)/auto/scheme/repl/module.scm \
+	$(_modules_dir)/auto/scheme/args/module.scm
 
 autoscheme_sources =  \
 	$(library_sources) \
 	$(src_dir)/application/program.scm 
 
+
+scheme_deps = \
+	$(modules_dir)/auto/scheme/environment/module.scm \
+	$(modules_dir)/auto/scheme/environment/procedures.scm \
+	$(modules_dir)/auto/scheme/environment/declarations.h \
+	$(modules_dir)/auto/scheme/environment/definitions.c \
+	$(modules_dir)/auto/scheme/environment/initialization.c \
+	$(modules_dir)/auto/scheme/environment/macros.scm 
 
 
 
@@ -59,7 +63,7 @@ $(bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_
 	$(CC) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
 
 
-$(gen_dir)/scheme.c: $(bin_dir)/autoscheme $(src_dir)/application/scheme.scm   $(src_dir)/application/environment.scm $(src_dir)/application/macros.scm $(src_dir)/application/list.scm $(src_dir)/application/definitions.c
+$(gen_dir)/scheme.c: $(bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(scheme_deps)
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
@@ -97,21 +101,21 @@ $(bin_dir)/autoscheme: $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module
 	$(CC) $(compile_options) -I$(src_dir) -o $(bin_dir)/autoscheme $(obj_dir)/s7.o $(gen_dir)/auto_scheme_environment_module.c $(gen_dir)/s7_module.c $(gen_dir)/program.c
 
 
-$(gen_dir)/program.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources) $(modules_deps)
+$(gen_dir)/program.c: $(bin_dir)/autoscheme-prime $(autoscheme_sources) 
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/program.c --link-modules="auto_scheme_environment s7"
 
 
 
-$(gen_dir)/s7_module.c: $(bin_dir)/autoscheme-prime $(modules_dir)/s7/module.scm
+$(gen_dir)/s7_module.c: $(bin_dir)/autoscheme-prime $(_modules_dir)/s7/module.scm
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -m $(modules_dir)/s7/module.scm -n s7 -o $(gen_dir)/s7_module.c
+	$(bin_dir)/autoscheme-prime -m $(_modules_dir)/s7/module.scm -n s7 -o $(gen_dir)/s7_module.c
 
 
 
-$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(modules_dir)/auto/scheme/environment/module.scm 
+$(gen_dir)/auto_scheme_environment_module.c: $(bin_dir)/autoscheme-prime $(_modules_dir)/auto/scheme/environment/module.scm 
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -m $(modules_dir)/auto/scheme/environment/module.scm -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment_module.c
+	$(bin_dir)/autoscheme-prime -m $(_modules_dir)/auto/scheme/environment/module.scm -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment_module.c
 
 
 

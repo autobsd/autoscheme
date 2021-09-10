@@ -32,13 +32,16 @@
     (define compile-expression
       (lambda (sc expression source quote-level)
 
-	(letrec ((compile-time-macros `((include . ,(lambda (form)
-						      (if (null? (cdr form)) form
-							  (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
-								 (included-expressions (with-input-from-file included-source read-list))
-								 )
-							    (cons 'begin included-expressions)
-							    ))))
+	(letrec ((compile-time-macros `(;; (include . ,(lambda (form)
+					;; 	      (if (null? (cdr form)) form
+					;; 		  (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
+					;; 			 (included-expressions (begin  (display "inside compile-time 'include' macro...")(newline)
+					;; 						       (display "included-source: ")(write included-source)(newline)
+					;; 						       (with-input-from-file included-source read-list)))
+					;; 			 )
+
+					;; 		    (cons 'begin included-expressions)
+					;; 		    ))))
 
 					(include-string . ,(lambda (form)
 							     (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
@@ -82,14 +85,26 @@
 		 )
 
 
-	  (cond ((and (pair? expression) (equal? (car expression) 'quote) (not (negative? quote-level)))
+	  (cond ((and (pair? expression) (member (car expression) '(quote _quote)) (not (negative? quote-level)))
 		 (string-append "cons( mk_symbol(\"quote\" )," (compile-expression sc (cdr expression) source -1) ")"))
 
-		((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
+		((and (pair? expression) (member (car expression) '(quasiquote _quasiquote)) (not (negative? quote-level)))
 		 (string-append "cons( mk_symbol(\"quasiquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
 
-		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
+		((and (pair? expression) (member (car expression) '(unquote _unquote)) (positive? quote-level))
 		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+
+		((and (pair? expression) (member (car expression) '(unquote-splicing _unquote-splicing)) (positive? quote-level))
+		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+
+
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'include))
+		 (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
+			(included-expressions (with-input-from-file included-source read-list))
+			)
+		   (compile-expression sc (cons 'begin included-expressions) included-source quote-level)))
+		   
+
 
 		((and (zero? quote-level) (compile-time-macro? expression))
 		 (let* ((expanded-expression (expand-compile-time-macro expression))
@@ -102,10 +117,10 @@
 		((boolean? expression) (if expression (string-append "T") (string-append "F")))
 		((char? expression) (string-append "mk_character(" (number->string (char->integer expression)) ")"))
 
-		((equal? expression '_quote) (string-append "mk_symbol(\"quote\" )"))
-		((equal? expression '_quasiquote) (string-append "mk_symbol(\"quasiquote\" )"))
-		((equal? expression '_unquote) (string-append "mk_symbol(\"unquote\" )"))
-		((equal? expression '_unquote-splicing) (string-append "mk_symbol(\"unquote-splicing\" )"))
+		;; ((equal? expression '_quote) (string-append "mk_symbol(\"quote\" )"))
+		;; ((equal? expression '_quasiquote) (string-append "mk_symbol(\"quasiquote\" )"))
+		;; ((equal? expression '_unquote) (string-append "mk_symbol(\"unquote\" )"))
+		;; ((equal? expression '_unquote-splicing) (string-append "mk_symbol(\"unquote-splicing\" )"))
 
 		((symbol? expression) (string-append "mk_symbol(\"" (symbol->string expression) "\" )"))
 		((string? expression) (string-append "mk_string(" (object->string expression) " )" ))

@@ -2,7 +2,6 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-;; (auto scheme environment)
 (foreign-declaration (include-string "declarations.h"))
 (foreign-definition (include-string "definitions.c"))
 (foreign-initialization "scheme_register_foreign_func( \"make-environment\", mk_environment );\n")
@@ -28,6 +27,7 @@
 
 (define environment-delete!
   (lambda (environment symbol)
+    (import (only (auto scheme list) alist-delete))
     (let ((binding-lists (map (lambda (alist)
 				(if (assoc symbol alist)
 				    (alist-delete alist symbol)

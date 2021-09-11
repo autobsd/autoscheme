@@ -4581,8 +4581,9 @@ OP_EXPANDPATTERN:
 		s_goto(OP_APPLY);
 
 	case OP_PEVAL:	/* eval */
-		if (!validargs("eval", 1, 1, TST_ANY)) Error_0(msg);
+		if (!validargs("eval", 1, 2, TST_ANY TST_ENVIRONMENT)) Error_0(msg);
 		code = car(args);
+		if (is_pair(cdr(args))) envir = cadr(args);
 		args = NIL;
 		s_goto(OP_EVAL);
 

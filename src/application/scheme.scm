@@ -4,6 +4,18 @@
 
 (display "inside AutoScheme application...\n")
 
+(define env (make-environment (cons 'begin begin)
+			      (cons 'display display)
+			      (cons 'newline newline)
+			      (cons 'write write)
+			      (cons 'var "val")
+			      
+))
+
+(eval '(begin (display "hello world, var:")(write var) (newline)) env)
+
+
+
 
 ;; (define x 1)
 (let ((y 2))

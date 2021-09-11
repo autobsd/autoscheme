@@ -5,13 +5,6 @@
 (display "inside AutoScheme application...\n")
 
 
-
-(include "../modules/auto/scheme/environment/module.scm")
-(include "../modules/auto/scheme/list/module.scm")
-
-
- 
-
 ;; (define x 1)
 (let ((y 2))
   ;; (define bindings '((a . 10) (b . 20) (c . 30)))

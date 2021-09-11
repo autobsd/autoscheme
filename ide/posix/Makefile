@@ -47,33 +47,44 @@ autoscheme_sources =  \
 	$(src_dir)/application/program.scm 
 
 
-scheme_deps = \
-	$(modules_dir)/auto/scheme/environment/module.scm \
+
+
+
+auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
+auto_scheme_environment_dep = \
+	$(auto_scheme_environment_module_scm) \
 	$(modules_dir)/auto/scheme/environment/procedures.scm \
 	$(modules_dir)/auto/scheme/environment/declarations.h \
 	$(modules_dir)/auto/scheme/environment/definitions.c \
 	$(modules_dir)/auto/scheme/environment/initialization.c \
-	$(modules_dir)/auto/scheme/environment/macros.scm 
+	$(modules_dir)/auto/scheme/environment/macros.scm \
 
+auto_scheme_list_module_scm = $(modules_dir)/auto/scheme/list/module.scm 
+auto_scheme_list_dep = \
+	$(auto_scheme_list_module_scm) \
+
+
+libautoscheme_obj = \
+	$(obj_dir)/bignum.o \
+	$(obj_dir)/autoscheme.o \
+	$(obj_dir)/auto_scheme_list.o \
+	$(obj_dir)/auto_scheme_environment.o \
 
 
 all: build
 
-build: $(_bin_dir)/scheme 
+build: $(bin_dir)/scheme 
 
 
-$(_bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(_gen_dir)/scheme.c
-	$(CC) -o $(_bin_dir)/scheme $(_gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
+$(bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_dir)/scheme.c
+	mkdir -p $(bin_dir)
+	$(CC) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
 
-
-$(_gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(scheme_deps)
-	mkdir -p $(_gen_dir)
-	echo "making $(_gen_dir)/scheme.c"
+$(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(scheme_deps)
+	mkdir -p $(gen_dir)
+	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(_gen_dir)/scheme.c # --link-modules="auto_scheme_environment"
-
-
-
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --link-modules="auto_scheme_environment auto_scheme_list"
 
 
 
@@ -82,23 +93,52 @@ $(include_dir)/autoscheme.h: $(src_dir)/library/autoscheme.h
 	mkdir -p $(include_dir)	
 	cp $(src_dir)/library/autoscheme.h $(include_dir)/autoscheme.h
 
-$(lib_dir)/libautoscheme.a: $(_obj_dir)/bignum.o $(_obj_dir)/autoscheme.o 
+
+
+
+$(lib_dir)/libautoscheme.a: $(libautoscheme_obj)
 	mkdir -p $(lib_dir)	
-	ar cr $(lib_dir)/libautoscheme.a $(_obj_dir)/bignum.o $(_obj_dir)/autoscheme.o 
-
-
-
-$(_obj_dir)/autoscheme.o: $(src_dir)/library/autoscheme.c $(src_dir)/library/autoscheme.h
-	mkdir -p $(_obj_dir)
-	$(CC) -c $(src_dir)/library/autoscheme.c -o $(_obj_dir)/autoscheme.o
-
-$(_obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
-	mkdir -p $(_obj_dir)
-	$(CC) -c $(src_dir)/library/bignum.c -o $(_obj_dir)/bignum.o
+	ar cr $(lib_dir)/libautoscheme.a  $(libautoscheme_obj)
 
 
 
 
+
+$(obj_dir)/auto_scheme_list.o: $(gen_dir)/auto_scheme_list.c
+	mkdir -p $(obj_dir)
+	$(CC) -c $(gen_dir)/auto_scheme_list.c -o $(obj_dir)/auto_scheme_list.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_list.c: $(auto_scheme_list_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_list_module_scm) -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
+
+
+$(obj_dir)/auto_scheme_environment.o: $(gen_dir)/auto_scheme_environment.c
+	mkdir -p $(obj_dir)
+	$(CC) -c $(gen_dir)/auto_scheme_environment.c -o $(obj_dir)/auto_scheme_environment.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_environment.c: $(auto_scheme_environment_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_environment_module_scm) -n auto_scheme_environment -o $(gen_dir)/auto_scheme_environment.c
+
+
+
+
+
+$(obj_dir)/autoscheme.o: $(src_dir)/library/autoscheme.c $(src_dir)/library/autoscheme.h
+	mkdir -p $(obj_dir)
+	$(CC) -c $(src_dir)/library/autoscheme.c -o $(obj_dir)/autoscheme.o
+
+$(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
+	mkdir -p $(obj_dir)
+	$(CC) -c $(src_dir)/library/bignum.c -o $(obj_dir)/bignum.o
+
+
+
+
+
+
+#####################
 
 
 

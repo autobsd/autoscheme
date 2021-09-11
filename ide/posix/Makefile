@@ -59,6 +59,11 @@ auto_scheme_environment_dep = \
 	$(modules_dir)/auto/scheme/environment/initialization.c \
 	$(modules_dir)/auto/scheme/environment/macros.scm \
 
+auto_scheme_module_scm = $(modules_dir)/auto/scheme/module.scm 
+auto_scheme_dep = \
+	$(auto_scheme_module_scm) \
+
+
 auto_scheme_list_module_scm = $(modules_dir)/auto/scheme/list/module.scm 
 auto_scheme_list_dep = \
 	$(auto_scheme_list_module_scm) \
@@ -67,8 +72,9 @@ auto_scheme_list_dep = \
 libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
-	$(obj_dir)/auto_scheme_list.o \
 	$(obj_dir)/auto_scheme_environment.o \
+	$(obj_dir)/auto_scheme.o \
+	$(obj_dir)/auto_scheme_list.o \
 
 
 all: build
@@ -84,7 +90,7 @@ $(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --link-modules="auto_scheme_environment auto_scheme_list"
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme_environment auto_scheme_list auto_scheme"
 
 
 
@@ -111,6 +117,17 @@ $(obj_dir)/auto_scheme_list.o: $(gen_dir)/auto_scheme_list.c
 $(gen_dir)/auto_scheme_list.c: $(auto_scheme_list_dep) $(_bin_dir)/autoscheme
 	mkdir -p $(gen_dir)
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_list_module_scm) -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
+
+
+
+$(obj_dir)/auto_scheme.o: $(gen_dir)/auto_scheme.c
+	mkdir -p $(obj_dir)
+	$(CC) -c $(gen_dir)/auto_scheme.c -o $(obj_dir)/auto_scheme.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme.c: $(auto_scheme_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_module_scm) -n auto_scheme -o $(gen_dir)/auto_scheme.c
+
 
 
 $(obj_dir)/auto_scheme_environment.o: $(gen_dir)/auto_scheme_environment.c

@@ -75,7 +75,13 @@
 
   (display "myvar: ")(write myvar)(newline)
   (display "myvar4: ")(write myvar4)(newline)
-  (environment-delete! (current-environment) 'myvar4)
+  ;; (environment-delete! (current-environment) 'myvar4)
+  
+  (newline)
+  (write (macro-expand '(environment (only (mylib) myvar))))(newline)
+  (define env (environment (only (mylib) myvar)))
+  (write env)(newline)
+
   (quit)
 
   ;; (display (environment? env))(newline)

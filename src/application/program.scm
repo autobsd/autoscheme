@@ -82,7 +82,7 @@
 
 (define option-table `((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources")
 		       (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources")
-		       (,(option '(#\l "link-modules") #t #f recognized-processor) "Link modules")
+		       (,(option '(#\l "load-modules") #t #f recognized-processor) "Load modules")
 		       (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
 		       (,(option '(#\n "module-name") #t #f recognized-processor) "Specify compiled module name")
 		       (,(option '(#\o "output-file") #t #f recognized-processor) "Specify output file")
@@ -121,13 +121,13 @@
        (compile-module-selected (option-selected? "compile-module" options))
        (module-name (get-selected-arg "module-name"))
 
-       (link-modules (get-selected-arg "link-modules"))
+       (load-modules (get-selected-arg "load-modules"))
 
 
        (interpret-selected (option-selected? "interpret" options))
 
 
-       (module-list (if link-modules (string-tokenize link-modules) '()))
+       (module-list (if load-modules (string-tokenize load-modules) '()))
        )
 
 

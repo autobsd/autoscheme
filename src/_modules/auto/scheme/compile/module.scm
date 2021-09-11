@@ -112,7 +112,7 @@
 		   (compile-expression sc expanded-expression source _quote-level)
 		 ))
 
-		((pair? expression) (string-append "cons(" (compile-expression sc (car expression) source quote-level) ", " (compile-expression sc (cdr expression) source quote-level) " )"))
+		((pair? expression) (string-append "cons(" (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 		((null? expression) (string-append "NIL"))
 		((boolean? expression) (if expression (string-append "T") (string-append "F")))
 		((char? expression) (string-append "mk_character(" (number->string (char->integer expression)) ")"))
@@ -122,8 +122,8 @@
 		;; ((equal? expression '_unquote) (string-append "mk_symbol(\"unquote\" )"))
 		;; ((equal? expression '_unquote-splicing) (string-append "mk_symbol(\"unquote-splicing\" )"))
 
-		((symbol? expression) (string-append "mk_symbol(\"" (symbol->string expression) "\" )"))
-		((string? expression) (string-append "mk_string(" (object->string expression) " )" ))
+		((symbol? expression) (string-append "mk_symbol(\"" (symbol->string expression) "\")"))
+		((string? expression) (string-append "mk_string(" (object->string expression) ")" ))
 
 		((number? expression) (compile-number sc expression))
 
@@ -150,7 +150,7 @@
 									    )
 							(cond ((null? remainder) (string-append "NIL" ))
 
-							      (else (string-append "cons(" (compile-expression sc (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ", "
+							      (else (string-append "cons(" (compile-expression sc (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ","
 										   (get-expressions (cdr remainder))
 										   ")"
 										   ))
@@ -255,11 +255,12 @@
 				    ;; "    auto_argv = argv;\n"
 
 				    (apply string-append (map (lambda (name)
-								(string-append " autoscheme_module__" name "( s7, mod_env );\n"))
+								;; (string-append " autoscheme_module__" name "( s7, mod_env );\n"))
+								(string-append " autoscheme_module__" name "();\n"))
 							      module-list))
 
 				    ;; "    autoscheme_module__program( s7, mod_env );\n"
-				    "    autoscheme_module__program( );\n"
+				    "    autoscheme_module__program();\n"
 
 				    ;; "s7_gc_unprotect_at( s7, mod_env_loc );\n"
 

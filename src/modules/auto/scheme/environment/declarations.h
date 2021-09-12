@@ -3,4 +3,6 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include <stdio.h>
-pointer mk_environment( pointer p );
+pointer mk_environment( pointer args );
+pointer environment_undefine_d( pointer args );
+pointer environment_defined_symbols( pointer args );

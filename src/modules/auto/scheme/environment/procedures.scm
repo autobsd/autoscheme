@@ -5,10 +5,14 @@
 (foreign-declaration (include-string "declarations.h"))
 (foreign-definition (include-string "definitions.c"))
 (foreign-initialization "scheme_register_foreign_func( \"make-environment\", mk_environment );\n")
+(foreign-initialization "scheme_register_foreign_func( \"environment-undefine!\", environment_undefine_d );\n")
+(foreign-initialization "scheme_register_foreign_func( \"environment-defined-symbols\", environment_defined_symbols );\n")
 
-(define environment-symbols
-  (lambda (environment)
-    (map car (apply append environment))))
+;; (define environment-symbols
+;;   (lambda (environment)
+;;     (map (lambda (p)
+;; 	   (if (defined? (car p) environment)
+;;  (apply append environment))))
 
 
 (define environment-assoc 
@@ -25,19 +29,19 @@
     (cdr (environment-assoc environment symbol))))
 
 
-(define environment-delete!
-  (lambda (environment symbol)
-    (import (only (auto scheme list) alist-delete))
-    (let ((binding-lists (map (lambda (alist)
-				(if (assoc symbol alist)
-				    (alist-delete alist symbol)
-				    alist)
-				)
-			      environment)))
+;; (define environment-delete!
+;;   (lambda (environment symbol)
+;;     (import (only (auto scheme list) alist-delete))
+;;     (let ((binding-lists (map (lambda (alist)
+;; 				(if (assoc symbol alist)
+;; 				    (alist-delete alist symbol)
+;; 				    alist)
+;; 				)
+;; 			      environment)))
 
-      (set-car! environment (car binding-lists))
-      (set-cdr! environment (cdr binding-lists))
-      environment)))
+;;       (set-car! environment (car binding-lists))
+;;       (set-cdr! environment (cdr binding-lists))
+;;       environment)))
 
 
 (define environment-update!

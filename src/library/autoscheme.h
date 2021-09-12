@@ -233,6 +233,7 @@ enum {
 #define cadddr(p)       car(cdr(cdr(cdr(p))))
 #define cddddr(p)       cdr(cdr(cdr(cdr(p))))
 
+extern pointer UNDEF;
 extern pointer NIL;
 extern pointer T;
 extern pointer F;
@@ -259,6 +260,10 @@ pointer mk_vector(int len);
 pointer vector_elem(pointer v, int i);
 pointer set_vector_elem(pointer v, int i, pointer a);
 int list_length(pointer a);
+
+int equal(pointer a, pointer b);
+pointer reverse(pointer a);
+
 
 void scheme_init(void);
 void scheme_deinit(void);

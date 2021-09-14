@@ -53,7 +53,6 @@ autoscheme_sources =  \
 auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
 auto_scheme_environment_dep = \
 	$(auto_scheme_environment_module_scm) \
-	$(modules_dir)/auto/scheme/environment/procedures.scm \
 	$(modules_dir)/auto/scheme/environment/declarations.h \
 	$(modules_dir)/auto/scheme/environment/definitions.c \
 	$(modules_dir)/auto/scheme/environment/initialization.c \

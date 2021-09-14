@@ -2817,9 +2817,6 @@ pointer mappend(pointer f, pointer l, pointer r)
 	}
 }
 
-/* true or false value macro */
-#define istrue(p)       ((p) != F)
-#define isfalse(p)      ((p) == F)
 
 /* Error macro */
 #define	BEGIN	do {
@@ -7532,41 +7529,27 @@ void FatalError(char *s)
 	longjmp(error_jmp, OP_QUIT);
 }
 
-/* ========== Main ========== */
+/* ========== Helper Funcitons ========== */
 
-#define banner "Hello, This is AutoScheme.\n"
-#define InitFile "init.scm"
-
-int start(int argc, char *argv[])
+int member( pointer object, pointer list )
 {
-	int ret;
-	FILE *fin;
-
-	scheme_init();
-
-	/* Load "init.scm" */
-	if ((fin = fopen(InitFile, "rb")) != NULL) {
-		ret = scheme_load_file(fin);
-	} else {
-		fprintf(stderr, "Unable to open %s\n", InitFile);
-	}
-
-	if (argc > 1) {
-		fin = fopen(argv[1], "rb");
-		if (fin == NULL) {
-			fprintf(stderr, "Unable to open %s\n", argv[1]);
-			return 1;
-		}
-	} else {
-		fin = stdin;
-		printf(banner);
-	}
-	ret = scheme_load_file(fin);
-
-	scheme_deinit();
-
-	return ret;
+    pointer x;
+    for( x = list; x != NIL; x = cdr( x )) 
+	if( equal( car( x ),  object )) return 1;
+    return 0;
 }
 
+pointer assoc( pointer object, pointer alist )
+{
+    pointer x;
+    for( x = alist; x != NIL; x = cdr( x )) 
+	if( equal( caar( x ),  object )) return car( x );
+    return F;
+}
 
-
+pointer make_environment( pointer alist )
+{
+    pointer environment = cons( alist, NIL );
+    setenvironment( environment );
+    return environment;
+}

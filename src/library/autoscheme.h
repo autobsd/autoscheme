@@ -63,7 +63,7 @@
 extern "C" {
 #endif
 
-int start( int argc, char **argv );
+
 
 /*
  * Define or undefine following symbols as you need.
@@ -233,6 +233,11 @@ enum {
 #define cadddr(p)       car(cdr(cdr(cdr(p))))
 #define cddddr(p)       cdr(cdr(cdr(cdr(p))))
 
+
+/* true or false value macro */
+#define istrue(p)       ((p) != F)
+#define isfalse(p)      ((p) == F)
+
 extern pointer UNDEF;
 extern pointer NIL;
 extern pointer T;
@@ -248,6 +253,7 @@ pointer mk_integer(int32_t num);
 pointer mk_real(double num);
 pointer mk_number(pointer v);
 pointer mk_string(const char *str);
+pointer mk_counted_string(const char *str, size_t len);
 pointer mk_empty_string(size_t len, int fill);
 pointer mk_symbol(const char *name);
 pointer mk_uninterned_symbol(const char *name);
@@ -263,6 +269,11 @@ int list_length(pointer a);
 
 int equal(pointer a, pointer b);
 pointer reverse(pointer a);
+
+
+int member( pointer object, pointer list );
+pointer assoc( pointer object, pointer alist );
+pointer make_environment( pointer alist );
 
 
 void scheme_init(void);

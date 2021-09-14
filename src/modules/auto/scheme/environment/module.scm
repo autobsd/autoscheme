@@ -2,6 +2,9 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(include "procedures.scm")
+(foreign-declaration (include-string "declarations.h"))
+(foreign-definition (include-string "definitions.c"))
+(foreign-initialization (include-string "initialization.c"))
+
 (include "macros.scm")
 

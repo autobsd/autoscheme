@@ -3,6 +3,15 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include <stdio.h>
-pointer mk_environment( pointer args );
-pointer environment_undefine_d( pointer args );
-pointer environment_defined_symbols( pointer args );
+#include <string.h>
+static pointer ff_environment_define_d( pointer args );
+static pointer ff_environment_undefine_d( pointer args );
+static pointer ff_environment_defined_symbols( pointer args );
+static pointer ff_environment_assoc( pointer args );
+static pointer ff_environment_ref( pointer args );
+static pointer ff_environment_update_d( pointer args );
+static pointer ff_environment_import_d( pointer args );
+static pointer ff_environment_only( pointer args );
+static pointer ff_environment_except( pointer args );
+static pointer ff_environment_prefix( pointer args );
+static pointer ff_environment_rename( pointer args );

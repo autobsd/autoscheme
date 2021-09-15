@@ -115,11 +115,30 @@ static pointer ff_environment_assoc( pointer args )
 
 static pointer environment_ref( pointer environment, pointer symbol )
 {
-    return cdr( environment_assoc( environment, symbol ));    
+    pointer binding = environment_assoc( environment, symbol );
+
+    if( isfalse( binding ))
+    {
+	char *format_string = "Unbounded variable %s";
+	char *symbol_name = symname( symbol );
+	char *message;
+	size_t message_length;
+
+	message_length = ( size_t )snprintf( NULL, 0, format_string, symbol_name );
+	message = malloc( message_length + 1);
+	snprintf( message, message_length + 1, format_string, symbol_name );
+   
+	FatalForeignError( message );
+	free( message );
+    }
+    return cdr( binding );    
 }
 static pointer ff_environment_ref( pointer args )
 {
-    return cdr( ff_environment_assoc( args ));
+    pointer environment = car( args );
+    pointer symbol = cadr( args );
+
+    return environment_ref( environment, symbol );
 }
 
 

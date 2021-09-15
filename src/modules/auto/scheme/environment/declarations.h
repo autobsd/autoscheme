@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 static pointer ff_environment_define_d( pointer args );
 static pointer ff_environment_undefine_d( pointer args );

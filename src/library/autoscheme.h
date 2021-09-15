@@ -275,6 +275,7 @@ int member( pointer object, pointer list );
 pointer assoc( pointer object, pointer alist );
 pointer make_environment( pointer alist );
 
+void FatalForeignError( char *s );
 
 void scheme_init(void);
 void scheme_deinit(void);

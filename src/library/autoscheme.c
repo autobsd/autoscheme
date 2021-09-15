@@ -7528,6 +7528,12 @@ void FatalError(char *s)
 	args = NIL;
 	longjmp(error_jmp, OP_QUIT);
 }
+void FatalForeignError( char *s )
+{
+    fprintf(stderr, "Fatal error: %s\n", s);
+    flushinput();
+    exit( 1 );
+}
 
 /* ========== Helper Funcitons ========== */
 

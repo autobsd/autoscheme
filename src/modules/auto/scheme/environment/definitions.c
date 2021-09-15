@@ -37,9 +37,15 @@ static pointer ff_environment_define_d( pointer args )
 static pointer ff_environment_undefine_d( pointer args )
 {
     pointer environment = car( args );
-    pointer symbol = cadr( args );
+    pointer symbols = cdr( args );
 
-    return environment_define_d( environment, symbol, UNDEF );
+    pointer x;
+
+    for( x = symbols; x != NIL; x = cdr( x ))
+    {
+	environment_define_d( environment, car( x ), UNDEF );
+    }
+    return environment;
 }
 
 	

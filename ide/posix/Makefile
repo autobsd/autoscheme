@@ -20,7 +20,7 @@ include_dir = include
 install_dir = /usr/local/bin
 
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -std=c89 
-compile_options = -fbracket-depth=10000 $(strict_options) 
+compile_options = -fbracket-depth=10000 # $(strict_options) 
 
 
 library_sources = \
@@ -83,13 +83,13 @@ build: $(bin_dir)/scheme
 
 $(bin_dir)/scheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_dir)/scheme.c
 	mkdir -p $(bin_dir)
-	$(CC) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
+	$(CC) $(compile_options) -o $(bin_dir)/scheme $(gen_dir)/scheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
 
 $(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(scheme_deps)
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme_environment auto_scheme_list auto_scheme"
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme_environment auto_scheme"
 
 
 

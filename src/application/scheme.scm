@@ -2,46 +2,60 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+(import (auto scheme)
+	)
+
 (display "inside AutoScheme application...\n")
 
 
 
+(define-library (mylib)
+  (import (only (auto scheme) 
+		let begin define 
+		environment-rename 
+		environment-only
+		current-environment
+		quote
+		write
+		newline
+		))
+  (export (rename a aa) b c x y z)
+  (begin 
 
-(define myvar1 1)
-
-(let ()
-
-  (display "myvar1: ")(write myvar1)(newline)
-  (define myvar1 11)
-  (display "myvar1: ")(write myvar1)(newline)
-
-  ;; (environment-undefine! (current-environment) 'myvar1)
-  ;; (write (environment-defined-symbols (current-environment)))(newline)
-  ;; (quit)
-
-  (write (environment-assoc (current-environment) 'myvar1)) (newline)
-
-  ;; (display  (car (current-environment)))(newline)
-  ;; ;; (display "myvar4: ")(write myvar4)(newline)
-
-  ;; (newline)
-  ;; (write (environment-defined-symbols (current-environment)))
-  (newline)
-  
-
+    (define a 1) 
+    (define b 2) 
+    (define c 3) 
+    (define d 4) 
+    (define e 5) 
+    (define f 6) 
+    (define x 7) 
+    (define y 8) 
+    (define z 9)
+(write (current-environment))(newline)
+    )
   )
-  ;; (write (environment-defined-symbols (current-environment)))(newline)
-(environment-update! (current-environment) 'myvar1 2)
 
-(display "myvar1: ")(write myvar1)(newline)
-(write (environment-ref (current-environment) 'myvar1)) (newline)
 
-(define env (apply make-environment '((x . 3)(y . 4)(z . 5))))
-(define env2 (apply make-environment '((a . 1)(b . 2)(c . 3))))
-(define env3 (apply make-environment '((d . 1)(e . 2)(f . 3))))
+(write (environment-ref (current-environment) (string->symbol "(mylib)")))
+(newline)(newline)
 
-(environment-import! (current-environment) (environment-rename env '(z . zzz)) (environment-only env2 'a 'b) (environment-except env3 'd 'e) (environment-prefix env2 'pre-))
-(display "defined symbols: ")(write (environment-defined-symbols (current-environment)))(newline)
+(import (only (mylib) aa b c)
+	(prefix (except (only (mylib) x y z) y) pre-)
+	)
+
+
+(display "aa: ")(write aa)(newline)
+(display "b: ")(write b)(newline)
+(display "c: ")(write c)(newline)
+
+(display "pre-x: ")(write pre-x)(newline)
+;; (display "y: ")(write y)(newline)
+(display "pre-z: ")(write pre-z)(newline)
+
+
+
+(write (environment (only (mylib) aa b c)
+		    (prefix (except (only (mylib) x y z) y) pre-)
+		    ))
 (newline)
-(display "f: ")(write f)(newline)
-(display "pre-b: ")(write pre-b)(newline)
+

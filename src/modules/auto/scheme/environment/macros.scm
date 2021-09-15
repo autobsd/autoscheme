@@ -19,6 +19,8 @@
 
 	(export-only '())
 	(export-rename '())
+
+
 	)
 
     (for-each (lambda (declaration)
@@ -40,18 +42,26 @@
 		)
 	      export-declarations)
 
-    (_quasiquote (environment-update! (current-environment) ',(string->symbol (object->string name)) 
-				      (let ()
-					(_unquote-splicing import-declarations)
-					(_unquote-splicing begin-declarations)	   
-					(environment-rename (environment-only (current-environment) 
+    (let ((environment-declaration (cons 'environment (map cadr import-declarations)))
+	  )
 
-									      (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-only)))
+      (_quasiquote (environment-update! (current-environment) ',(string->symbol (object->string name)) 
+					(eval
+					 '(begin
+					    (_unquote-splicing begin-declarations)	   
+					    (environment-rename (environment-only (current-environment) 
 
-							    (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-rename)))
-					)
-				      ))
-    ))
+										  (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-only)))
+
+								(_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-rename)))
+					    )
+					    (_unquote environment-declaration)
+					    
+					    )
+					 )))))
+   
+
+
 
 
 (define-macro (import . sets)

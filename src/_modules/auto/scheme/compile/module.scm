@@ -85,7 +85,7 @@
 		 )
 
 
-	  (cond ((and (pair? expression) (member (car expression) '(quote _quote)) (not (negative? quote-level)))
+	  (cond ((and (pair? expression) (member (car expression) '(quote _quote)) (zero? quote-level))
 		 (string-append "cons( mk_symbol(\"quote\" )," (compile-expression sc (cdr expression) source -1) ")"))
 
 		((and (pair? expression) (member (car expression) '(quasiquote _quasiquote)) (not (negative? quote-level)))

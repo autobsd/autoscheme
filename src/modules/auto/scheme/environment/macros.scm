@@ -13,55 +13,14 @@
 
 
 (define-macro (define-library name . declarations)
-  (let ((export-declarations '())
-	(import-declarations '())
-	(begin-declarations '())
-
-	(export-only '())
-	(export-rename '())
-
-
+  (let ((name-symbol (string->symbol (object->string name)))
+	(quoted-declarations (map (lambda (declaration)
+				    (_quasiquote ',declaration)
+				    )
+				  declarations))
 	)
-
-    (for-each (lambda (declaration)
-		(cond ((eq? (car declaration) 'export) (set! export-declarations (cons declaration export-declarations)))
-		      ((eq? (car declaration) 'import) (set! import-declarations (cons declaration import-declarations)))
-		      ((eq? (car declaration) 'begin) (set! begin-declarations (cons declaration begin-declarations)))
-		      (else (error 'define-library "unknown declaration type:" (car declaration)))))
-	      (reverse declarations))
-
-    (for-each (lambda (declaration)
-		(for-each (lambda (spec)
-			    (cond ((symbol? spec) (set! export-only (cons spec export-only)))
-				  ((and (list? spec) (= (length spec) 3) (equal? (car spec) 'rename)) 
-				   (set! export-only (cons (cadr spec) export-only))
-				   (set! export-rename (cons (cons (cadr spec) (caddr spec)) export-rename)))
-				  (else (error 'define-library "unknown export spec:" spec)))
-			    )
-			  (cdr declaration))
-		)
-	      export-declarations)
-
-    (let ((environment-declaration (cons 'environment (map cadr import-declarations)))
-	  )
-
-      (_quasiquote (environment-update! (current-environment) ',(string->symbol (object->string name)) 
-					(eval
-					 '(begin
-					    (_unquote-splicing begin-declarations)	   
-					    (environment-rename (environment-only (current-environment) 
-
-										  (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-only)))
-
-								(_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-rename)))
-					    )
-					    (_unquote environment-declaration)
-					    
-					    )
-					 )))))
-   
-
-
+  (quasiquote (environment-define! (current-environment) ',name-symbol (make-library (_unquote-splicing quoted-declarations))))
+  ))
 
 
 (define-macro (import . sets)

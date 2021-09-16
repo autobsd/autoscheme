@@ -6,5 +6,6 @@
 (foreign-definition (include-string "definitions.c"))
 (foreign-initialization (include-string "initialization.c"))
 
+(include "procedures.scm")
 (include "macros.scm")
 

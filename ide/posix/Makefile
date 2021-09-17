@@ -56,11 +56,27 @@ auto_scheme_environment_dep = \
 	$(modules_dir)/auto/scheme/environment/declarations.h \
 	$(modules_dir)/auto/scheme/environment/definitions.c \
 	$(modules_dir)/auto/scheme/environment/initialization.c \
-	$(modules_dir)/auto/scheme/environment/macros.scm \
+	$(modules_dir)/auto/scheme/environment/library.scm \
+
+
+
+auto_scheme_library_module_scm = $(modules_dir)/auto/scheme/library/module.scm 
+auto_scheme_library_dep = \
+	$(auto_scheme_library_module_scm) \
+	$(modules_dir)/auto/scheme/library/procedures.scm \
+	$(modules_dir)/auto/scheme/library/macros.scm \
+	$(modules_dir)/auto/scheme/library/library.scm \
+
 
 auto_scheme_module_scm = $(modules_dir)/auto/scheme/module.scm 
 auto_scheme_dep = \
 	$(auto_scheme_module_scm) \
+
+
+auto_scheme_eval_module_scm = $(modules_dir)/auto/scheme/eval/module.scm 
+auto_scheme_eval_dep = \
+	$(auto_scheme_eval_module_scm) \
+
 
 
 auto_scheme_list_module_scm = $(modules_dir)/auto/scheme/list/module.scm 
@@ -72,7 +88,9 @@ libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
 	$(obj_dir)/auto_scheme_environment.o \
+	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme.o \
+	$(obj_dir)/auto_scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
 
 
@@ -89,7 +107,7 @@ $(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme_environment auto_scheme"
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme_environment auto_scheme_library auto_scheme auto_scheme_eval"
 
 
 
@@ -118,6 +136,15 @@ $(gen_dir)/auto_scheme_list.c: $(auto_scheme_list_dep) $(_bin_dir)/autoscheme
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_list_module_scm) -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
 
 
+$(obj_dir)/auto_scheme_eval.o: $(gen_dir)/auto_scheme_eval.c
+	mkdir -p $(obj_dir)
+	$(CC) -c $(gen_dir)/auto_scheme_eval.c -o $(obj_dir)/auto_scheme_eval.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_eval.c: $(auto_scheme_eval_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_eval_module_scm) -n auto_scheme_eval -o $(gen_dir)/auto_scheme_eval.c
+
+
 
 $(obj_dir)/auto_scheme.o: $(gen_dir)/auto_scheme.c
 	mkdir -p $(obj_dir)
@@ -126,6 +153,16 @@ $(obj_dir)/auto_scheme.o: $(gen_dir)/auto_scheme.c
 $(gen_dir)/auto_scheme.c: $(auto_scheme_dep) $(_bin_dir)/autoscheme
 	mkdir -p $(gen_dir)
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_module_scm) -n auto_scheme -o $(gen_dir)/auto_scheme.c
+
+
+
+$(obj_dir)/auto_scheme_library.o: $(gen_dir)/auto_scheme_library.c
+	mkdir -p $(obj_dir)
+	$(CC) -c $(gen_dir)/auto_scheme_library.c -o $(obj_dir)/auto_scheme_library.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_library.c: $(auto_scheme_library_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_library_module_scm) -n auto_scheme_library -o $(gen_dir)/auto_scheme_library.c
 
 
 

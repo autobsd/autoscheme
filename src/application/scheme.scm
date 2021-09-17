@@ -2,23 +2,31 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(import (auto scheme)
+(import (only (auto scheme) 
+	      ;; begin
+	      ;; display
+	      ;; newline
+	      write
+	      )
 	)
-
 (display "inside AutoScheme application...\n")
+
+;; (display "auto_scheme: ")(write (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme)"))))(newline)
+;; (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+
 
 
 
 (define-library (mylib)
   (import (only (auto scheme) 
 		let begin define 
-		environment-rename 
-		environment-only
 		current-environment
 		quote
 		write
 		newline
-		))
+		)
+	  ;; (auto scheme environment)
+	  )
   (export (rename a aa) b c x y z)
   (begin 
 
@@ -31,7 +39,7 @@
     (define x 7) 
     (define y 8) 
     (define z 9)
-(write (current-environment))(newline)
+;; (write (current-environment))(newline)
     )
   )
 
@@ -44,6 +52,7 @@
 	)
 
 
+
 (display "aa: ")(write aa)(newline)
 (display "b: ")(write b)(newline)
 (display "c: ")(write c)(newline)
@@ -53,9 +62,12 @@
 (display "pre-z: ")(write pre-z)(newline)
 
 
+(import (auto scheme eval))
 
 (write (environment (only (mylib) aa b c)
 		    (prefix (except (only (mylib) x y z) y) pre-)
 		    ))
 (newline)
 
+;; (write (environment (auto scheme environment)))(newline)
+(write (environment (auto scheme library)))(newline)

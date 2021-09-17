@@ -2,6 +2,33 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+
+(define environment-import-sets!
+  (lambda (target . sets)
+
+    (letrec ((process-import-set
+	      (lambda (set)
+		(if (not (pair? set)) (error "improper import-set:" set)
+		    (cond ((equal? (car set) 'only) (apply environment-only (cons (process-import-set (cadr set)) (cddr set))))
+			  ((equal? (car set) 'except) (apply environment-except (cons (process-import-set (cadr set)) (cddr set))))
+			  ((equal? (car set) 'prefix) (environment-prefix (process-import-set (cadr set)) (caddr set)))
+			  ((equal? (car set) 'rename) (apply environment-rename (cons (process-import-set (cadr set)) (cddr set))))
+			  (else (environment-ref (current-environment) (string->symbol (object->string set))))
+			  ))))
+	     )
+      (for-each (lambda (set)
+		  (environment-import! target (process-import-set set))
+		  )
+		sets)
+
+      target
+      )))
+
+
+
+
+
+
 (define make-library
   (lambda declarations
 
@@ -13,17 +40,6 @@
 	     (export-rename '())
 
 	     (library-environment (make-environment))
-
-	     (process-import-set
-	      (lambda (set)
-		(if (not (pair? set)) (error "improper import-set:" set)
-		    (cond ((equal? (car set) 'only) (apply environment-only (cons (process-import-set (cadr set)) (cddr set))))
-			  ((equal? (car set) 'except) (apply environment-except (cons (process-import-set (cadr set)) (cddr set))))
-			  ((equal? (car set) 'prefix) (environment-prefix (process-import-set (cadr set)) (caddr set)))
-			  ((equal? (car set) 'rename) (apply environment-except (cons (process-import-set (cadr set)) (cddr set))))
-			  (else (environment-ref (current-environment) (string->symbol (object->string set))))
-			  ))))
-
 	     )
 
       (for-each (lambda (declaration)
@@ -46,28 +62,30 @@
 		export-declarations)
 
       (for-each (lambda (declaration)
-		  (for-each (lambda (set)
-			      (environment-import! library-environment (process-import-set set))
-			      )
-			    (cdr declaration))
+		  (apply environment-import-sets! (cons library-environment (cdr declaration)))
 		  )
 		import-declarations)
-      
 
 
       (eval
        (_quasiquote (begin
 		      (_unquote-splicing begin-declarations)	   
-		      (environment-rename (environment-only (current-environment) 
-
-							    (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-only)))
-
-					  (_unquote-splicing (map (lambda (sym) (_quasiquote (quote ,sym))) export-rename)))
+		      
 		      ))
 
        library-environment
-
        
        )
+
+
+      (apply environment-rename (cons (apply environment-only (cons library-environment
+
+								    export-only))
+
+
+				      export-rename))
+      
+
+
       )))
 

@@ -9,18 +9,27 @@
   		define-macro
   		lambda
 		eval
-		quasiquote
-		quote
-		map
-
-		append
 		cons
-  		))
+		apply
+  		)
+
+	  (only (auto scheme environment)
+		make-environment
+		)
+
+	  (only (auto scheme library)
+		environment-import-sets!
+		)
+	  )
 
   (export environment eval)
   (begin
 
-    (define-macro (environment . sets) (_quasiquote (environment-import-sets! (make-environment) (_unquote-splicing (map (lambda (set) (_quasiquote (quote ,set))) sets)))))
+    (define-macro (environment . sets) 
+
+      (apply environment-import-sets! (cons (make-environment) sets))
+      
+      )
 
     ))
 

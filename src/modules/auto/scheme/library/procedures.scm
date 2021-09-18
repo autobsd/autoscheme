@@ -2,7 +2,6 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-
 (define environment-import-sets!
   (lambda (target . sets)
 
@@ -15,16 +14,16 @@
 			  ((equal? (car set) 'rename) (apply environment-rename (cons (process-import-set (cadr set)) (cddr set))))
 			  (else (environment-ref (current-environment) (string->symbol (object->string set))))
 			  ))))
+	     
 	     )
       (for-each (lambda (set)
+
 		  (environment-import! target (process-import-set set))
 		  )
 		sets)
 
       target
       )))
-
-
 
 
 
@@ -70,22 +69,12 @@
       (eval
        (_quasiquote (begin
 		      (_unquote-splicing begin-declarations)	   
-		      
 		      ))
-
        library-environment
-       
        )
 
+      (apply environment-rename (cons (apply environment-only (cons library-environment export-only)) export-rename))
 
-      (apply environment-rename (cons (apply environment-only (cons library-environment
-
-								    export-only))
-
-
-				      export-rename))
-      
-
-
-      )))
+      ))
+  )
 

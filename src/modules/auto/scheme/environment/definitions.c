@@ -6,7 +6,7 @@ static pointer environment_define_d( pointer environment, pointer symbol, pointe
 {
     pointer x;
 
-    for( x = car( environment ); x != NIL; x = cdr( x )) 
+    for( x = car( environment ); is_pair( x ); x = cdr( x )) 
     {
 	if( caar( x ) == symbol )
 	{
@@ -41,7 +41,7 @@ static pointer ff_environment_undefine_d( pointer args )
 
     pointer x;
 
-    for( x = symbols; x != NIL; x = cdr( x ))
+    for( x = symbols; is_pair( x ); x = cdr( x ))
     {
 	environment_define_d( environment, car( x ), UNDEF );
     }
@@ -58,9 +58,9 @@ static pointer environment_defined_symbols( pointer environment )
 
     pointer x, y;
 
-    for( x = environment; x != NIL; x = cdr( x )) 
+    for( x = environment; is_pair( x ); x = cdr( x )) 
     {
-	for( y = car( x ); y != NIL; y = cdr( y )) 
+	for( y = car( x ); is_pair( y ); y = cdr( y )) 
 	{
 	    symbol = caar( y );
 
@@ -73,7 +73,6 @@ static pointer environment_defined_symbols( pointer environment )
 	    }
 	}
     }
-
     return reverse( defined_symbols );
 }
 
@@ -89,9 +88,9 @@ static pointer environment_assoc( pointer environment, pointer symbol )
 {
     pointer x, y;
 
-    for( x = environment; x != NIL; x = cdr( x )) 
+    for( x = environment; is_pair( x ); x = cdr( x )) 
     {
-	for( y = car( x ); y != NIL; y = cdr( y )) 
+	for( y = car( x ); is_pair( y ); y = cdr( y )) 
 	{
 	    if( caar( y ) == symbol )
 	    {
@@ -172,11 +171,11 @@ static pointer ff_environment_import_d( pointer args )
     pointer value;
     pointer x,y;
 
-    for( x = environments; x != NIL; x = cdr( x )) 
+    for( x = environments; is_pair( x ); x = cdr( x )) 
     {
 	symbols = environment_defined_symbols( car( x ));
 
-	for( y = symbols; y != NIL; y = cdr( y ))
+	for( y = symbols; is_pair( y ); y = cdr( y ))
 	{
 	    value = environment_ref( car( x ), car( y ));
 	    environment_define_d( target, car( y ), value);
@@ -193,7 +192,7 @@ static pointer ff_environment_only( pointer args )
     pointer value;
     pointer x;
 
-    for( x = symbols; x != NIL; x = cdr( x ))
+    for( x = symbols; is_pair( x ); x = cdr( x ))
     {
 	value = environment_ref( environment, car( x ));
 	environment_define_d( target, car( x ), value );
@@ -214,7 +213,7 @@ static pointer ff_environment_except( pointer args )
     pointer value;
     pointer x;
 
-    for( x = symbols; x != NIL; x = cdr( x ))
+    for( x = symbols; is_pair( x ); x = cdr( x ))
     {
 	symbol = car( x );
 
@@ -248,7 +247,7 @@ static pointer ff_environment_prefix( pointer args )
 
     pointer x;
 
-    for( x = symbols; x != NIL; x = cdr( x ))
+    for( x = symbols; is_pair( x ); x = cdr( x ))
     {
 	symbol = car( x );
 	value = environment_ref( environment, symbol );
@@ -284,7 +283,7 @@ static pointer ff_environment_rename( pointer args )
 
     pointer x;
 
-    for( x = symbols; x != NIL; x = cdr( x ))
+    for( x = symbols; is_pair( x ); x = cdr( x ))
     {
 	symbol = car( x );
 	value = environment_ref( environment, symbol );

@@ -4,7 +4,9 @@
 
 (environment-define! (current-environment) (string->symbol "(auto scheme environment)")
 		     (apply environment-only (cons (current-environment)
-						   '( make-environment
+						   '( current-environment
+						      calling-environment
+						      make-environment
 						      environment-define!
 						      environment-undefine!
 						      environment-defined-symbols

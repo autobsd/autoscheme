@@ -9,13 +9,15 @@
 				    )
 				  declarations))
 	)
-    (quasiquote (environment-define! (current-environment) ',name-symbol (make-library (_unquote-splicing quoted-declarations))))
+
+    (apply environment-define! (cons (calling-environment) (cons name-symbol (list (apply make-library declarations)))))
+
     ))
 
 
 (define-macro (import . sets)
 
-  (_quasiquote (environment-import-sets! (current-environment) (_unquote-splicing (map (lambda (set) (_quasiquote (quote ,set))) sets))))
+  (apply environment-import-sets! (cons (calling-environment) sets))
 
   )
 

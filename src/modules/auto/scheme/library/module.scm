@@ -2,7 +2,8 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-((lambda (parent-environment)
+(let ((parent-environment (calling-environment)))
+  
    (environment-import! (current-environment) parent-environment)
 
    (define object->string
@@ -15,12 +16,9 @@
        ))
 
 
-   (display "inside (auto scheme library)")(newline)
    (include "macros.scm")
    (include "procedures.scm")
    (include "library.scm")
-
-
 
 
    (environment-import! parent-environment (environment-only (current-environment) 
@@ -31,7 +29,3 @@
 							     (string->symbol "(auto scheme library)")
 							     ))
    )
-
-
- (current-environment)
- )

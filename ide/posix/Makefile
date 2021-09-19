@@ -123,7 +123,7 @@ $(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="_auto_scheme auto_scheme_eval" # auto_scheme_environment auto_scheme_library auto_scheme auto_scheme_eval"
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="auto_scheme auto_scheme_eval" # auto_scheme_environment auto_scheme_library auto_scheme auto_scheme_eval"
 
 
 

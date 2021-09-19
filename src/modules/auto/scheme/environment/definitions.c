@@ -118,7 +118,7 @@ static pointer environment_ref( pointer environment, pointer symbol )
 
     if( isfalse( binding ))
     {
-	char *format_string = "Unbounded variable %s";
+	char *format_string = "Unbound variable %s";
 	char *symbol_name = symname( symbol );
 	char *message;
 	size_t message_length;
@@ -298,4 +298,31 @@ static pointer ff_environment_rename( pointer args )
     }
 
     return target;
+}
+
+
+
+static pointer ff_environment_delete_d( pointer args )
+{
+    pointer environment = car( args );
+    pointer symbol = cadr( args );
+
+    pointer x, y;
+
+    pointer *parent;
+    
+    for( x = environment; is_pair( x ); x = cdr( x )) 
+    {
+	parent = &(car( x ));
+
+	for( y = car( x ); is_pair( y ); y = cdr( y )) 
+	{
+	    if( caar( y ) == symbol )
+		*parent = cdr( y );
+	    else
+		parent = &(cdr( y));
+	}
+    }
+    
+    return environment;
 }

@@ -16,3 +16,5 @@ static pointer ff_environment_only( pointer args );
 static pointer ff_environment_except( pointer args );
 static pointer ff_environment_prefix( pointer args );
 static pointer ff_environment_rename( pointer args );
+
+static pointer ff_environment_delete_d( pointer args );

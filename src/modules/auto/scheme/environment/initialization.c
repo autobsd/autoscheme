@@ -15,4 +15,5 @@ scheme_register_foreign_func( "environment-except",          ff_environment_exce
 scheme_register_foreign_func( "environment-prefix",          ff_environment_prefix          );
 scheme_register_foreign_func( "environment-rename",          ff_environment_rename          );
 
+scheme_register_foreign_func( "environment-delete!",         ff_environment_delete_d        );
 

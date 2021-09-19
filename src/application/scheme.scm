@@ -2,21 +2,22 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+;; (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+;; (quit)
 (import (only (auto scheme) 
 	      display
 	      newline
 	      write
 	      quit
+	      environment-defined-symbols
+	      current-environment
 	      let
 	      define
-	      apply
-	      cons
-	      quote
-	      string->symbol 
 	      )
-	(auto scheme environment)
+
 	)
 (display "inside AutoScheme application...\n")
+(display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
 
 (define x 7)
 (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
@@ -24,9 +25,11 @@
 (newline)
 
 (let ()
-  (import (only (auto scheme environment)
+  (import (only (auto scheme)
 		environment-update!
 		environment-ref
+		calling-environment
+		quote
 		))
   (define x 77)
   (display "x: ")(write x)(newline)
@@ -76,7 +79,11 @@
     )
   )
 
-
+(import (only (auto scheme) 
+	      apply
+	      string->symbol
+	      make-environment
+	      ))
 (display "(mylib): ")(write (environment-ref (current-environment) (string->symbol "(mylib)")))
 (newline)(newline)
 (display "new env: ")(write (apply make-environment '((m . 66)(n . 77)(o . 88) (p . 99))))
@@ -103,7 +110,7 @@
 (display "pre-z: ")(write pre-z)(newline)
 
 (import (auto scheme eval)
-	(auto scheme library)
+	(auto scheme)
 	)
 
 (write (environment (only (mylib) aa b c)
@@ -113,6 +120,6 @@
 
 (newline)
 (display "this-->")(newline)
-(write (environment (auto scheme environment)))(newline)
-(write (environment (auto scheme library)))(newline)
+(write (environment (auto scheme eval)))(newline)
+;; (write (environment (auto scheme)))(newline)
 (newline)

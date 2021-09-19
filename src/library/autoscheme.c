@@ -3212,6 +3212,7 @@ enum {
 	OP_CURR_ENV,
 
 	OP_CALL_ENV,
+	OP_GLOB_ENV,
 
 	OP_READ,
 	OP_READ_CHAR,
@@ -3442,7 +3443,7 @@ OP_EVAL:
 					}
 				}
 			}
-			Error_1("Unbounded variable", code);
+			Error_1("Unbound variable", code);
 		} else if (is_pair(code) && !is_environment(code)) {
 			s_save(OP_E0ARGS, NIL, code);
 			code = car(code);
@@ -3908,7 +3909,7 @@ OP_QQUOTE1:
 				}
 			}
 		}
-		Error_1("Unbounded variable", code);
+		Error_1("Unbound variable", code);
 
 	case OP_BEGIN:		/* begin */
 OP_BEGIN:
@@ -6634,8 +6635,12 @@ OP_ERR1:
 		s_return(envir);
 
 	case OP_CALL_ENV:	/* calling-environment */
-		if (!validargs("current-environment", 0, 0, TST_NONE)) Error_0(msg);
+		if (!validargs("calling-environment", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(car(cdar(c_nest)));
+
+	case OP_GLOB_ENV:	/* global-environment */
+		if (!validargs("global-environment", 0, 0, TST_NONE)) Error_0(msg);
+		s_return(global_env);
 
 		/* ========== reading part ========== */
 	case OP_READ:			/* read */
@@ -7324,6 +7329,7 @@ void init_procs(void)
 	mk_proc(OP_CURR_ENV, "current-environment");
 
 	mk_proc(OP_CALL_ENV, "calling-environment");
+	mk_proc(OP_GLOB_ENV, "global-environment");
 
 	mk_proc(OP_READ_CHAR, "read-char");
 	mk_proc(OP_PEEK_CHAR, "peek-char");

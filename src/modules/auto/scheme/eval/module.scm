@@ -5,19 +5,19 @@
 (define-library (auto scheme eval)
 
   (import (only (auto scheme) 
-  		begin
+  	        begin
   		define-macro
   		lambda
 		eval
 		cons
 		apply
-  		)
+  	  ;; 	)
 
-	  (only (auto scheme environment)
+	  ;; (only (auto scheme environment)
 		make-environment
-		)
+		;; )
 
-	  (only (auto scheme library)
+	  ;; (only (auto scheme library)
 		environment-import-sets!
 		)
 	  )

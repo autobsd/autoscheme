@@ -22,9 +22,10 @@
 	      (else (error "compile error - unknown number type: " num)))))
 
 
-    (define *foreign-intializations* #<unspecified>) 
-    (define *foreign-definitions* #<unspecified>) 
-    (define *foreign-declartions* #<unspecified>) 
+    (define *foreign-intializations* '()) 
+    (define *foreign-finalizations* '()) 
+    (define *foreign-definitions* '()) 
+    (define *foreign-declartions* '()) 
 
 
 
@@ -50,29 +51,37 @@
 							       included-string
 							       )))
 
-					(foreign-declaration . ,(lambda (form)
-								  (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
-									 )
-								    (set! *foreign-declartions* (cons included-string *foreign-declartions*))
-								    ;; #<unspecified>
-								    #t
-								    )))
+					(foreign-declare . ,(lambda (form)
+							      (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+								     )
+								(set! *foreign-declartions* (cons included-string *foreign-declartions*))
+								;; #<unspecified>
+								#t
+								)))
 
-					(foreign-definition . ,(lambda (form)
+					(foreign-define . ,(lambda (form)
+							     (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+								    )
+							       (set! *foreign-definitions* (cons included-string *foreign-definitions*))
+							       ;; #<unspecified> 
+							       #t
+							       )))
+
+					(foreign-initialize . ,(lambda (form)
 								 (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
 									)
-								   (set! *foreign-definitions* (cons included-string *foreign-definitions*))
+								   (set! *foreign-intializations* (cons included-string *foreign-intializations*))
 								   ;; #<unspecified> 
 								   #t
 								   )))
 
-					(foreign-initialization . ,(lambda (form)
-								     (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
-									    )
-								       (set! *foreign-intializations* (cons included-string *foreign-intializations*))
-								       ;; #<unspecified> 
-								       #t
-								       )))
+					(foreign-finalize . ,(lambda (form)
+							       (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
+								      )
+								 (set! *foreign-finalizations* (cons included-string *foreign-finalizations*))
+								 ;; #<unspecified> 
+								 #t
+								 )))
 					))
 		 (compile-time-macro? (lambda (form)
 					(and (pair? form) (symbol? (car form)) (assoc (car form) compile-time-macros))))
@@ -103,14 +112,14 @@
 			(included-expressions (with-input-from-file included-source read-list))
 			)
 		   (compile-expression sc (cons 'begin included-expressions) included-source quote-level)))
-		   
+		
 
 
 		((and (zero? quote-level) (compile-time-macro? expression))
 		 (let* ((expanded-expression (expand-compile-time-macro expression))
 			(_quote-level (if (equal? expanded-expression expression) -1 quote-level)))
 		   (compile-expression sc expanded-expression source _quote-level)
-		 ))
+		   ))
 
 		((pair? expression) (string-append "cons(" (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
 		((null? expression) (string-append "NIL"))
@@ -171,6 +180,8 @@
 
 			 evaluated-expressions
 
+			 (apply string-append *foreign-finalizations*)
+
 			 "return 0;\n"
 			 "}\n"
 			 
@@ -184,6 +195,7 @@
       (lambda (source-files module-name output-file)
 
 	(set! *foreign-intializations* '()) 
+	(set! *foreign-finalizations* '()) 
 	(set! *foreign-definitions* '()) 
 	(set! *foreign-declartions* '()) 
 

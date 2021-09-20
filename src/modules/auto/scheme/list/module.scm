@@ -3,7 +3,11 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define-library (auto scheme list)
-  (export alist-delete)
+  (import (auto scheme))
+  (export alist-delete 
+	  alist-delete!
+	  )
+
   (begin 
     
     (define alist-delete
@@ -12,4 +16,21 @@
 	      ((equal? (caar alist) key) (alist-delete (cdr alist) key))
 	      (else (cons (car alist) (alist-delete (cdr alist) key))))))
 
+
+    (define alist-delete!
+      (lambda (alist key)
+
+	(cond ((null? alist) '())
+
+	      ((equal? (caar alist) key) (cond ((null? (cdr alist)) '())
+					       (else (set-car! alist (cadr alist))
+						     (set-cdr! alist (cddr alist))
+						     (alist-delete alist key)
+						     alist)
+						     ))
+
+	      (else (set-cdr! alist (alist-delete (cdr alist) key)) alist)
+
+	      )
+	))
     ))

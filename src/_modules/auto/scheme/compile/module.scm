@@ -147,7 +147,7 @@
     (define module-prototype
       (lambda (name)
 	;; (string-append "int " "autoscheme_module__" name "( s7_scheme *s7, s7_pointer env )")))
-	(string-append "int " "autoscheme_module__" name "()")))
+	(string-append "int " "LOAD_MODULE__" name "()")))
 
 
 
@@ -268,11 +268,11 @@
 
 				    (apply string-append (map (lambda (name)
 								;; (string-append " autoscheme_module__" name "( s7, mod_env );\n"))
-								(string-append " autoscheme_module__" name "();\n"))
+								(string-append " LOAD_MODULE__" name "();\n"))
 							      module-list))
 
 				    ;; "    autoscheme_module__program( s7, mod_env );\n"
-				    "    autoscheme_module__program();\n"
+				    "    LOAD_MODULE__program();\n"
 
 				    ;; "s7_gc_unprotect_at( s7, mod_env_loc );\n"
 

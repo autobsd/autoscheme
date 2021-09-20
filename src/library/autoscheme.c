@@ -6636,7 +6636,18 @@ OP_ERR1:
 
 	case OP_CALL_ENV:	/* calling-environment */
 		if (!validargs("calling-environment", 0, 0, TST_NONE)) Error_0(msg);
-		s_return(car(cdar(c_nest)));
+		printf("--->\n");fflush(stdout);
+		s_return(dump_envir(dump));
+
+		/* s_return(cons(NIL,NIL)); */
+
+		/* s_return(car(cdar(c_nest))); */
+		/* s_return(dump_envir(dump)); */
+		/* s_return(car(cdar(cdr(c_nest)))); */
+
+
+
+
 
 	case OP_GLOB_ENV:	/* global-environment */
 		if (!validargs("global-environment", 0, 0, TST_NONE)) Error_0(msg);

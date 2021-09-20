@@ -64,6 +64,11 @@ auto_scheme_dep = \
 	$(modules_dir)/auto/scheme/library/library.scm \
 
 
+auto_scheme_base_module_scm = $(modules_dir)/auto/scheme/base/module.scm 
+auto_scheme_base_dep = \
+	$(auto_scheme_base_module_scm) \
+
+
 
 # auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
 # auto_scheme_environment_dep = \
@@ -83,9 +88,6 @@ auto_scheme_dep = \
 # 	$(modules_dir)/auto/scheme/library/library.scm \
 
 
-# auto_scheme_module_scm = $(modules_dir)/auto/scheme/module.scm 
-# auto_scheme_dep = \
-# 	$(auto_scheme_module_scm) \
 
 
 auto_scheme_eval_module_scm = $(modules_dir)/auto/scheme/eval/module.scm 
@@ -103,14 +105,16 @@ libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
 	$(obj_dir)/auto_scheme.o \
+	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/auto_scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
-	# $(obj_dir)/_auto_scheme.o \
+
 	# $(obj_dir)/auto_scheme_environment.o \
 	# $(obj_dir)/auto_scheme_library.o \
 
 
-scheme_modules = auto_scheme auto_scheme_eval auto_scheme_list
+scheme_modules = auto_scheme
+# auto_scheme_base auto_scheme_eval auto_scheme_list
 
 
 all: build
@@ -126,7 +130,7 @@ $(gen_dir)/scheme.c: $(_bin_dir)/autoscheme $(src_dir)/application/scheme.scm $(
 	mkdir -p $(gen_dir)
 	echo "making $(gen_dir)/scheme.c"
 	cd ../../src/application && pwd && ls
-	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c  --load-modules="$(scheme_modules)" # auto_scheme_environment auto_scheme_library auto_scheme auto_scheme_eval"
+	$(_bin_dir)/autoscheme --compile $(src_dir)/application/scheme.scm -o $(gen_dir)/scheme.c --load-modules="$(scheme_modules)"
 
 
 
@@ -162,6 +166,16 @@ $(obj_dir)/auto_scheme_eval.o: $(gen_dir)/auto_scheme_eval.c
 $(gen_dir)/auto_scheme_eval.c: $(auto_scheme_eval_dep) $(_bin_dir)/autoscheme
 	mkdir -p $(gen_dir)
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_eval_module_scm) -n auto_scheme_eval -o $(gen_dir)/auto_scheme_eval.c
+
+
+
+$(obj_dir)/auto_scheme_base.o: $(gen_dir)/auto_scheme_base.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_base.c -o $(obj_dir)/auto_scheme_base.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_base.c: $(auto_scheme_base_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_base_module_scm) -n auto_scheme_base -o $(gen_dir)/auto_scheme_base.c
 
 
 

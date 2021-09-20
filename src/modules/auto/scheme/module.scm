@@ -8,40 +8,43 @@
 
 
 
-(let ((parent-environment (calling-environment)))
-  
-  (environment-import! (current-environment) parent-environment)
+((lambda (parent-environment)
+   
+   (environment-import! (current-environment) parent-environment)
 
-  (define object->string
-    (lambda (object)
-      (let ((string-port (open-output-string)))
-	(write object string-port)
-	(let ((output-string (get-output-string string-port)))
-	  (close-output-port string-port)
-	  output-string))
-      ))
-
-
-  (include "library/macros.scm")
-  (include "library/procedures.scm")
-  (include "library/library.scm")
-  (include "identifiers.scm")
+   (define object->string
+     (lambda (object)
+       (let ((string-port (open-output-string)))
+	 (write object string-port)
+	 (let ((output-string (get-output-string string-port)))
+	   (close-output-port string-port)
+	   output-string))
+       ))
 
 
-  (environment-define! (current-environment) (string->symbol "(auto scheme)")
-		       (apply environment-only (cons (current-environment)
-						     identifiers)))
+   (include "library/macros.scm")
+   (include "library/procedures.scm")
+   (include "library/library.scm")
+   (include "identifiers.scm")
 
-  (for-each (lambda (identifier)
-	      (environment-delete! parent-environment identifier)
-	      )
-	    identifiers)
 
-  (environment-import! parent-environment (environment-only (current-environment) 
-							    'define-library
-							    'import
-							    (string->symbol "(auto scheme)")
-							    'begin
-							    ))
+   (environment-define! (current-environment) (string->symbol "(auto scheme)")
+			(apply environment-only (cons (current-environment)
+						      (append '() identifiers)
+						      )))
 
-  )
+   (for-each (lambda (identifier)
+	       (environment-delete! parent-environment identifier)
+	       )
+	     identifiers)
+
+   (environment-import! parent-environment (environment-only (current-environment) 
+							     'define-library
+							     'import
+							     (string->symbol "(auto scheme)")
+							     'begin
+							     'let
+							     ))
+
+   )
+ (current-environment))

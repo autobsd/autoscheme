@@ -2,6 +2,7 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+(let () (let ()
 (import (only (auto scheme) 
 	      display
 	      newline
@@ -11,12 +12,27 @@
 	      current-environment
 	      let
 	      define
+	      lambda
+	      calling-environment
+	      length
 	      )
 
 	)
 (display "inside AutoScheme application...\n")
-(let () 
-  (import (auto scheme)
+(define test #t)
+(display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+(newline)
+((lambda (parent-environment)
+	 (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+	 (display "length: ")(write (length (current-environment)))(newline)
+
+	 (display "parent-environment: ")(write (environment-defined-symbols parent-environment))(newline)
+	 (display "length: ")(write (length parent-environment))(newline)
+
+	 (display "calling-environment: ")(write (environment-defined-symbols (calling-environment)))(newline)
+	 (display "length: ")(write (length (calling-environment)))(newline)
+(newline)
+  (import (except (auto scheme base) +)
 	  (auto scheme list)
 	  )
   (define alist '((a . 1)(b . 2)(c . 3)(d . 4)(e . 5)(f . 6)))
@@ -25,9 +41,8 @@
   (display "new-alist: ")(write new-alist)(newline)
   (display "eq?: ")(write (eq? alist new-alist))(newline)
   ;; (quit)
-)
-
-
+) (current-environment))
+(quit)
 (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
 
 (define x 7)
@@ -134,3 +149,4 @@
 (write (environment (auto scheme eval)))(newline)
 ;; (write (environment (auto scheme)))(newline)
 (newline)
+))

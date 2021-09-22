@@ -80,12 +80,12 @@ auto_scheme_base_dep = \
 
 
 
-# auto_scheme_library_module_scm = $(modules_dir)/auto/scheme/library/module.scm 
-# auto_scheme_library_dep = \
-# 	$(auto_scheme_library_module_scm) \
-# 	$(modules_dir)/auto/scheme/library/procedures.scm \
-# 	$(modules_dir)/auto/scheme/library/macros.scm \
-# 	$(modules_dir)/auto/scheme/library/library.scm \
+auto_scheme_library_module_scm = $(modules_dir)/auto/scheme/library/module.scm 
+auto_scheme_library_dep = \
+	$(auto_scheme_library_module_scm) \
+	$(modules_dir)/auto/scheme/library/procedures.scm \
+	$(modules_dir)/auto/scheme/library/macros.scm \
+	$(modules_dir)/auto/scheme/library/library.scm \
 
 
 
@@ -106,14 +106,14 @@ libautoscheme_obj = \
 	$(obj_dir)/autoscheme.o \
 	$(obj_dir)/auto_scheme.o \
 	$(obj_dir)/auto_scheme_environment.o \
+	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/auto_scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
 
-	# $(obj_dir)/auto_scheme_library.o \
 
 
-scheme_modules = auto_scheme auto_scheme_environment
+scheme_modules = auto_scheme auto_scheme_environment auto_scheme_environment
 # auto_scheme_base auto_scheme_eval auto_scheme_list
 
 
@@ -189,13 +189,13 @@ $(gen_dir)/auto_scheme.c: $(auto_scheme_dep) $(_bin_dir)/autoscheme
 
 
 
-# $(obj_dir)/auto_scheme_library.o: $(gen_dir)/auto_scheme_library.c
-# 	mkdir -p $(obj_dir)
-# 	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_library.c -o $(obj_dir)/auto_scheme_library.o -I$(include_dir)
+$(obj_dir)/auto_scheme_library.o: $(gen_dir)/auto_scheme_library.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_library.c -o $(obj_dir)/auto_scheme_library.o -I$(include_dir)
 
-# $(gen_dir)/auto_scheme_library.c: $(auto_scheme_library_dep) $(_bin_dir)/autoscheme
-# 	mkdir -p $(gen_dir)
-# 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_library_module_scm) -n auto_scheme_library -o $(gen_dir)/auto_scheme_library.c
+$(gen_dir)/auto_scheme_library.c: $(auto_scheme_library_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_library_module_scm) -n auto_scheme_library -o $(gen_dir)/auto_scheme_library.c
 
 
 

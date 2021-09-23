@@ -90,9 +90,9 @@ auto_scheme_library_dep = \
 
 
 
-auto_scheme_eval_module_scm = $(modules_dir)/auto/scheme/eval/module.scm 
-auto_scheme_eval_dep = \
-	$(auto_scheme_eval_module_scm) \
+scheme_eval_module_scm = $(modules_dir)/scheme/eval/module.scm 
+scheme_eval_dep = \
+	$(scheme_eval_module_scm) \
 
 
 
@@ -108,7 +108,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme_base.o \
-	$(obj_dir)/auto_scheme_eval.o \
+	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
 
 
@@ -159,13 +159,13 @@ $(gen_dir)/auto_scheme_list.c: $(auto_scheme_list_dep) $(_bin_dir)/autoscheme
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_list_module_scm) -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
 
 
-$(obj_dir)/auto_scheme_eval.o: $(gen_dir)/auto_scheme_eval.c
+$(obj_dir)/scheme_eval.o: $(gen_dir)/scheme_eval.c
 	mkdir -p $(obj_dir)
-	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_eval.c -o $(obj_dir)/auto_scheme_eval.o -I$(include_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/scheme_eval.c -o $(obj_dir)/scheme_eval.o -I$(include_dir)
 
-$(gen_dir)/auto_scheme_eval.c: $(auto_scheme_eval_dep) $(_bin_dir)/autoscheme
+$(gen_dir)/scheme_eval.c: $(scheme_eval_dep) $(_bin_dir)/autoscheme
 	mkdir -p $(gen_dir)
-	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_eval_module_scm) -n auto_scheme_eval -o $(gen_dir)/auto_scheme_eval.c
+	$(_bin_dir)/autoscheme --compile-module $(scheme_eval_module_scm) -n scheme_eval -o $(gen_dir)/scheme_eval.c
 
 
 

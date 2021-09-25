@@ -13,6 +13,4 @@ It comprises a command-line application and a set of modules that provide the fo
 - a command-line shell
 <!-- 
 - extensions to the R7RS standard
-- incremental garbage collection
-- kernel level multithreading 
 -->

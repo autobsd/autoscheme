@@ -36,7 +36,6 @@ gc
 ;; (auto scheme environment)
 global-environment
 current-environment
-calling-environment
 make-environment
 environment-defined-symbols
 environment-import!
@@ -53,7 +52,7 @@ environment-define!
 
 ;; (auto scheme library)
 environment-import-sets!
-make-library
+eval-library
 import
 define-library
 	

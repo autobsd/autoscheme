@@ -27,7 +27,7 @@
 
     (define-macro (environment . sets) 
 
-      (apply environment-import-sets! (cons (make-environment) sets))
+      (apply environment-import-sets! (cons (make-environment) (cons caller-env sets)))
       
       )
 

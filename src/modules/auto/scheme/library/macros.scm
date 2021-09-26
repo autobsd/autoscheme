@@ -10,28 +10,14 @@
 				  declarations))
 	)
 
-    (apply environment-define! (cons (calling-environment) (cons name-symbol (list (apply make-library declarations)))))
-    ;; (apply environment-define! (cons (global-environment) (cons name-symbol (list (apply make-library declarations)))))
+    (apply environment-define! (cons caller-env (cons name-symbol (list (eval-library declarations caller-env)))))
 
     ))
 
 
 (define-macro (import . sets)
 
-  (cond (else;;(and (pair? sets)(pair? (car sets))(equal? (caar sets) 'except)) 
-  	 (display "found import sets: ")(write sets)(newline)
-  	 (display "calling-environment: ")(write (environment-defined-symbols (calling-environment)))(newline)
-  	 (display "length: ")(write (length (calling-environment)))(newline)
-	 (newline)
-  	 ;; (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
-  	 ;; (display "length: ")(write (length (current-environment)))(newline)
-	 ;; (newline)
-  	 (display "global-environment: ")(write (environment-defined-symbols (global-environment)))(newline)
-  	 (display "length: ")(write (length (global-environment)))(newline)
-  	 ))
-
-  ;; (apply environment-import-sets! (cons (global-environment) sets))
-  (apply environment-import-sets! (cons (calling-environment) sets))
+  (apply environment-import-sets! (cons caller-env (cons caller-env sets)))
 
   )
 

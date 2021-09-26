@@ -3,16 +3,17 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define environment-import-sets!
-  (lambda (target . sets)
+  (lambda (target source . sets)
 
     (letrec ((process-import-set
 	      (lambda (set)
+
 		(if (not (pair? set)) (error "improper import-set:" set)
 		    (cond ((equal? (car set) 'only) (apply environment-only (cons (process-import-set (cadr set)) (cddr set))))
 			  ((equal? (car set) 'except) (apply environment-except (cons (process-import-set (cadr set)) (cddr set))))
 			  ((equal? (car set) 'prefix) (environment-prefix (process-import-set (cadr set)) (caddr set)))
 			  ((equal? (car set) 'rename) (apply environment-rename (cons (process-import-set (cadr set)) (cddr set))))
-			  (else (environment-ref (current-environment) (string->symbol (object->string set))))
+			  (else (environment-ref source (string->symbol (object->string set))))
 			  ))))
 	     
 	     )
@@ -28,8 +29,8 @@
 
 
 
-(define make-library
-  (lambda declarations
+(define eval-library
+  (lambda (declarations environment)
 
     (letrec ((export-declarations '())
 	     (import-declarations '())
@@ -61,7 +62,7 @@
 		export-declarations)
 
       (for-each (lambda (declaration)
-		  (apply environment-import-sets! (cons library-environment (cdr declaration)))
+		  (apply environment-import-sets! (cons library-environment (cons environment (cdr declaration))))
 		  )
 		import-declarations)
 

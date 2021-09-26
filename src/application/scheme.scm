@@ -2,7 +2,6 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(let () (let ()
 (import (only (auto scheme) 
 	      display
 	      newline
@@ -13,80 +12,63 @@
 	      let
 	      define
 	      lambda
-	      calling-environment
+	      ;; calling-environment
 	      length
 	      )
+	(auto scheme base)
 
 	)
 (display "inside AutoScheme application...\n")
-(define test #t)
-(display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+;; (define test #t)
+
 (newline)
 ((lambda (parent-environment)
-	 (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
-	 (display "length: ")(write (length (current-environment)))(newline)
 
-	 (display "parent-environment: ")(write (environment-defined-symbols parent-environment))(newline)
-	 (display "length: ")(write (length parent-environment))(newline)
+   (import (except (auto scheme base) +)
+	   (auto scheme list)
+	   )
+   (define alist '((a . 1)(b . 2)(c . 3)(d . 4)(e . 5)(f . 6)))
+   (display "alist: ")(write alist)(newline)
+   (define new-alist (alist-delete! alist 'b))
+   (display "new-alist: ")(write new-alist)(newline)
+   (display "eq?: ")(write (eq? alist new-alist))(newline)
+   ;; (quit)
+   ) (current-environment))
 
-	 (display "calling-environment: ")(write (environment-defined-symbols (calling-environment)))(newline)
-	 (display "length: ")(write (length (calling-environment)))(newline)
-(newline)
-  (import (except (auto scheme base) +)
-	  (auto scheme list)
-	  )
-  (define alist '((a . 1)(b . 2)(c . 3)(d . 4)(e . 5)(f . 6)))
-  (display "alist: ")(write alist)(newline)
-  (define new-alist (alist-delete! alist 'b))
-  (display "new-alist: ")(write new-alist)(newline)
-  (display "eq?: ")(write (eq? alist new-alist))(newline)
-  ;; (quit)
-) (current-environment))
-(quit)
-(display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
 
 (define x 7)
-(display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
 (display "x: ")(write x)(newline)
 (newline)
 
 (let ()
-  (import (only (auto scheme)
-		environment-update!
-		environment-ref
-		calling-environment
-		quote
-		))
   (define x 77)
   (display "x: ")(write x)(newline)
 
-  (display "x: ")(write (environment-ref (calling-environment) 'x))(newline)
+  ;; (display "x: ")(write (environment-ref caller-env 'x))(newline)
 
-  (environment-update! (calling-environment) 'y 88)
-  (display "calling-environment: ")(write (environment-defined-symbols (calling-environment)))(newline)
+  ;; (environment-update! caller-env 'y 88)
+  ;; (display ";; calling-environment: ")(write (environment-defined-symbols caller-env))(newline)
   (newline)
 
 
 )
-(display "y: ")(write y)(newline)
+;; (display "y: ")(write y)(newline)
+(display "x: ")(write x)(newline)
 
-;; (quit)
+;; ;; (quit)
 
-;; (display "auto_scheme: ")(write (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme)"))))(newline)
-;; (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
+;; ;; (display "auto_scheme: ")(write (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme)"))))(newline)
+;; ;; (display "current-environment: ")(write (environment-defined-symbols (current-environment)))(newline)
 
 
 
 
 (define-library (mylib)
   (import (only (auto scheme) 
-		let begin define 
+		define 
+		begin
 
-		quote
-		write
-		newline
 		)
-	  ;; (auto scheme environment)
 	  )
   (export (rename a aa) b c x y z zz)
   (begin 
@@ -101,7 +83,7 @@
     (define y 8) 
     (define z 9)
     (define zz 99)
-;; (write (current-environment))(newline)
+
     )
   )
 
@@ -109,6 +91,7 @@
 	      apply
 	      string->symbol
 	      make-environment
+	      environment-ref
 	      ))
 (display "(mylib): ")(write (environment-ref (current-environment) (string->symbol "(mylib)")))
 (newline)(newline)
@@ -117,15 +100,10 @@
 
 (import (only (mylib) aa b c)
 	(prefix (except (only (mylib) x y z) y) pre-)
-
-
  )
 
 
 
-
-(write (environment-defined-symbols (current-environment)))
-(newline)(newline)
 
 (display "aa: ")(write aa)(newline)
 (display "b: ")(write b)(newline)
@@ -135,18 +113,15 @@
 ;; (display "y: ")(write y)(newline)
 (display "pre-z: ")(write pre-z)(newline)
 
-(import (auto scheme eval)
-	(auto scheme)
+(import (scheme eval)
+
 	)
 
+(newline)(newline)
 (write (environment (only (mylib) aa b c)
 		    (prefix (except (only (mylib) x y z) y) pre-)
+
 		    ))
-
+		   
 
 (newline)
-(display "this-->")(newline)
-(write (environment (auto scheme eval)))(newline)
-;; (write (environment (auto scheme)))(newline)
-(newline)
-))

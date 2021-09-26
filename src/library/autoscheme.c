@@ -3509,7 +3509,17 @@ OP_APPLY:
 			s_return(x);
 		} else if (is_closure(code)) {	/* CLOSURE */
 			/* make environment */
+
+		    if( is_macro(code) )
+		    {
+			x = cons( cons( mk_symbol( "caller-env" ), envir ), NIL );
+			envir = cons(x, closure_env(code));
+		    }
+		    else
+		    {
 			envir = cons(NIL, closure_env(code));
+		    }
+
 			setenvironment(envir);
 			for (mark_x = car(closure_code(code));
 			     is_pair(mark_x); mark_x = cdr(mark_x), args = cdr(args)) {
@@ -6634,21 +6644,6 @@ OP_ERR1:
 		if (!validargs("current-environment", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(envir);
 
-	case OP_CALL_ENV:	/* calling-environment */
-		if (!validargs("calling-environment", 0, 0, TST_NONE)) Error_0(msg);
-		printf("--->\n");fflush(stdout);
-		s_return(dump_envir(dump));
-
-		/* s_return(cons(NIL,NIL)); */
-
-		/* s_return(car(cdar(c_nest))); */
-		/* s_return(dump_envir(dump)); */
-		/* s_return(car(cdar(cdr(c_nest)))); */
-
-
-
-
-
 	case OP_GLOB_ENV:	/* global-environment */
 		if (!validargs("global-environment", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(global_env);
@@ -7339,7 +7334,6 @@ void init_procs(void)
 	mk_proc(OP_INT_ENV, "interaction-environment");
 	mk_proc(OP_CURR_ENV, "current-environment");
 
-	mk_proc(OP_CALL_ENV, "calling-environment");
 	mk_proc(OP_GLOB_ENV, "global-environment");
 
 	mk_proc(OP_READ_CHAR, "read-char");

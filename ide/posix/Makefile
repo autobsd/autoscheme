@@ -113,8 +113,9 @@ libautoscheme_obj = \
 
 
 
-scheme_modules = auto_scheme auto_scheme_environment auto_scheme_environment
-# auto_scheme_base auto_scheme_eval auto_scheme_list
+scheme_modules = auto_scheme scheme_eval auto_scheme_base auto_scheme_list
+# auto_scheme_environment
+
 
 
 all: build

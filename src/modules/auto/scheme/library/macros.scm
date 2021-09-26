@@ -10,14 +10,14 @@
 				  declarations))
 	)
 
-    (apply environment-define! (cons caller-env (cons name-symbol (list (eval-library declarations caller-env)))))
+    (apply environment-define! (cons (expansion-environment) (cons name-symbol (list (eval-library declarations (expansion-environment))))))
 
     ))
 
 
 (define-macro (import . sets)
 
-  (apply environment-import-sets! (cons caller-env (cons caller-env sets)))
+  (apply environment-import-sets! (cons (expansion-environment) (cons (expansion-environment) sets)))
 
   )
 

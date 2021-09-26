@@ -3512,7 +3512,11 @@ OP_APPLY:
 
 		    if( is_macro(code) )
 		    {
-			x = cons( cons( mk_symbol( "caller-env" ), envir ), NIL );
+			x = cons( cons( cons( mk_symbol( "_expansion-environment" ), envir ), NIL ), NIL );
+			setenvironment( x );
+			y = mk_closure( cons( NIL, cons( mk_symbol( "_expansion-environment" ), NIL )), x );
+			x = cons( cons( mk_symbol( "expansion-environment" ), y ), NIL );
+
 			envir = cons(x, closure_env(code));
 		    }
 		    else

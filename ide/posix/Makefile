@@ -67,10 +67,6 @@ auto_scheme_dep = \
 auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
 auto_scheme_environment_dep = \
 	$(auto_scheme_environment_module_scm) \
-	$(modules_dir)/auto/scheme/environment/declarations.h \
-	$(modules_dir)/auto/scheme/environment/definitions.c \
-	$(modules_dir)/auto/scheme/environment/initialization.c \
-	$(modules_dir)/auto/scheme/environment/library.scm \
 
 
 
@@ -105,6 +101,26 @@ auto_scheme_write_module_scm = $(modules_dir)/auto/scheme/write/module.scm
 auto_scheme_write_dep = \
 	$(auto_scheme_write_module_scm) \
 
+auto_scheme_args_fold_module_scm = $(modules_dir)/auto/scheme/args/fold/module.scm 
+auto_scheme_args_fold_dep = \
+	$(auto_scheme_args_fold_module_scm) \
+
+auto_scheme_args_module_scm = $(modules_dir)/auto/scheme/args/module.scm 
+auto_scheme_args_dep = \
+	$(auto_scheme_args_module_scm) \
+
+auto_scheme_string_module_scm = $(modules_dir)/auto/scheme/string/module.scm 
+auto_scheme_string_dep = \
+	$(auto_scheme_string_module_scm) \
+
+auto_scheme_cxr_module_scm = $(modules_dir)/auto/scheme/cxr/module.scm 
+auto_scheme_cxr_dep = \
+	$(auto_scheme_cxr_module_scm) \
+
+auto_scheme_process_context_module_scm = $(modules_dir)/auto/scheme/process/context/module.scm 
+auto_scheme_process_context_dep = \
+	$(auto_scheme_process_context_module_scm) \
+
 
 libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
@@ -116,11 +132,16 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
 	$(obj_dir)/auto_scheme_write.o \
+	$(obj_dir)/auto_scheme_args_fold.o \
+	$(obj_dir)/auto_scheme_args.o \
+	$(obj_dir)/auto_scheme_string.o \
+	$(obj_dir)/auto_scheme_cxr.o \
+	$(obj_dir)/auto_scheme_process_context.o \
 
 
 
-scheme_modules = auto_scheme auto_scheme_eval auto_scheme_base auto_scheme_list auto_scheme_write
-# auto_scheme_environment auto_scheme_library
+scheme_modules = auto_scheme auto_scheme_base auto_scheme_environment auto_scheme_eval auto_scheme_list auto_scheme_write auto_scheme_cxr auto_scheme_string auto_scheme_args_fold auto_scheme_args auto_scheme_process_context
+#  auto_scheme_library
 
 
 
@@ -157,6 +178,51 @@ $(lib_dir)/libautoscheme.a: $(libautoscheme_obj)
 
 
 
+$(obj_dir)/auto_scheme_process_context.o: $(gen_dir)/auto_scheme_process_context.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_process_context.c -o $(obj_dir)/auto_scheme_process_context.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_process_context.c: $(auto_scheme_process_context_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_process_context_module_scm) -n auto_scheme_process_context -o $(gen_dir)/auto_scheme_process_context.c
+
+
+$(obj_dir)/auto_scheme_cxr.o: $(gen_dir)/auto_scheme_cxr.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_cxr.c -o $(obj_dir)/auto_scheme_cxr.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_cxr.c: $(auto_scheme_cxr_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_cxr_module_scm) -n auto_scheme_cxr -o $(gen_dir)/auto_scheme_cxr.c
+
+
+$(obj_dir)/auto_scheme_string.o: $(gen_dir)/auto_scheme_string.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_string.c -o $(obj_dir)/auto_scheme_string.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_string.c: $(auto_scheme_string_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_string_module_scm) -n auto_scheme_string -o $(gen_dir)/auto_scheme_string.c
+
+
+$(obj_dir)/auto_scheme_args.o: $(gen_dir)/auto_scheme_args.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_args.c -o $(obj_dir)/auto_scheme_args.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_args.c: $(auto_scheme_args_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_args_module_scm) -n auto_scheme_args -o $(gen_dir)/auto_scheme_args.c
+
+
+$(obj_dir)/auto_scheme_args_fold.o: $(gen_dir)/auto_scheme_args_fold.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_args_fold.c -o $(obj_dir)/auto_scheme_args_fold.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_args_fold.c: $(auto_scheme_args_fold_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_args_fold_module_scm) -n auto_scheme_args_fold -o $(gen_dir)/auto_scheme_args_fold.c
+
+
 $(obj_dir)/auto_scheme_write.o: $(gen_dir)/auto_scheme_write.c
 	mkdir -p $(obj_dir)
 	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_write.c -o $(obj_dir)/auto_scheme_write.o -I$(include_dir)
@@ -164,7 +230,6 @@ $(obj_dir)/auto_scheme_write.o: $(gen_dir)/auto_scheme_write.c
 $(gen_dir)/auto_scheme_write.c: $(auto_scheme_write_dep) $(_bin_dir)/autoscheme
 	mkdir -p $(gen_dir)
 	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_write_module_scm) -n auto_scheme_write -o $(gen_dir)/auto_scheme_write.c
-
 
 
 $(obj_dir)/auto_scheme_list.o: $(gen_dir)/auto_scheme_list.c

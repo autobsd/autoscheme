@@ -134,6 +134,10 @@ force
 ;; (auto scheme load)
 load
 
+;; (auto scheme process context)
+emergency-exit
+exit
+
 ;; (auto scheme read)
 read
 

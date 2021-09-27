@@ -9,8 +9,29 @@
 
 
 ((lambda (parent-environment)
-   
    (environment-import! (current-environment) parent-environment)
+
+   (define exit #f)
+
+   (call-with-current-continuation 
+    (lambda (return)
+      (let ((obj (call-with-current-continuation 
+		  (lambda (_exit)
+		    (cond ((not exit)
+			   (set! exit _exit)
+			   (return)
+			   )
+			  )
+		    ))))
+
+	(emergency-exit (cond ((integer? obj) obj)
+			      ((eq? obj #f) 1)
+			      (else 0)))
+	
+	)
+      )
+    )
+
 
    (define object->string
      (lambda (object)

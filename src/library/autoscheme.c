@@ -3186,6 +3186,7 @@ enum {
 	OP_PUT,
 	OP_GET,
 	OP_QUIT,
+	OP_EMERGENCY_EXIT,
 	OP_GC,
 	OP_GCVERB,
 	OP_CALL_INFILE0,
@@ -6484,6 +6485,13 @@ OP_ERR1:
 		}
 		return 0;
 
+	case OP_EMERGENCY_EXIT:	/* emergency-exit */
+		if (!validargs("emergency-exit", 0, 1, TST_INTEGER)) Error_0(msg);
+		if (is_pair(args)) {
+		    exit( (int)ivalue(car(args)));
+		}
+		exit( 0 );
+
 	case OP_GC:		/* gc */
 		if (!validargs("gc", 0, 0, TST_NONE)) Error_0(msg);
 		gc(&NIL, &NIL);
@@ -7360,6 +7368,7 @@ void init_procs(void)
 	mk_proc(OP_ATOMP, "atom?");
 	mk_proc(OP_GENSYM, "gensym");
 	mk_proc(OP_QUIT, "quit");
+	mk_proc(OP_EMERGENCY_EXIT, "emergency-exit");
 }
 
 

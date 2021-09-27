@@ -2,10 +2,49 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-;; (foreign-declare (include-string "declarations.h"))
-;; (foreign-define (include-string "definitions.c"))
-;; (foreign-initialize (include-string "initialization.c"))
+(define-library (auto scheme environment)
+  
+  (import (only (auto scheme) 
+		global-environment
+		current-environment
+		make-environment
+		environment-defined-symbols
+		environment-import!
+		environment-delete!
+		environment-rename
+		environment-prefix
+		environment-except
+		environment-only
+		environment-update!
+		environment-ref
+		environment-assoc
+		environment-undefine!
+		environment-define!
 
-;; (include "library.scm")
 
+		)
 
+	  (only (auto scheme base)
+		begin
+		)
+	  )
+
+  (export global-environment
+	  current-environment
+	  make-environment
+	  environment-defined-symbols
+	  environment-import!
+	  environment-delete!
+	  environment-rename
+	  environment-prefix
+	  environment-except
+	  environment-only
+	  environment-update!
+	  environment-ref
+	  environment-assoc
+	  environment-undefine!
+	  environment-define!
+
+	  )
+
+  )

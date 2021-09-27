@@ -10,7 +10,7 @@
 				  declarations))
 	)
 
-    (apply environment-define! (cons (expansion-environment) (cons name-symbol (list (eval-library declarations (expansion-environment))))))
+    (apply environment-define! (cons (expansion-environment) (cons name-symbol (list (library-eval declarations (expansion-environment))))))
 
     ))
 

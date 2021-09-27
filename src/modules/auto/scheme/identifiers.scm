@@ -52,7 +52,7 @@ environment-define!
 
 ;; (auto scheme library)
 environment-import-sets!
-eval-library
+library-eval
 import
 define-library
 	

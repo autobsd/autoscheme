@@ -29,7 +29,7 @@
 
 
 
-(define eval-library
+(define library-eval
   (lambda (declarations environment)
 
     (letrec ((export-declarations '())

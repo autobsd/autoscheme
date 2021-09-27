@@ -2,7 +2,7 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(define-library (scheme eval)
+(define-library (auto scheme eval)
 
   (import (only (auto scheme) 
   	        begin

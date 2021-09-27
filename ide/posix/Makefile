@@ -101,6 +101,11 @@ auto_scheme_list_dep = \
 	$(auto_scheme_list_module_scm) \
 
 
+auto_scheme_write_module_scm = $(modules_dir)/auto/scheme/write/module.scm 
+auto_scheme_write_dep = \
+	$(auto_scheme_write_module_scm) \
+
+
 libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
@@ -110,11 +115,12 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/auto_scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
+	$(obj_dir)/auto_scheme_write.o \
 
 
 
-scheme_modules = auto_scheme auto_scheme_eval auto_scheme_base auto_scheme_list
-# auto_scheme_environment
+scheme_modules = auto_scheme auto_scheme_eval auto_scheme_base auto_scheme_list auto_scheme_write
+# auto_scheme_environment auto_scheme_library
 
 
 
@@ -148,6 +154,16 @@ $(lib_dir)/libautoscheme.a: $(libautoscheme_obj)
 	ar cr $(lib_dir)/libautoscheme.a  $(libautoscheme_obj)
 
 
+
+
+
+$(obj_dir)/auto_scheme_write.o: $(gen_dir)/auto_scheme_write.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_write.c -o $(obj_dir)/auto_scheme_write.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_write.c: $(auto_scheme_write_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_write_module_scm) -n auto_scheme_write -o $(gen_dir)/auto_scheme_write.c
 
 
 

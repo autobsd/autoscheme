@@ -127,7 +127,12 @@
        (interpret-selected (option-selected? "interpret" options))
 
 
-       (module-list (if load-modules (string-tokenize load-modules) '()))
+       (module-list (if load-modules (apply append (map (lambda (token)
+							  (if (= (string-length token) 0) '()
+							      (list token)))
+							(string-tokenize load-modules)))
+
+			'()))
        )
 
 

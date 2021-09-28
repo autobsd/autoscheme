@@ -2,33 +2,30 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-;; (foreign-declaration (include-string "declarations.h"))
-;; (foreign-definition (include-string "definitions.c"))
-;; (foreign-initialization (include-string "initialization.c"))
-
-
-
-;; (define-library (auto scheme process context)
-;;   (import (only (s7) exit emergency-exit))
-;;   (export exit emergency-exit)
-
-;;   (export command-line current-directory)
-;;   )
-
-;; (let ()
-;;   (import (only (s7) rootlet))
-;;   (environment-remove! (rootlet) 'command-line 'current-directory))
+(foreign-declare (include-string "declarations.h"))
+(foreign-define (include-string "definitions.c"))
+(foreign-initialize (include-string "initialization.c"))
 
 
 (define-library (auto scheme process context)
   (import (only (auto scheme)
 		emergency-exit
 		exit
-
+		quote
 		begin
-		))
-  (export emergency-exit
+		)
+	  (auto scheme environment)
+	  )
+  (export (rename _command-line command-line)
+	  emergency-exit
 	  exit
 	  )
+
+  (begin
+    (environment-update! (current-environment) '_command-line (environment-ref (global-environment) 'command-line))
+
+    (environment-delete! (global-environment) 'command-line)
+    )
   )
-  
+
+

@@ -120,6 +120,9 @@ auto_scheme_cxr_dep = \
 auto_scheme_process_context_module_scm = $(modules_dir)/auto/scheme/process/context/module.scm 
 auto_scheme_process_context_dep = \
 	$(auto_scheme_process_context_module_scm) \
+	$(modules_dir)/auto/scheme/process/context/declarations.h \
+	$(modules_dir)/auto/scheme/process/context/definitions.c \
+	$(modules_dir)/auto/scheme/process/context/initialization.c \
 
 
 libautoscheme_obj = \
@@ -140,8 +143,17 @@ libautoscheme_obj = \
 
 
 
-scheme_modules = auto_scheme auto_scheme_base auto_scheme_environment auto_scheme_eval auto_scheme_list auto_scheme_write auto_scheme_cxr auto_scheme_string auto_scheme_args_fold auto_scheme_args auto_scheme_process_context
-#  auto_scheme_library
+scheme_modules = auto_scheme auto_scheme_base \
+                 auto_scheme_environment \
+                 auto_scheme_eval \
+                 auto_scheme_list \
+                 auto_scheme_write \
+                 auto_scheme_cxr \
+                 auto_scheme_string \
+                 auto_scheme_args_fold \
+                 auto_scheme_args \
+                 auto_scheme_process_context \
+              #  auto_scheme_library
 
 
 

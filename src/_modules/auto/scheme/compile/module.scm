@@ -207,7 +207,8 @@
 				   "#include \"autoscheme.h\"\n"
 				   ))
 	       (declarations-template (string-append
-				       (module-prototype module-name) ";\n"))
+				       (module-prototype module-name) ";\n"
+				       ))
 	       
 	       (module-function (compile-module-function module-name source-files))
 
@@ -242,6 +243,10 @@
 								 module-list))
 
 				       (module-prototype "program") ";\n"
+
+				       "int auto_argc;\n"
+				       "char **auto_argv;\n"
+
 				       ))
 
 	       (functions-template (string-append
@@ -263,8 +268,8 @@
 
 				    ;; "    s7_scheme *s7 = auto_init();\n"
 
-				    ;; "    auto_argc = argc;\n"
-				    ;; "    auto_argv = argv;\n"
+				    "    auto_argc = argc;\n"
+				    "    auto_argv = argv;\n"
 
 				    (apply string-append (map (lambda (name)
 								;; (string-append " autoscheme_module__" name "( s7, mod_env );\n"))

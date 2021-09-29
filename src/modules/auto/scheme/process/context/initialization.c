@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 scheme_register_foreign_func( "command-line",            ff_command_line            );
+scheme_register_foreign_func( "current-directory",      ff_current_directory       );
 
 
-/* s7_define_function( s7, "current-directory", current_directory, 0, 0, false, "(current-directory) returns the current working directory" ); */
+

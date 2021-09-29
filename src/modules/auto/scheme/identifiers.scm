@@ -4,6 +4,7 @@
 
 (define identifiers '( 
 
+object->string
 receive
 
 atom?

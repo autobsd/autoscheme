@@ -17,14 +17,18 @@
 	  (auto scheme environment)
 	  )
   (export (rename _command-line command-line)
+	  (rename _current-directory current-directory)
 	  emergency-exit
 	  exit
 	  )
+  
 
   (begin
     (environment-update! (current-environment) '_command-line (environment-ref (global-environment) 'command-line))
-
     (environment-delete! (global-environment) 'command-line)
+
+    (environment-update! (current-environment) '_current-directory (environment-ref (global-environment) 'current-directory))
+    (environment-delete! (global-environment) 'current-directory)
     )
   )
 

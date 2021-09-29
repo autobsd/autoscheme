@@ -7,9 +7,12 @@
 	(auto scheme args fold)
 	(auto scheme args)
 	(auto scheme cxr)
-
 	(auto scheme process context)
 	(auto scheme string)
+	(auto scheme compile)
+
+	(auto scheme read)
+	(auto scheme file)
 	)
 
 
@@ -123,24 +126,11 @@
 			'()))
        )
 
-(newline)
-(display "result: ")(write result)(newline)
-(display "options: ")(write options)(newline)
-(display "source-files: ")(write source-files)(newline)
-(display "compile-selected: ")(write compile-selected)(newline)
-(display "output-file: ")(write output-file)(newline)
-(display "compile-module-selected: ")(write compile-module-selected)(newline)
-(display "module-name: ")(write module-name)(newline)
-(display "load-modules: ")(write load-modules)(newline)
-(display "interpret-selected: ")(write interpret-selected)(newline)
 
-
-(newline)
-
-  ;; (cond ;; (compile-selected (compile-program source-files module-list output-file))
-  ;; 	;; (compile-module-selected (compile-module source-files module-name output-file))
-  ;; 	;; (interpret-selected (interpret source-files))
-  ;; 	(else (help-processor))
-  ;; 	)
+  (cond (compile-selected (compile-program source-files module-list output-file))
+  	(compile-module-selected (compile-module source-files module-name output-file))
+  	(interpret-selected (interpret source-files))
+  	(else (help-processor))
+  	)
   
   )

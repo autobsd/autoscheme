@@ -6534,7 +6534,8 @@ OP_ERR1:
 		s_return(value);
 
 	case OP_CURR_INPORT:	/* current-input-port */
-		if (!validargs("current-input-port", 0, 0, TST_NONE)) Error_0(msg);
+		if (!validargs("current-input-port", 0, 1, TST_INPORT)) Error_0(msg);
+		if (is_pair(args)) inport = car(args);
 		s_return(inport);
 
 	case OP_CURR_OUTPORT:	/* current-output-port */
@@ -6545,7 +6546,8 @@ OP_ERR1:
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
-			s_return(F);
+		    Error_1("Unable to open file", car(args));
+		    /* s_return(F); */
 		}
 		code = cadr(args);
 		args = cons(x, inport);

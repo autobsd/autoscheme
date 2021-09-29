@@ -124,6 +124,21 @@ auto_scheme_process_context_dep = \
 	$(modules_dir)/auto/scheme/process/context/definitions.c \
 	$(modules_dir)/auto/scheme/process/context/initialization.c \
 
+auto_scheme_path_module_scm = $(modules_dir)/auto/scheme/path/module.scm 
+auto_scheme_path_dep = \
+	$(auto_scheme_path_module_scm) \
+
+auto_scheme_read_module_scm = $(modules_dir)/auto/scheme/read/module.scm 
+auto_scheme_read_dep = \
+	$(auto_scheme_read_module_scm) \
+
+auto_scheme_file_module_scm = $(modules_dir)/auto/scheme/file/module.scm 
+auto_scheme_file_dep = \
+	$(auto_scheme_file_module_scm) \
+
+auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm 
+auto_scheme_compile_dep = \
+	$(auto_scheme_compile_module_scm) \
 
 libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
@@ -140,6 +155,10 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_string.o \
 	$(obj_dir)/auto_scheme_cxr.o \
 	$(obj_dir)/auto_scheme_process_context.o \
+	$(obj_dir)/auto_scheme_path.o \
+	$(obj_dir)/auto_scheme_read.o \
+	$(obj_dir)/auto_scheme_file.o \
+	$(obj_dir)/auto_scheme_compile.o \
 
 
 
@@ -153,6 +172,10 @@ scheme_modules = auto_scheme auto_scheme_base \
                  auto_scheme_args_fold \
                  auto_scheme_args \
                  auto_scheme_process_context \
+                 auto_scheme_path \
+                 auto_scheme_read \
+                 auto_scheme_file \
+                 auto_scheme_compile \
               #  auto_scheme_library
 
 
@@ -188,6 +211,42 @@ $(lib_dir)/libautoscheme.a: $(libautoscheme_obj)
 
 
 
+
+
+$(obj_dir)/auto_scheme_compile.o: $(gen_dir)/auto_scheme_compile.c
+	mkdir -p $(obj_dir)
+	$(CC) $(compile_options) -c $(gen_dir)/auto_scheme_compile.c -o $(obj_dir)/auto_scheme_compile.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_compile.c: $(auto_scheme_compile_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_compile_module_scm) -n auto_scheme_compile -o $(gen_dir)/auto_scheme_compile.c
+
+
+$(obj_dir)/auto_scheme_file.o: $(gen_dir)/auto_scheme_file.c
+	mkdir -p $(obj_dir)
+	$(CC) $(file_options) -c $(gen_dir)/auto_scheme_file.c -o $(obj_dir)/auto_scheme_file.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_file.c: $(auto_scheme_file_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_file_module_scm) -n auto_scheme_file -o $(gen_dir)/auto_scheme_file.c
+
+
+$(obj_dir)/auto_scheme_read.o: $(gen_dir)/auto_scheme_read.c
+	mkdir -p $(obj_dir)
+	$(CC) $(read_options) -c $(gen_dir)/auto_scheme_read.c -o $(obj_dir)/auto_scheme_read.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_read.c: $(auto_scheme_read_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_read_module_scm) -n auto_scheme_read -o $(gen_dir)/auto_scheme_read.c
+
+
+$(obj_dir)/auto_scheme_path.o: $(gen_dir)/auto_scheme_path.c
+	mkdir -p $(obj_dir)
+	$(CC) $(path_options) -c $(gen_dir)/auto_scheme_path.c -o $(obj_dir)/auto_scheme_path.o -I$(include_dir)
+
+$(gen_dir)/auto_scheme_path.c: $(auto_scheme_path_dep) $(_bin_dir)/autoscheme
+	mkdir -p $(gen_dir)
+	$(_bin_dir)/autoscheme --compile-module $(auto_scheme_path_module_scm) -n auto_scheme_path -o $(gen_dir)/auto_scheme_path.c
 
 
 $(obj_dir)/auto_scheme_process_context.o: $(gen_dir)/auto_scheme_process_context.c

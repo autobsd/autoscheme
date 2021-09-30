@@ -5,12 +5,10 @@
 # AutoScheme
 
 AutoScheme is a practical cross-platform implementation of the Scheme programming language.  
-It comprises a command-line application and a set of modules that provide the following:
+It comprises a command-line application and an embeddable C library that provide the following:
 
+- a Scheme interpreter
 - an S2S compiler (Scheme to C/C++)
-- an interpreter
 - an interactive REPL
 - a command-line shell
-<!-- 
-- extensions to the R7RS standard
--->
+- a set of modules that implement and extend the R7RS standard

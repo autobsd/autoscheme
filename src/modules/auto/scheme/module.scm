@@ -43,6 +43,14 @@
        ))
 
 
+   ;; (define append
+   ;;   (lambda lists
+   ;;     (if (null? lists) '()
+   ;; 	   (let append-remainder ((remainder (car lists)))
+   ;; 	     (cond ((null? remainder) (apply auto-append (cdr lists)))
+   ;; 		   (else (cons (car remainder) (append-remainder (cdr remainder)))))))))
+
+
    (include "library/macros.scm")
    (include "library/procedures.scm")
    (include "library/library.scm")

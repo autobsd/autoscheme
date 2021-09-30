@@ -12,14 +12,13 @@
 	  (auto scheme base)
 	  (auto scheme file)
 	  (auto scheme read)
- 	  ;; (auto scheme process context)
 	  (auto scheme write)
 	  )
 
   (begin
 
     (define compile-number
-      (lambda (sc num)
+      (lambda (num)
 	(cond ((integer? num) (string-append "mk_integer(" (number->string num) ")"))
 	      ((real? num) (string-append "mk_real(" (number->string num) ")"))
 	      (else (error "compile error - unknown number type: " num)))))
@@ -34,36 +33,22 @@
 
 
     (define compile-expression
-      (lambda (sc expression source quote-level)
-;; (display "got here??\n")
-;; (write expression)(newline)
-	(letrec ((compile-time-macros (_quasiquote (;; (include . ,(lambda (form)
-					;; 	      (if (null? (cdr form)) form
-					;; 		  (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
-					;; 			 (included-expressions (begin  (display "inside compile-time 'include' macro...")(newline)
-					;; 						       (display "included-source: ")(write included-source)(newline)
-					;; 						       (with-input-from-file included-source read-list)))
-					;; 			 )
+      (lambda (expression source quote-level)
 
-					;; 		    (cons 'begin included-expressions)
-					;; 		    ))))
+	(letrec ((compile-time-macros `((include-string . ,(lambda (form)
 
-					(include-string . ,(lambda (form)
-;; (display "whatabout here????\n")
-;; (write source)(newline)
-;; (write  (path-directory source))(newline)
 							     (let* ((included-source (path-make-absolute (cadr form) (path-directory source)))
 								    (included-string (with-input-from-file included-source read-string))
 								    )
-;; (display "and here????\n")
+
 							       included-string
 							       )))
 
 					(foreign-declare . ,(lambda (form)
-;; (display "then??\n")
+
 							      (let* ((included-string (apply string-append (map expand-compile-time-macro (cdr form))))
 								     )
-;; (display "then??\n")
+
 								(set! *foreign-declartions* (cons included-string *foreign-declartions*))
 								;; #<unspecified>
 								#t
@@ -92,15 +77,14 @@
 								 ;; #<unspecified> 
 								 #t
 								 )))
-					))
+					)
 				      )
 		 
 		 (compile-time-macro? (lambda (form)
 					(and (pair? form) (symbol? (car form)) (assoc (car form) compile-time-macros))))
 
 		 (expand-compile-time-macro (lambda (form)
-;; (display "here????\n")
-;; (write form)(newline)
+
 					      (if (compile-time-macro? form)
 						  ((cdr (assoc (car form) compile-time-macros)) form)
 						  form)))
@@ -108,73 +92,73 @@
 		 )
 
 
-	  (cond ((and (pair? expression) (member (car expression) '(quote _quote)) (zero? quote-level))
-		 (string-append "cons( mk_symbol(\"quote\" )," (compile-expression sc (cdr expression) source -1) ")"))
+	  (cond ((and (pair? expression) (equal? (car expression) 'quote) (zero? quote-level))
+		 (string-append "cons( mk_symbol(\"quote\" )," (compile-expression (cdr expression) source -1) ")"))
 
-		((and (pair? expression) (member (car expression) '(quasiquote _quasiquote)) (not (negative? quote-level)))
-		 (string-append "cons( mk_symbol(\"quasiquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+		((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
+		 (string-append "cons( mk_symbol(\"quasiquote\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
 
-		((and (pair? expression) (member (car expression) '(unquote _unquote)) (positive? quote-level))
-		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
+		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
 
-		((and (pair? expression) (member (car expression) '(unquote-splicing _unquote-splicing)) (positive? quote-level))
-		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression sc (cdr expression) source (+ quote-level 1)) ")"))
+		((and (pair? expression) (equal? (car expression) 'unquote-splicing) (positive? quote-level))
+		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
 
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'include))
 		 (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
 			(included-expressions (with-input-from-file included-source read-list))
 			)
-		   (compile-expression sc (cons 'begin included-expressions) included-source quote-level)))
+		   (compile-expression (cons 'begin included-expressions) included-source quote-level)))
 		
 
 
 		((and (zero? quote-level) (compile-time-macro? expression))
 		 (let* ((expanded-expression (expand-compile-time-macro expression))
 			(_quote-level (if (equal? expanded-expression expression) -1 quote-level)))
-		   (compile-expression sc expanded-expression source _quote-level)
+		   (compile-expression expanded-expression source _quote-level)
 		   ))
 
-		((pair? expression) (string-append "cons(" (compile-expression sc (car expression) source quote-level) "," (compile-expression sc (cdr expression) source quote-level) ")"))
+		((pair? expression) (string-append "cons(" (compile-expression (car expression) source quote-level) "," (compile-expression (cdr expression) source quote-level) ")"))
 		((null? expression) (string-append "NIL"))
 		((boolean? expression) (if expression (string-append "T") (string-append "F")))
 		((char? expression) (string-append "mk_character(" (number->string (char->integer expression)) ")"))
-
-		;; ((equal? expression '_quote) (string-append "mk_symbol(\"quote\" )"))
-		;; ((equal? expression '_quasiquote) (string-append "mk_symbol(\"quasiquote\" )"))
-		;; ((equal? expression '_unquote) (string-append "mk_symbol(\"unquote\" )"))
-		;; ((equal? expression '_unquote-splicing) (string-append "mk_symbol(\"unquote-splicing\" )"))
-
 		((symbol? expression) (string-append "mk_symbol(\"" (symbol->string expression) "\")"))
 		((string? expression) (string-append "mk_string(" (object->string expression) ")" ))
 
-		((number? expression) (compile-number sc expression))
+		((number? expression) (compile-number expression))
 
-		((equal? expression #<undefined>) (string-append "UNDEF"))
-		((equal? expression #<unspecified>) (string-append "T"))
+		;; ((equal? expression #<undefined>) (string-append "UNDEF"))
+		;; ((equal? expression #<unspecified>) (string-append "T"))
 
 
 		(else (error "compile error - unknown expression type: " expression))
 		))))
 
 
-    (define module-prototype
-      (lambda (name)
-	;; (string-append "int " "autoscheme_module__" name "( s7_scheme *s7, s7_pointer env )")))
-	(string-append "int " "LOAD_MODULE__" name "()")))
+    (define module-function-name
+      (lambda (module-name)
+	(string-append "LOAD_MODULE__" module-name)))
+    
+    (define module-function-declaration
+      (lambda (module-name)
+	(string-append "int " (module-function-name module-name) "(void)")))
+
+    (define module-function-prototype
+      (lambda (module-name)
+	(string-append "int " (module-function-name module-name) "()")))
 
 
 
     (define compile-module-function
       (lambda (name sources)
 
-	(let* ((sc "s7")
-	       (evaluated-expressions (string-append  "scheme_eval(cons(mk_symbol(\"begin\")," 
+	(let* ((evaluated-expressions (string-append  "scheme_eval(cons(mk_symbol(\"begin\")," 
 						      (let get-expressions ((remainder sources)
 									    )
 							(cond ((null? remainder) (string-append "NIL" ))
 
-							      (else (string-append "cons(" (compile-expression sc (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ","
+							      (else (string-append "cons(" (compile-expression (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ","
 										   (get-expressions (cdr remainder))
 										   ")"
 										   ))
@@ -186,7 +170,7 @@
 
 	       )
 
-	  (string-append (module-prototype name) "\n"
+	  (string-append (module-function-prototype name) "\n"
 			 "{\n"
 
 
@@ -218,11 +202,10 @@
 	       (output-file (or output-file "module.c"))
 
 	       (includes-template (string-append 
-				   "#define _Bool int\n"
 				   "#include \"autoscheme.h\"\n"
 				   ))
 	       (declarations-template (string-append
-				       (module-prototype module-name) ";\n"
+				       (module-function-declaration module-name) ";\n"
 				       ))
 	       
 	       (module-function (compile-module-function module-name source-files))
@@ -254,10 +237,10 @@
 	       (declarations-template (string-append
 
 				       (apply string-append (map (lambda (name)
-								   (string-append (module-prototype name) ";\n"))
+								   (string-append (module-function-declaration name) ";\n"))
 								 module-list))
 
-				       (module-prototype "program") ";\n"
+				       (module-function-declaration "program") ";\n"
 
 				       "int auto_argc;\n"
 				       "char **auto_argv;\n"
@@ -266,39 +249,18 @@
 
 	       (functions-template (string-append
 
-				    ;; "s7_scheme *auto_init()\n"
-				    ;; "{\n"
-				    ;; "    s7_scheme *s7 = s7_init();\n"
-
-				    ;; "mod_env = s7_inlet( s7, s7_f( s7 ));\n"
-				    ;; "mod_env_loc = s7_gc_protect( s7, mod_env );\n"
-
-				    ;; "    return s7;\n"
-				    ;; "}\n"
-
 				    "int main( int argc, char **argv )\n"
 				    "{\n"
-
-				    "scheme_init();\n"
-
-				    ;; "    s7_scheme *s7 = auto_init();\n"
-
 				    "    auto_argc = argc;\n"
 				    "    auto_argv = argv;\n"
+				    "    scheme_init();\n"
 
 				    (apply string-append (map (lambda (name)
-								;; (string-append " autoscheme_module__" name "( s7, mod_env );\n"))
-								(string-append " LOAD_MODULE__" name "();\n"))
+								(string-append "    LOAD_MODULE__" name "();\n"))
 							      module-list))
 
-				    ;; "    autoscheme_module__program( s7, mod_env );\n"
 				    "    LOAD_MODULE__program();\n"
-
-				    ;; "s7_gc_unprotect_at( s7, mod_env_loc );\n"
-
-				    ;; "s7_free( s7 );\n"
-
-				    "scheme_deinit();\n"
+				    "    scheme_deinit();\n"
 				    "    return 0;\n"
 				    "}\n"
 				    ))

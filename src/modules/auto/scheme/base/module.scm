@@ -12,10 +12,7 @@
   (export (rename call-with-current-continuation call/cc))
   (export (rename auto-read-string read-string))
 
-
   (begin
-    (newline)(display "reading-string...\n")(newline)
-
 
     (define read-string
       (lambda (k . rest)
@@ -46,6 +43,8 @@
 		    (string-append s (apply auto-read-string (cons #f rest)))))
 	      (apply read-string args))
 	  )))
+
+
 
     )
   )

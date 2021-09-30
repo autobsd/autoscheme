@@ -5,7 +5,7 @@
 (define-macro (define-library name . declarations)
   (let ((name-symbol (string->symbol (object->string name)))
 	(quoted-declarations (map (lambda (declaration)
-				    (_quasiquote ',declaration)
+				    (quasiquote ',declaration)
 				    )
 				  declarations))
 	)

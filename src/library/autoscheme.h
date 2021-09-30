@@ -189,7 +189,7 @@ enum {
 	port_output = 2,
 	port_file = 4,
 	port_string = 8,
-	port_eof = 16,
+	port_eof = 16
 };
 #define is_port(p)      (type(p) & T_PORT)
 #define is_inport(p)    (is_port(p) && ((p)->_isfixnum & port_input))
@@ -267,6 +267,7 @@ pointer vector_elem(pointer v, int i);
 pointer set_vector_elem(pointer v, int i, pointer a);
 int list_length(pointer a);
 
+int eqv(pointer a, pointer b);
 int equal(pointer a, pointer b);
 pointer reverse(pointer a);
 
@@ -274,6 +275,7 @@ pointer reverse(pointer a);
 int member( pointer object, pointer list );
 pointer assoc( pointer object, pointer alist );
 pointer make_environment( pointer alist );
+pointer append(pointer a, pointer b);
 
 void FatalForeignError( char *s );
 
@@ -285,6 +287,8 @@ void scheme_register_foreign_func(const char *name, foreign_func ff);
 pointer scheme_apply0(const char *procname);
 pointer scheme_apply1(const char *procname, pointer argslist);
 pointer scheme_eval(pointer obj);
+pointer scheme_call(pointer func, pointer argslist);
+
 
 #ifdef __cplusplus
 }

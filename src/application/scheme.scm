@@ -79,8 +79,7 @@
 				  )))
 
 
-;; (help-processor)
-(display "(command-line): ")(write (command-line))(newline)
+
 
 
 (let* ((seeds (list '() '()))

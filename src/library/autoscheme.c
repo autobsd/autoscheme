@@ -160,7 +160,7 @@ pointer dump_base; /* pointer to base of allocated dump stack */
 unsigned char getc_save[4];	/* getc save buffer */
 int getc_save_count = 0;	/* getc save count */
 
-int internal_fgetc(FILE *fin)
+static int internal_fgetc(FILE *fin)
 {
 	if (fin == stdin && getc_save_count > 0) {
 		return getc_save[--getc_save_count];
@@ -168,10 +168,10 @@ int internal_fgetc(FILE *fin)
 	return fgetc(fin);
 }
 
-void internal_ungetc(int c, FILE *fin)
+static void internal_ungetc(int c, FILE *fin)
 {
 	if (fin == stdin) {
-		if (getc_save_count < sizeof(getc_save)) {
+		if ((unsigned long)getc_save_count < sizeof(getc_save)) {
 			getc_save[getc_save_count++] = (unsigned char)c;
 		} else {
 			ungetc(c, fin);
@@ -194,7 +194,7 @@ void internal_ungetc(int c, FILE *fin)
  *  0xFFFFFF00 - 0xFFFFFF7F (!UTF-8 0x80 - FF)
  *  0xFFFFFFFF              (EOF)
  */
-size_t utf32_to_utf8(const int utf32, char *const utf8)
+static size_t utf32_to_utf8(const int utf32, char *const utf8)
 {
 	if (utf32 < 0x00) {
 		if (utf8 != NULL) {
@@ -235,42 +235,42 @@ size_t utf32_to_utf8(const int utf32, char *const utf8)
 	return 0;
 }
 
-int utf32_toupper(int c)
+static int utf32_toupper(int c)
 {
 	return isascii(c) ? toupper(c) : c;	/* only ASCII */
 }
 
-int utf32_tolower(int c)
+static int utf32_tolower(int c)
 {
 	return isascii(c) ? tolower(c) : c;	/* only ASCII */
 }
 
-int utf32_isalpha(int c)
+static int utf32_isalpha(int c)
 {
 	return isascii(c) && isalpha(c);	/* only ASCII */
 }
 
-int utf32_isdigit(int c)
+static int utf32_isdigit(int c)
 {
 	return isascii(c) && isdigit(c);	/* only ASCII */
 }
 
-int utf32_isspace(int c)
+static int utf32_isspace(int c)
 {
 	return isascii(c) && isspace(c);	/* only ASCII */
 }
 
-int utf32_isupper(int c)
+static int utf32_isupper(int c)
 {
 	return isascii(c) && isupper(c);	/* only ASCII */
 }
 
-int utf32_islower(int c)
+static int utf32_islower(int c)
 {
 	return isascii(c) && islower(c);	/* only ASCII */
 }
 
-int utf8_fgetc(FILE *fin)
+static int utf8_fgetc(FILE *fin)
 {
 	int p[4];
 
@@ -324,7 +324,7 @@ int utf8_fgetc(FILE *fin)
 	}
 }
 
-size_t utf8_get_next(const char *utf8, int *utf32)
+static size_t utf8_get_next(const char *utf8, int *utf32)
 {
 	const unsigned char *p = (unsigned char *)utf8;
 
@@ -397,7 +397,7 @@ size_t utf8_get_next(const char *utf8, int *utf32)
 	}
 }
 
-size_t utf8_strlen(const char *s)
+static size_t utf8_strlen(const char *s)
 {
 	size_t count = 0;
 
@@ -408,7 +408,7 @@ size_t utf8_strlen(const char *s)
 	return count;
 }
 
-int utf8_strref(const char *s, size_t pos)
+static int utf8_strref(const char *s, size_t pos)
 {
 	int c;
 
@@ -419,7 +419,7 @@ int utf8_strref(const char *s, size_t pos)
 	return -1;
 }
 
-int utf8_strpos(const char *s, size_t pos)
+static int utf8_strpos(const char *s, size_t pos)
 {
 	const char *t = s;
 
@@ -430,7 +430,7 @@ int utf8_strpos(const char *s, size_t pos)
 	return -1;
 }
 
-int utf8_stricmp(const char *s1, const char *s2)
+static int utf8_stricmp(const char *s1, const char *s2)
 {
 	const char *p1 = s1, *p2 = s2;
 	int c1, c2;
@@ -452,14 +452,14 @@ int utf8_stricmp(const char *s1, const char *s2)
 pointer from_space;
 pointer to_space;
 
-void alloc_cellseg(void)
+static void alloc_cellseg(void)
 {
 	fcells = CELL_SEGSIZE;
 	free_cell = from_space = cell_seg;
 	to_space = cell_seg + CELL_SEGSIZE;
 }
 #else
-void alloc_cellseg(void)
+static void alloc_cellseg(void)
 {
 	pointer p;
 	int i;
@@ -478,7 +478,7 @@ void alloc_cellseg(void)
 #endif
 
 /* get new cell.  parameter a, b is marked by gc. */
-pointer get_cell(pointer *a, pointer *b)
+static pointer get_cell(pointer *a, pointer *b)
 {
 #ifndef USE_COPYING_GC
 	pointer x;
@@ -503,7 +503,7 @@ pointer get_cell(pointer *a, pointer *b)
 }
 
 #ifdef USE_COPYING_GC
-pointer find_consecutive_cells(size_t n)
+static pointer find_consecutive_cells(size_t n)
 {
 	if (fcells >= n) {
 		pointer p = free_cell;
@@ -540,7 +540,7 @@ pointer find_consecutive_cells(size_t n)
 }
 #endif
 
-pointer get_consecutive_cells(size_t n, pointer *a, pointer *b)
+static pointer get_consecutive_cells(size_t n, pointer *a, pointer *b)
 {
 	pointer x;
 
@@ -555,7 +555,7 @@ pointer get_consecutive_cells(size_t n, pointer *a, pointer *b)
 	return x;
 }
 
-void push_recent_alloc(pointer recent)
+static void push_recent_alloc(pointer recent)
 {
 	pointer holder = get_cell(&recent, &NIL);
 
@@ -600,7 +600,7 @@ pointer mk_integer(int32_t num)
 	return x;
 }
 
-pointer mk_bignum(int32_t col, pointer bn)
+static pointer mk_bignum(int32_t col, pointer bn)
 {
 	pointer x = get_cell(&bn, &NIL);
 
@@ -630,7 +630,7 @@ pointer mk_number(pointer v)
 }
 
 /* get new memblock */
-pointer mk_memblock(size_t len, pointer *a, pointer *b)
+static pointer mk_memblock(size_t len, pointer *a, pointer *b)
 {
 	pointer x = get_consecutive_cells(2 + len / sizeof(struct cell), a, b);
 
@@ -667,7 +667,7 @@ static void bignum_adjust(pointer z, pointer m, int32_t col, int32_t sign)
 	}
 }
 
-pointer mk_integer_from_str(const char *s, size_t len, int b)
+static pointer mk_integer_from_str(const char *s, size_t len, int b)
 {
 	int32_t i, col, sign;
 	pointer m, x;
@@ -712,7 +712,7 @@ pointer mk_integer_from_str(const char *s, size_t len, int b)
 }
 
 /* get new string */
-pointer get_string_cell(size_t len, pointer *a)
+static pointer get_string_cell(size_t len, pointer *a)
 {
 	pointer x = mk_memblock(len, a, &NIL);
 	pointer y = get_cell(&x, a);
@@ -916,7 +916,7 @@ pointer mk_port_string(pointer p, int prop)
 	return x;
 }
 
-void fill_vector(pointer v, pointer a)
+static void fill_vector(pointer v, pointer a)
 {
 	int i;
 	int n = 1 + (int)ivalue(v) / 2 + (int)ivalue(v) % 2;
@@ -962,7 +962,7 @@ pointer set_vector_elem(pointer v, int i, pointer a)
 	}
 }
 
-pointer mk_foreign_func(foreign_func ff, pointer *pp)
+static pointer mk_foreign_func(foreign_func ff, pointer *pp)
 {
 	pointer x = get_cell(pp, &NIL);
 
@@ -974,7 +974,7 @@ pointer mk_foreign_func(foreign_func ff, pointer *pp)
 
 #ifndef USE_SCHEME_STACK
 /* get dump stack */
-pointer mk_dumpstack(pointer next)
+static pointer mk_dumpstack(pointer next)
 {
 	pointer x = get_consecutive_cells(3, &next, &NIL);
 
@@ -991,7 +991,7 @@ pointer mk_dumpstack(pointer next)
 #ifdef USE_COPYING_GC
 pointer next;
 
-pointer forward(pointer x)
+static pointer forward(pointer x)
 {
 	if (x < from_space || from_space + CELL_SEGSIZE <= x) {
 		return x;
@@ -1031,7 +1031,7 @@ pointer forward(pointer x)
 }
 
 #ifndef USE_SCHEME_STACK
-void forward_dump(pointer base, pointer curr)
+static void forward_dump(pointer base, pointer curr)
 {
 	pointer p, q;
 
@@ -1356,7 +1356,7 @@ void gc(pointer *a, pointer *b)
 
 /* ========== Routines for Ports ========== */
 
-pointer port_from_filename(const char *filename, int prop)
+static pointer port_from_filename(const char *filename, int prop)
 {
 	FILE *fp = NULL;
 
@@ -1375,17 +1375,17 @@ pointer port_from_filename(const char *filename, int prop)
 
 #define BLOCK_SIZE 256
 
-pointer port_from_scratch(void)
+static pointer port_from_scratch(void)
 {
 	return mk_port_string(mk_empty_string(BLOCK_SIZE, '\0'), port_output);
 }
 
-pointer port_from_string(const char *str, int prop)
+static pointer port_from_string(const char *str, int prop)
 {
 	return mk_port_string(mk_string(str), prop);
 }
 
-pointer realloc_port_string(pointer p)
+static pointer realloc_port_string(pointer p)
 {
 	size_t curr_len = port_curr(p) - strvalue(car(p));
 	size_t new_size = strlength(car(p)) + BLOCK_SIZE;
@@ -1398,7 +1398,7 @@ pointer realloc_port_string(pointer p)
 	return p;
 }
 
-void port_close(pointer p)
+static void port_close(pointer p)
 {
 	if (port_file(p) != NULL) {
 		if (is_fileport(p)) {
@@ -1428,7 +1428,7 @@ void port_close(pointer p)
 #define TOK_PAREN_CURLY  32
 
 /* get new character from input file */
-int inchar(void)
+static int inchar(void)
 {
 	int c;
 
@@ -1461,7 +1461,7 @@ int inchar(void)
 }
 
 /* back to standard input */
-void flushinput(void)
+static void flushinput(void)
 {
 	while (1) {
 		if (is_fileport(inport) && port_file(inport) != stdin && port_file(inport) != NULL) {
@@ -1478,7 +1478,7 @@ void flushinput(void)
 }
 
 /* check c is delimiter */
-int isdelim(char *s, int c)
+static int isdelim(char *s, int c)
 {
 	if (c == EOF) return 0;
 	while (*s)
@@ -1488,7 +1488,7 @@ int isdelim(char *s, int c)
 }
 
 /* back character to input buffer */
-void backchar(int c)
+static void backchar(int c)
 {
 	if (c != EOF) {
 		if (is_fileport(inport)) {
@@ -1503,7 +1503,7 @@ void backchar(int c)
 	}
 }
 
-void putstr(const char *s)
+static void putstr(const char *s)
 {
 	if (is_fileport(outport)) {
 		fputs(s, port_file(outport));
@@ -1521,7 +1521,7 @@ void putstr(const char *s)
 	}
 }
 
-void putcharacter(const int c)
+static void putcharacter(const int c)
 {
 	if (is_fileport(outport)) {
 		fputc(c, port_file(outport));
@@ -1537,7 +1537,7 @@ void putcharacter(const int c)
 }
 
 /* read chacters to delimiter */
-char *readstr(char *delim)
+static char *readstr(char *delim)
 {
 	char *p = strvalue(strbuff);
 	int c;
@@ -1563,7 +1563,7 @@ char *readstr(char *delim)
 }
 
 /* read string expression "xxx...xxx" */
-pointer readstrexp(void)
+static pointer readstrexp(void)
 {
 	char *p = strvalue(strbuff);
 	int c, c1 = 0;
@@ -1670,7 +1670,7 @@ pointer readstrexp(void)
 }
 
 /* skip white characters */
-int skipspace(void)
+static int skipspace(void)
 {
 	int c;
 
@@ -1681,7 +1681,7 @@ int skipspace(void)
 }
 
 /* get token */
-int token(void)
+static int token(void)
 {
 	int c = skipspace();
 	if (c == EOF) {
@@ -1750,7 +1750,7 @@ int token(void)
 /* ========== Routines for Printing ========== */
 #define	ok_abbrev(x)	(is_pair(x) && cdr(x) == NIL)
 
-void printslashstring(unsigned char *s)
+static void printslashstring(unsigned char *s)
 {
 	int d;
 
@@ -1789,7 +1789,7 @@ void printslashstring(unsigned char *s)
 	putcharacter('"');
 }
 
-char *atom2str(pointer l, int f)
+static char *atom2str(pointer l, int f)
 {
 	char *p;
 	if (l == NIL)
@@ -1952,7 +1952,7 @@ char *atom2str(pointer l, int f)
 }
 
 /* print atoms */
-size_t printatom(pointer l, int f)
+static size_t printatom(pointer l, int f)
 {
 	char *p = atom2str(l, f);
 
@@ -2249,7 +2249,7 @@ static void bignum_pow(pointer z, pointer x, int32_t val)
 /* ========== Routines for Evaluation Cycle ========== */
 
 /* make closure. c is code. e is environment */
-pointer mk_closure(pointer c, pointer e)
+static pointer mk_closure(pointer c, pointer e)
 {
 	pointer x = get_cell(&c, &e);
 
@@ -2261,7 +2261,7 @@ pointer mk_closure(pointer c, pointer e)
 }
 
 /* make continuation. */
-pointer mk_continuation(pointer d)
+static pointer mk_continuation(pointer d)
 {
 	pointer x = get_cell(&NIL, &d);
 
@@ -2284,7 +2284,7 @@ pointer reverse(pointer a) /* a must be checked by gc */
 }
 
 /* reverse list (without last arg) -- make new cells */
-void short_reverse(void)
+static void short_reverse(void)
 {
 	if (is_pair(args)) {
 		pointer p = cons(value, NIL);
@@ -2301,7 +2301,7 @@ void short_reverse(void)
 }
 
 /* reverse list --- no make new cells */
-pointer non_alloc_rev(pointer term, pointer list)
+static pointer non_alloc_rev(pointer term, pointer list)
 {
 	pointer p = list, result = term, q;
 
@@ -2361,7 +2361,7 @@ int list_length(pointer a)
 }
 
 /* shared tail */
-pointer shared_tail(pointer a, pointer b)
+static pointer shared_tail(pointer a, pointer b)
 {
 	int alen = list_length(a);
 	int blen = list_length(b);
@@ -2452,7 +2452,7 @@ int equal(pointer a, pointer b)
 	}
 }
 
-int is_ellipsis(pointer p)
+static int is_ellipsis(pointer p)
 {
 	pointer x, y;
 	for (x = envir; x != NIL; x = cdr(x)) {
@@ -2465,7 +2465,7 @@ int is_ellipsis(pointer p)
 	return p == ELLIPSIS;
 }
 
-int matchpattern(pointer p, pointer f, pointer keyword, int *s)
+static int matchpattern(pointer p, pointer f, pointer keyword, int *s)
 {
 	pointer x;
 	if (is_symbol(p)) {
@@ -2528,7 +2528,7 @@ int matchpattern(pointer p, pointer f, pointer keyword, int *s)
 }
 
 /* note: value = (vector of bindings, list of keywords) */
-void bindpattern(pointer p, pointer f, int d, int n, int *s)
+static void bindpattern(pointer p, pointer f, int d, int n, int *s)
 {
 	pointer x;
 	if (is_symbol(p)) {
@@ -2586,7 +2586,7 @@ void bindpattern(pointer p, pointer f, int d, int n, int *s)
 	}
 }
 
-pointer expandsymbol(pointer p)
+static pointer expandsymbol(pointer p)
 {
 	pointer x, y;
 	if (is_symbol(p)) {
@@ -2639,7 +2639,7 @@ pointer expandsymbol(pointer p)
 	}
 }
 
-pointer expandpattern(pointer p, int d, int n, int *e)
+static pointer expandpattern(pointer p, int d, int n, int *e)
 {
 	pointer x, y = NULL;
 	int i, j;
@@ -2783,7 +2783,7 @@ pointer expandpattern(pointer p, int d, int n, int *e)
 }
 
 /* make cons list for quasiquote */
-pointer mcons(pointer f, pointer l, pointer r)
+static pointer mcons(pointer f, pointer l, pointer r)
 {
 	pointer x;
 
@@ -2801,7 +2801,7 @@ pointer mcons(pointer f, pointer l, pointer r)
 }
 
 /* make append list for quasiquote */
-pointer mappend(pointer f, pointer l, pointer r)
+static pointer mappend(pointer f, pointer l, pointer r)
 {
 	pointer x;
 
@@ -2864,7 +2864,7 @@ pointer mappend(pointer f, pointer l, pointer r)
 
 #define s_next_op() ((int)(intptr_t)dump_op(dump_next(dump)))
 
-pointer s_clone(pointer d) {
+static pointer s_clone(pointer d) {
 	pointer p;
 
 	if (d == NIL) return dump_base;
@@ -2877,7 +2877,7 @@ pointer s_clone(pointer d) {
 	return dump_prev(p);
 }
 
-pointer s_clone_save(void) {
+static pointer s_clone_save(void) {
 	pointer p = NIL;
 
 	for (mark_x = dump_base; mark_x != dump; mark_x = dump_prev(mark_x)) {
@@ -3248,7 +3248,7 @@ enum {
 	OP_MACRO_EXPAND0,
 	OP_MACRO_EXPAND1,
 	OP_MACRO_EXPAND2,
-	OP_ATOMP,
+	OP_ATOMP
 };
 
 #define TST_NONE 0
@@ -3269,7 +3269,7 @@ enum {
 
 char msg[256];
 
-int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
+static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 {
 	pointer x;
 	int n = 0, i = 0;
@@ -3339,7 +3339,7 @@ int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 					return 0;
 				}
 				break;
-			case '\012': // TST_CHAR */
+			case '\012': /* TST_CHAR */
 				if (!is_character(car(x))) {
 					snprintf(msg, sizeof(msg), "%s: argument %d must be: character", name, i);
 					return 0;
@@ -3383,7 +3383,7 @@ int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 }
 
 /* kernel of this intepreter */
-int Eval_Cycle(int operator)
+static int Eval_Cycle(int operator)
 {
 	FILE *tmpfp = NULL;
 	int tok = 0;
@@ -6476,7 +6476,16 @@ OP_ERR1:
 
 	case OP_APPEND:	/* append */
 		if (!validargs("append", 0, 65535, TST_NONE)) Error_0(msg);
-		s_return(append(car(args), cadr(args)));
+		if( args == NIL ) s_return( NIL );
+		x = reverse( args );
+		y = cdr( x );
+		x = car( x );
+		while( is_pair( y )) 
+		{
+		    x = append( car( y ), x );
+		    y = cdr( y );
+		}
+		s_return( x );
 
 	case OP_QUIT:		/* quit */
 		if (!validargs("quit", 0, 1, TST_INTEGER)) Error_0(msg);
@@ -7049,7 +7058,7 @@ OP_PVECFROM:
 
 /* ========== Initialization of internal keywords ========== */
 
-void mk_syntax(int op, char *name)
+static void mk_syntax(int op, char *name)
 {
 	pointer x;
 
@@ -7062,7 +7071,7 @@ void mk_syntax(int op, char *name)
 	car(global_env) = x;
 }
 
-void mk_proc(int op, char *name)
+static void mk_proc(int op, char *name)
 {
 	pointer x, y;
 
@@ -7077,7 +7086,7 @@ void mk_proc(int op, char *name)
 }
 
 
-void init_vars_global(void)
+static void init_vars_global(void)
 {
 	oblist = NIL;
 	winders = NIL;
@@ -7118,7 +7127,7 @@ void init_vars_global(void)
 }
 
 
-void init_syntax(void)
+static void init_syntax(void)
 {
 	/* init syntax */
 	mk_syntax(OP_LAMBDA, "lambda");
@@ -7154,7 +7163,7 @@ void init_syntax(void)
 }
 
 
-void init_procs(void)
+static void init_procs(void)
 {
 	/* init procedure */
 	mk_proc(OP_PEVAL, "eval");
@@ -7479,7 +7488,7 @@ void scheme_register_foreign_func(const char *name, foreign_func ff)
 	car(global_env) = x;
 }
 
-void save_from_C_call(void)
+static void save_from_C_call(void)
 {
 	pointer x;
 #ifndef USE_SCHEME_STACK
@@ -7498,7 +7507,7 @@ void save_from_C_call(void)
 	envir = global_env;
 }
 
-void restore_from_C_call(void)
+static void restore_from_C_call(void)
 {
 #ifndef USE_SCHEME_STACK
 	c_sink = caar(c_nest);

@@ -16,13 +16,13 @@
     (define option 
       (lambda (names required-arg? optional-arg? processor)
 
-	(apply make-environment (_quasiquote ((names . ,names)
-					      (required-arg? . ,required-arg?)
-					      (optional-arg? . ,optional-arg?)
-					      (processor . ,processor)
+	(apply make-environment `((names . ,names)
+				  (required-arg? . ,required-arg?)
+				  (optional-arg? . ,optional-arg?)
+				  (processor . ,processor)
 
-					      )
-					     ))))
+				  )
+	       )))
 
     (define option-names (lambda (option) (environment-ref option 'names)))
     (define option-required-arg? (lambda (option) (environment-ref option 'required-arg?)))

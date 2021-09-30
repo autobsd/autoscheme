@@ -12,6 +12,7 @@ static pointer ff_command_line( pointer args )
     }
 
     return arguments;
+    ( void )args;
 }
 
 static pointer ff_current_directory( pointer args )
@@ -26,8 +27,8 @@ static pointer ff_current_directory( pointer args )
 	/* exit( 1 ); */
     }
 
-
     return mk_string( cwd );
+    ( void )args;
 }
 
 

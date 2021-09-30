@@ -1,9 +1,6 @@
 gen/
-_gen/
-obj/
 _obj/
 bin/
-_bin/
 include/
 lib/
 tmp/

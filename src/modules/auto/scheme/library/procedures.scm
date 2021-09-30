@@ -68,9 +68,9 @@
 
 
       (eval
-       (_quasiquote (begin
-		      (_unquote-splicing begin-declarations)	   
-		      ))
+       `(begin
+	  ,@begin-declarations
+	  )
        library-environment
        )
 

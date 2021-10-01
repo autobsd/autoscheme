@@ -9,10 +9,10 @@
 	(auto scheme cxr)
 	(auto scheme process context)
 	(auto scheme string)
-	(auto scheme compile)
-
 	(auto scheme read)
 	(auto scheme file)
+	(auto scheme compile)
+	(auto scheme interpret)
 	)
 
 
@@ -128,7 +128,7 @@
 
   (cond (compile-selected (compile-program source-files module-list output-file))
   	(compile-module-selected (compile-module source-files module-name output-file))
-  	(interpret-selected (interpret source-files))
+  	(interpret-selected (apply interpret source-files))
   	(else (help-processor))
   	)
   

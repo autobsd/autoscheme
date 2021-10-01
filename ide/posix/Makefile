@@ -116,6 +116,13 @@ auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm
 auto_scheme_compile_dep = \
 	$(auto_scheme_compile_module_scm) \
 
+auto_scheme_interpret_module_scm = $(modules_dir)/auto/scheme/interpret/module.scm 
+auto_scheme_interpret_dep = \
+	$(auto_scheme_interpret_module_scm) \
+	$(modules_dir)/auto/scheme/interpret/declarations.h \
+	$(modules_dir)/auto/scheme/interpret/definitions.c \
+
+
 libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
@@ -135,6 +142,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_read.o \
 	$(obj_dir)/auto_scheme_file.o \
 	$(obj_dir)/auto_scheme_compile.o \
+	$(obj_dir)/auto_scheme_interpret.o \
 
 
 
@@ -153,6 +161,7 @@ scheme_modules = auto_scheme \
                  auto_scheme_read \
                  auto_scheme_file \
                  auto_scheme_compile \
+                 auto_scheme_interpret \
               #  auto_scheme_library
 
 
@@ -182,6 +191,13 @@ $(lib_dir)/libautoscheme.a: $(libautoscheme_obj)
 	ar cr $(lib_dir)/libautoscheme.a  $(libautoscheme_obj)
 
 
+
+$(obj_dir)/auto_scheme_interpret.o: $(gen_dir)/auto_scheme_interpret.c
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_interpret.c -o $(obj_dir)/auto_scheme_interpret.o -I$(include_dir)
+$(gen_dir)/auto_scheme_interpret.c: $(auto_scheme_interpret_dep) $(bin_dir)/scheme-prime
+	mkdir -p $(gen_dir)
+	$(bin_dir)/scheme-prime --compile-module $(auto_scheme_interpret_module_scm) -n auto_scheme_interpret -o $(gen_dir)/auto_scheme_interpret.c
 
 $(obj_dir)/auto_scheme_compile.o: $(gen_dir)/auto_scheme_compile.c
 	mkdir -p $(obj_dir)
@@ -331,6 +347,7 @@ $(bin_dir)/scheme-prime:
 		$(prime_dir)/auto_scheme_environment.c \
 		$(prime_dir)/auto_scheme_cxr.c \
 		$(prime_dir)/auto_scheme_compile.c \
+		$(prime_dir)/auto_scheme_interpret.c \
 		$(prime_dir)/auto_scheme_args.c \
 		$(prime_dir)/auto_scheme_args_fold.c \
 		$(prime_dir)/scheme.c  

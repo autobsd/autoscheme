@@ -19,7 +19,10 @@
 
 	  ;; (only (auto scheme library)
 		environment-import-sets!
+
+		global-environment
 		)
+
 	  )
 
   (export environment eval)
@@ -28,6 +31,7 @@
     (define-macro (environment . sets) 
 
       (apply environment-import-sets! (cons (make-environment) (cons (expansion-environment) sets)))
+      ;; (apply environment-import-sets! (cons (make-environment) (cons (global-environment) sets)))
       
       )
 

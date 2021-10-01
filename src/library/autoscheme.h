@@ -247,7 +247,12 @@ extern pointer mark_x;
 extern pointer mark_y;
 extern jmp_buf error_jmp;
 
+extern pointer global_env;
+
 pointer cons(pointer a, pointer b);
+
+pointer mk_foreign_func(foreign_func ff, pointer *pp);
+
 pointer mk_character(int c);
 pointer mk_integer(int32_t num);
 pointer mk_real(double num);
@@ -287,6 +292,9 @@ void scheme_register_foreign_func(const char *name, foreign_func ff);
 pointer scheme_apply0(const char *procname);
 pointer scheme_apply1(const char *procname, pointer argslist);
 pointer scheme_eval(pointer obj);
+
+pointer autoscheme_eval( pointer object, pointer environment );
+
 pointer scheme_call(pointer func, pointer argslist);
 
 

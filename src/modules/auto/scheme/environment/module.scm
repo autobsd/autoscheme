@@ -20,8 +20,7 @@
 		environment-assoc
 		environment-undefine!
 		environment-define!
-
-
+		environment?
 		)
 
 	  (only (auto scheme base)
@@ -44,7 +43,7 @@
 	  environment-assoc
 	  environment-undefine!
 	  environment-define!
-
+	  environment?
 	  )
 
   )

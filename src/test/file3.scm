@@ -2,5 +2,5 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(import (auto scheme))
-(display "inside file3.scm...\n")
+(import (auto scheme write))
+(display "hello world\n")

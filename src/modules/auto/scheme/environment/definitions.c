@@ -2,6 +2,14 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
+static pointer ff_environment_p( pointer args )
+{
+    if( is_environment( car( args )))
+	return T;
+
+    return F;
+}
+
 static pointer environment_define_d( pointer environment, pointer symbol, pointer value )
 {
     pointer x;

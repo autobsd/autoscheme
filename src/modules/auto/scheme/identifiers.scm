@@ -38,6 +38,7 @@ gc
 global-environment
 current-environment
 make-environment
+environment?
 environment-defined-symbols
 environment-import!
 environment-delete!

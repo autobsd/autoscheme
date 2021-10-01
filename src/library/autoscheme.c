@@ -962,7 +962,7 @@ pointer set_vector_elem(pointer v, int i, pointer a)
 	}
 }
 
-static pointer mk_foreign_func(foreign_func ff, pointer *pp)
+pointer mk_foreign_func(foreign_func ff, pointer *pp)
 {
 	pointer x = get_cell(pp, &NIL);
 
@@ -7548,6 +7548,21 @@ pointer scheme_eval(pointer obj)
 	restore_from_C_call();
 	return value;
 }
+pointer autoscheme_eval( pointer object, pointer environment )
+{
+	int old_repl = interactive_repl;
+	interactive_repl = 0;
+	save_from_C_call();
+	envir = environment;
+	args = NIL;
+	code = object;
+	Eval_Cycle(OP_EVAL);
+	interactive_repl = old_repl;
+	restore_from_C_call();
+	return value;
+}
+
+
 
 pointer scheme_apply0(const char *procname)
 {

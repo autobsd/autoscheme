@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include "autoscheme.h"
-int LOAD_MODULE__auto_scheme_library(void);
-int LOAD_MODULE__auto_scheme_library()
+int LOAD_MODULE__auto_scheme_library(pointer environment);
+int LOAD_MODULE__auto_scheme_library(pointer environment)
 {
-scheme_eval(cons(mk_symbol("begin"),cons(cons(mk_symbol("begin"),NIL),NIL)));
+autoscheme_eval(cons(mk_symbol("begin"),cons(cons(mk_symbol("begin"),NIL),NIL)),environment);
 return 0;
 }

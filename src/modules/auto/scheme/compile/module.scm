@@ -105,12 +105,17 @@
 		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
 
 
+		;; mk_foreign_func(foreign_func ff, pointer *pp)
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-function))
+		 (string-append "mk_foreign_func(" (object->string (cadr expression)) ",&NIL)" ))
+
+
+
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'include))
 		 (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
 			(included-expressions (with-input-from-file included-source read-list))
 			)
 		   (compile-expression (cons 'begin included-expressions) included-source quote-level)))
-		
 
 
 		((and (zero? quote-level) (compile-time-macro? expression))
@@ -142,18 +147,22 @@
     
     (define module-function-declaration
       (lambda (module-name)
-	(string-append "int " (module-function-name module-name) "(void)")))
+	;; (string-append "int " (module-function-name module-name) "(void)")
+	(string-append "int " (module-function-name module-name) "(pointer environment)")
+	))
 
     (define module-function-prototype
       (lambda (module-name)
-	(string-append "int " (module-function-name module-name) "()")))
+	;; (string-append "int " (module-function-name module-name) "()")
+	(string-append "int " (module-function-name module-name) "(pointer environment)")
+	))
 
 
 
     (define compile-module-function
       (lambda (name sources)
 
-	(let* ((evaluated-expressions (string-append  "scheme_eval(cons(mk_symbol(\"begin\")," 
+	(let* ((evaluated-expressions (string-append  "autoscheme_eval(cons(mk_symbol(\"begin\")," 
 						      (let get-expressions ((remainder sources)
 									    )
 							(cond ((null? remainder) (string-append "NIL" ))
@@ -165,7 +174,7 @@
 							      )
 							)
 
-						      "));\n"))
+						      "),environment);\n"))
 	       
 
 	       )
@@ -256,10 +265,10 @@
 				    "    scheme_init();\n"
 
 				    (apply string-append (map (lambda (name)
-								(string-append "    LOAD_MODULE__" name "();\n"))
+								(string-append "    LOAD_MODULE__" name "(global_env);\n"))
 							      module-list))
 
-				    "    LOAD_MODULE__program();\n"
+				    "    LOAD_MODULE__program(global_env);\n"
 				    "    scheme_deinit();\n"
 				    "    return 0;\n"
 				    "}\n"

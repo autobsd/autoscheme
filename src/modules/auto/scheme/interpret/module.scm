@@ -22,9 +22,11 @@
   (begin
     ;; ((environment-ref (global-environment) (string->symbol "load-modules")))
 
-(    (foreign-function ff_load_modules)
-)
+;; (    (foreign-function ff_load_modules)
+;; )
 
+;; (    (foreign-procedure OP_DISPLAY)
+;;  "\nthis is a message from locally registered procedure <---\n\n")
 
     ;; (define interpretation-environment
     ;;   (lambda ()

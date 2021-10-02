@@ -31,6 +31,7 @@ auto_scheme_module_scm = $(modules_dir)/auto/scheme/module.scm
 auto_scheme_dep = \
 	$(auto_scheme_module_scm) \
 	$(modules_dir)/auto/scheme/identifiers.scm \
+	$(modules_dir)/auto/scheme/procedures.c \
 	$(modules_dir)/auto/scheme/environment/declarations.h \
 	$(modules_dir)/auto/scheme/environment/definitions.c \
 	$(modules_dir)/auto/scheme/environment/initialization.c \

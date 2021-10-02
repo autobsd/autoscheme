@@ -4,12 +4,19 @@
 
 (foreign-declare (include-string "environment/declarations.h"))
 (foreign-define (include-string "environment/definitions.c"))
-(foreign-initialize (include-string "environment/initialization.c"))
+(foreign-initialize (include-string "environment/initialization.c")
+		    (include-string "procedures.c")
+		    )
 
 
 
 ((lambda (parent-environment)
    (environment-import! (current-environment) parent-environment)
+
+
+   (environment-define! (current-environment) 'display (foreign-procedure OP_DISPLAY))
+   (environment-define! (current-environment) 'newline (foreign-procedure OP_NEWLINE))
+
 
    (define exit #f)
 

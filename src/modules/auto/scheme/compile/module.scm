@@ -105,9 +105,12 @@
 		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
 
 
-		;; mk_foreign_func(foreign_func ff, pointer *pp)
+
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-function))
 		 (string-append "mk_foreign_func(" (object->string (cadr expression)) ",&NIL)" ))
+
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-procedure))
+		 (string-append "mk_proc(" (object->string (cadr expression)) ",&NIL)" ))
 
 
 

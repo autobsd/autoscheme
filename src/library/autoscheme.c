@@ -6726,39 +6726,44 @@ OP_PVECFROM:
 
 /* ========== Initialization of internal keywords ========== */
 
-static void mk_syntax(int op, char *name)
+static pointer mk_syntax( enum eval_op operator, char *name )
 {
-	pointer x;
-
-	x = mk_string(name);
-	type(x) |= T_SYMBOL | T_SYNTAX;
-	syntaxnum(x) = (short)op;
-	oblist = cons(x, oblist);
-	x = cons(x, x);
-	x = cons(x, car(global_env));
-	car(global_env) = x;
+    pointer x;
+    x = mk_string( name );
+    type( x ) |= T_SYMBOL | T_SYNTAX;
+    syntaxnum( x ) = (short)operator;
+    return x;
 }
 
-pointer mk_proc(enum eval_op operator, pointer *pp)
+void scheme_register_syntax( enum eval_op operator, char *name, pointer environment )
 {
-	pointer x = get_cell(pp, &NIL);
+    pointer x,y;
 
-	type(x) = (T_PROC | T_ATOM);
-	ivalue(x) = operator;
-	set_num_integer(x);
-	return x;
-}
-void scheme_register_proc(enum eval_op operator, char *name, pointer environment)
-{
-	pointer x, y;
-
-	x = mk_symbol(name);
-	y = mk_proc(operator, &x);
-	x = cons(x, y);
-	x = cons(x, car(environment));
-	car(environment) = x;
+    x = mk_symbol( name );
+    y = mk_syntax( operator, name );
+    x = cons( x, y );
+    x = cons( x, car(environment ));
+    car( global_env ) = x;
 }
 
+pointer mk_proc( enum eval_op operator, pointer *pp )
+{
+    pointer x = get_cell( pp, &NIL );
+    type( x ) = ( T_PROC | T_ATOM );
+    ivalue( x ) = operator;
+    set_num_integer( x );
+    return x;
+}
+
+void scheme_register_proc( enum eval_op operator, char *name, pointer environment )
+{
+    pointer x, y;
+    x = mk_symbol( name );
+    y = mk_proc( operator, &x );
+    x = cons( x, y );
+    x = cons( x, car( environment ));
+    car( environment ) = x;
+}
 
 static void init_vars_global(void)
 {
@@ -6801,42 +6806,6 @@ static void init_vars_global(void)
 }
 
 
-static void init_syntax(void)
-{
-	/* init syntax */
-	mk_syntax(OP_LAMBDA, "lambda");
-	mk_syntax(OP_QUOTE, "quote");
-	mk_syntax(OP_QQUOTE0, "quasiquote");
-	mk_syntax(OP_DEF0, "define");
-	mk_syntax(OP_IF0, "if");
-	mk_syntax(OP_BEGIN, "begin");
-	mk_syntax(OP_SET0, "set!");
-	mk_syntax(OP_LET0, "let");
-	mk_syntax(OP_LET0AST, "let*");
-	mk_syntax(OP_LET0REC, "letrec");
-	mk_syntax(OP_LETRECAST0, "letrec*");
-	mk_syntax(OP_DO0, "do");
-	mk_syntax(OP_COND0, "cond");
-	mk_syntax(OP_ELSE, "else");
-	mk_syntax(OP_FEEDTO, "=>");
-	mk_syntax(OP_DELAY, "delay");
-	mk_syntax(OP_LAZY, "lazy");
-	mk_syntax(OP_AND0, "and");
-	mk_syntax(OP_OR0, "or");
-	mk_syntax(OP_C0STREAM, "cons-stream");
-	mk_syntax(OP_0MACRO, "macro");
-	mk_syntax(OP_DEFMACRO0, "define-macro");
-	mk_syntax(OP_CASE0, "case");
-	mk_syntax(OP_WHEN0, "when");
-	mk_syntax(OP_UNLESS0, "unless");
-	mk_syntax(OP_SYNTAXRULES, "syntax-rules");
-	mk_syntax(OP_DEFSYNTAX0, "define-syntax");
-	mk_syntax(OP_LETSYNTAX0, "let-syntax");
-	mk_syntax(OP_LETRECSYNTAX0, "letrec-syntax");
-	mk_syntax(OP_RECEIVE0, "receive");
-}
-
-
 /* initialization of AutoScheme */
 void scheme_init(void)
 {
@@ -6845,7 +6814,6 @@ void scheme_init(void)
 
 	/* initialize several globals */
 	init_vars_global();
-	init_syntax();
 
 	/* intialization of global pointers to special symbols */
 	LAMBDA = mk_symbol("lambda");
@@ -6926,7 +6894,8 @@ int scheme_load_string(const char *cmd)
 	return Eval_Cycle(op);
 }
 
-void scheme_register_foreign_func(const char *name, foreign_func ff)
+
+void scheme_register_foreign_func( const char *name, foreign_func ff, pointer environment )
 {
 	pointer s = mk_symbol(name);
 	pointer f = mk_foreign_func(ff, &s), x;
@@ -6938,7 +6907,7 @@ void scheme_register_foreign_func(const char *name, foreign_func ff)
 		}
 	}
 	x = cons(s, f);
-	x = cons(x, car(global_env));
+	x = cons(x, car(environment));
 	car(global_env) = x;
 }
 

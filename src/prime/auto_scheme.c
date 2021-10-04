@@ -367,20 +367,54 @@ static pointer ff_environment_delete_d( pointer args )
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-scheme_register_foreign_func( "make-environment",            make_environment               );
-scheme_register_foreign_func( "environment?"    ,            ff_environment_p               );
-scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        );
-scheme_register_foreign_func( "environment-undefine!",       ff_environment_undefine_d      );
-scheme_register_foreign_func( "environment-defined-symbols", ff_environment_defined_symbols );
-scheme_register_foreign_func( "environment-assoc",           ff_environment_assoc           );
-scheme_register_foreign_func( "environment-ref",             ff_environment_ref             );
-scheme_register_foreign_func( "environment-update!",         ff_environment_update_d        );
-scheme_register_foreign_func( "environment-import!",         ff_environment_import_d        );
-scheme_register_foreign_func( "environment-only",            ff_environment_only            );
-scheme_register_foreign_func( "environment-except",          ff_environment_except          );
-scheme_register_foreign_func( "environment-prefix",          ff_environment_prefix          );
-scheme_register_foreign_func( "environment-rename",          ff_environment_rename          );
-scheme_register_foreign_func( "environment-delete!",         ff_environment_delete_d        );
+scheme_register_foreign_func( "make-environment",            make_environment               , global_env);
+scheme_register_foreign_func( "environment?"    ,            ff_environment_p               , global_env);
+scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        , global_env);
+scheme_register_foreign_func( "environment-undefine!",       ff_environment_undefine_d      , global_env);
+scheme_register_foreign_func( "environment-defined-symbols", ff_environment_defined_symbols , global_env);
+scheme_register_foreign_func( "environment-assoc",           ff_environment_assoc           , global_env);
+scheme_register_foreign_func( "environment-ref",             ff_environment_ref             , global_env);
+scheme_register_foreign_func( "environment-update!",         ff_environment_update_d        , global_env);
+scheme_register_foreign_func( "environment-import!",         ff_environment_import_d        , global_env);
+scheme_register_foreign_func( "environment-only",            ff_environment_only            , global_env);
+scheme_register_foreign_func( "environment-except",          ff_environment_except          , global_env);
+scheme_register_foreign_func( "environment-prefix",          ff_environment_prefix          , global_env);
+scheme_register_foreign_func( "environment-rename",          ff_environment_rename          , global_env);
+scheme_register_foreign_func( "environment-delete!",         ff_environment_delete_d        , global_env);
+ /*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
+ */
+	scheme_register_syntax(OP_LAMBDA, "lambda", global_env);
+	scheme_register_syntax(OP_QUOTE, "quote", global_env);
+	scheme_register_syntax(OP_QQUOTE0, "quasiquote", global_env);
+	scheme_register_syntax(OP_DEF0, "define", global_env);
+	scheme_register_syntax(OP_IF0, "if", global_env);
+	scheme_register_syntax(OP_BEGIN, "begin", global_env);
+	scheme_register_syntax(OP_SET0, "set!", global_env);
+	scheme_register_syntax(OP_LET0, "let", global_env);
+	scheme_register_syntax(OP_LET0AST, "let*", global_env);
+	scheme_register_syntax(OP_LET0REC, "letrec", global_env);
+	scheme_register_syntax(OP_LETRECAST0, "letrec*", global_env);
+	scheme_register_syntax(OP_DO0, "do", global_env);
+	scheme_register_syntax(OP_COND0, "cond", global_env);
+	scheme_register_syntax(OP_ELSE, "else", global_env);
+	scheme_register_syntax(OP_FEEDTO, "=>", global_env);
+	scheme_register_syntax(OP_DELAY, "delay", global_env);
+	scheme_register_syntax(OP_LAZY, "lazy", global_env);
+	scheme_register_syntax(OP_AND0, "and", global_env);
+	scheme_register_syntax(OP_OR0, "or", global_env);
+	scheme_register_syntax(OP_C0STREAM, "cons-stream", global_env);
+	scheme_register_syntax(OP_0MACRO, "macro", global_env);
+	scheme_register_syntax(OP_DEFMACRO0, "define-macro", global_env);
+	scheme_register_syntax(OP_CASE0, "case", global_env);
+	scheme_register_syntax(OP_WHEN0, "when", global_env);
+	scheme_register_syntax(OP_UNLESS0, "unless", global_env);
+	scheme_register_syntax(OP_SYNTAXRULES, "syntax-rules", global_env);
+	scheme_register_syntax(OP_DEFSYNTAX0, "define-syntax", global_env);
+	scheme_register_syntax(OP_LETSYNTAX0, "let-syntax", global_env);
+	scheme_register_syntax(OP_LETRECSYNTAX0, "letrec-syntax", global_env);
+	scheme_register_syntax(OP_RECEIVE0, "receive", global_env);
  /*  This file is part of the 'AutoScheme' project.
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause

@@ -293,8 +293,10 @@ void scheme_deinit(void);
 int scheme_load_file(FILE *fin);
 int scheme_load_string(const char *cmd);
 
-void scheme_register_foreign_func(const char *name, foreign_func ff);
+
+void scheme_register_foreign_func( const char *name, foreign_func ff, pointer environment );
 void scheme_register_proc(enum eval_op operator, char *name, pointer environment);
+void scheme_register_syntax( enum eval_op operator, char *name, pointer environment );
 
 pointer scheme_apply0(const char *procname);
 pointer scheme_apply1(const char *procname, pointer argslist);

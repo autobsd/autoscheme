@@ -5,6 +5,7 @@
 (foreign-declare (include-string "environment/declarations.h"))
 (foreign-define (include-string "environment/definitions.c"))
 (foreign-initialize (include-string "environment/initialization.c")
+		    (include-string "syntax.c")
 		    (include-string "procedures.c")
 		    )
 

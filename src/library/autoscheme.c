@@ -3112,7 +3112,7 @@ OP_EVAL:
 					}
 				}
 			}
-			Error_1("Unbound variable", code);
+			Error_1("unbound variable", code);
 		} else if (is_pair(code) && !is_environment(code)) {
 			s_save(OP_E0ARGS, NIL, code);
 			code = car(code);
@@ -3197,7 +3197,7 @@ OP_APPLY:
 			for (mark_x = car(closure_code(code));
 			     is_pair(mark_x); mark_x = cdr(mark_x), args = cdr(args)) {
 				if (args == NIL) {
-					Error_0("Few arguments");
+					Error_0("too few arguments");
 				} else {
 					y = cons(car(mark_x), car(args));
 					y = cons(y, car(envir));
@@ -3207,7 +3207,7 @@ OP_APPLY:
 			if (mark_x == NIL) {
 				/*--
 				 * if (args != NIL) {
-				 * 	Error_0("Many arguments");
+				 * 	Error_0("too many arguments");
 				 * }
 				 */
 			} else if (is_symbol(mark_x)) {
@@ -3215,7 +3215,7 @@ OP_APPLY:
 				mark_x = cons(mark_x, car(envir));
 				car(envir) = mark_x;
 			} else {
-				Error_0("Syntax error in closure");
+				Error_0("bad syntax in closure");
 			}
 			code = cdr(closure_code(code));
 			args = NIL;
@@ -3230,7 +3230,7 @@ OP_APPLY:
 			}
 			s_goto(OP_APPLYCONT);
 		} else {
-			Error_0("Illegal function");
+		    Error_1("call of non-procedure", code);
 		}
 
 	case OP_APPLYCONT:
@@ -3258,10 +3258,10 @@ OP_APPLYCONT:
 			fprintf(port_file(outport), "loading %s\n", strvalue(car(args)));
 		}
 		if (load_files == MAXFIL) {
-			Error_1("Unable to open", car(args));
+			Error_1("unable to open", car(args));
 		}
 		if ((tmpfp = fopen(strvalue(car(args)), "rb")) == NULL) {
-			Error_1("Unable to open", car(args));
+			Error_1("unable to open", car(args));
 		}
 		load_stack[load_files++] = inport;
 		inport = mk_port(tmpfp, port_input);
@@ -3385,7 +3385,7 @@ OP_QQUOTE1:
 			if (UNQUOTE == car(code)) {
 				s_return(cadr(code));
 			} else if (UNQUOTESP == car(code)) {
-				Error_1("Unquote-splicing wasn't in a list:", code);
+				Error_1("unquote-splicing outside list:", code);
 			} else if (is_pair(car(code)) && UNQUOTESP == caar(code)) {
 				s_save(OP_QQUOTE8, NIL, code);
 				code = cdr(code);
@@ -3445,7 +3445,7 @@ OP_QQUOTE1:
 			code = cadr(code);
 		}
 		if (!is_symbol(args)) {
-			Error_0("Variable is not symbol");
+			Error_0("variable is not symbol");
 		}
 		s_save(OP_DEF1, NIL, args);
 		args = NIL;
@@ -3592,7 +3592,7 @@ OP_QQUOTE1:
 				}
 			}
 		}
-		Error_1("Unbound variable", code);
+		Error_1("unbound variable", code);
 
 	case OP_BEGIN:		/* begin */
 OP_BEGIN:
@@ -3623,7 +3623,7 @@ OP_BEGIN:
 		value = code;
 		code = is_symbol(car(code)) ? cadr(code) : car(code);
 		if (code != NIL && !is_pair(code)) {
-			Error_1("Bad syntax of binding spec in let :", code);
+			Error_1("bad binding syntax in let :", code);
 		}
 		/* fall through */
 
@@ -3632,7 +3632,7 @@ OP_BEGIN:
 			args = cons(value, args);
 			s_save(OP_LET1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in let :", car(code));
+				Error_1("bad binding syntax in let :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
@@ -3672,7 +3672,7 @@ OP_BEGIN:
 			s_goto(OP_BEGIN);
 		}
 		if (!is_pair(car(code)) || !is_pair(caar(code))) {
-			Error_1("Bad syntax of binding spec in let* :", car(code));
+			Error_1("bad binding syntax in let* :", car(code));
 		}
 		s_save(OP_LET1AST, cdr(code), car(code));
 		code = cadaar(code);
@@ -3691,7 +3691,7 @@ OP_BEGIN:
 		if (is_pair(code)) {	/* continue */
 			s_save(OP_LET2AST, args, code);
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in let* :", car(code));
+				Error_1("bad binding syntax in let* :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
@@ -3706,11 +3706,11 @@ OP_BEGIN:
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		if (!is_pair(car(code))) {
-			Error_1("Bad syntax of binding spec in letrec :", car(code));
+			Error_1("bad binding syntax in letrec :", car(code));
 		}
 		for (mark_x = car(code); is_pair(mark_x); mark_x = cdr(mark_x)) {
 			if (!is_pair(car(mark_x))) {
-				Error_1("Bad syntax of binding spec in letrec :", car(mark_x));
+				Error_1("bad binding syntax in letrec :", car(mark_x));
 			}
 			y = cons(caar(mark_x), UNDEF);
 			car(envir) = cons(y, car(envir));
@@ -3725,7 +3725,7 @@ OP_BEGIN:
 			args = cons(value, args);
 			s_save(OP_LET1REC, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in letrec :", car(code));
+				Error_1("bad binding syntax in letrec :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
@@ -3753,17 +3753,17 @@ OP_BEGIN:
 			s_goto(OP_BEGIN);
 		}
 		if (!is_pair(car(code))) {
-			Error_1("Bad syntax of binding spec in letrec* :", car(code));
+			Error_1("bad binding syntax in letrec* :", car(code));
 		}
 		for (mark_x = car(code); is_pair(mark_x); mark_x = cdr(mark_x)) {
 			if (!is_pair(car(mark_x))) {
-				Error_1("Bad syntax of binding spec in letrec* :", car(mark_x));
+				Error_1("bad binding syntax in letrec* :", car(mark_x));
 			}
 			y = cons(caar(mark_x), UNDEF);
 			car(envir) = cons(y, car(envir));
 		}
 		if (!is_pair(caar(code)) || !is_pair(cdr(caar(code)))) {
-			Error_1("Bad syntax of binding spec in letrec* :", caar(code));
+			Error_1("bad binding syntax in letrec* :", caar(code));
 		}
 		s_save(OP_LETRECAST1, cdr(code), car(code));
 		code = cadaar(code);
@@ -3779,7 +3779,7 @@ OP_BEGIN:
 		if (is_pair(code)) {	/* continue */
 			s_save(OP_LETRECAST1, args, code);
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in letrec* :", car(code));
+				Error_1("bad binding syntax in letrec* :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
@@ -3797,7 +3797,7 @@ OP_BEGIN:
 		value = code;
 		code = car(code);
 		if (!is_pair(code)) {
-			Error_1("Bad syntax of binding spec in do :", code);
+			Error_1("bad binding syntax in do :", code);
 		}
 		/* fall through */
 
@@ -3806,7 +3806,7 @@ OP_BEGIN:
 			args = cons(value, args);
 			s_save(OP_DO1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in do :", car(code));
+				Error_1("bad binding syntax in do :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
@@ -3824,7 +3824,7 @@ OP_DO2:
 		}
 		s_save(OP_DO3, NIL, code);
 		if (!is_pair(cadr(code))) {
-			Error_1("Bad syntax of binding spec in do :", cadr(code));
+			Error_1("bad binding syntax in do :", cadr(code));
 		}
 		code = car(cadr(code));
 		s_goto(OP_EVAL);
@@ -3863,7 +3863,7 @@ OP_DO2:
 
 	case OP_COND0:		/* cond */
 		if (!is_pair(car(code))) {
-			Error_1("Syntax error in cond :", car(code));
+			Error_1("bad syntax in cond :", car(code));
 		}
 		s_save(OP_COND1, NIL, code);
 		code = caar(code);
@@ -3885,7 +3885,7 @@ OP_DO2:
 			s_return(NIL);
 		} else {
 			if (!is_pair(car(code))) {
-				Error_1("Syntax error in cond :", car(code));
+				Error_1("bad syntax in cond :", car(code));
 			}
 			s_save(OP_COND1, NIL, code);
 			code = caar(code);
@@ -3905,10 +3905,10 @@ OP_DO2:
 		s_goto(OP_BEGIN);
 
 	case OP_ELSE:		/* else */
-		Error_0("Syntax error in else");
+		Error_0("bad syntax in else");
 
 	case OP_FEEDTO:		/* => */
-		Error_0("Syntax error in =>");
+		Error_0("bad syntax in =>");
 
 	case OP_DELAY:		/* delay */
 		x = cons(NIL, code);
@@ -3977,14 +3977,14 @@ OP_DO2:
 	case OP_DEFMACRO0:	/* define-macro */
 		if (is_pair(car(code))) {
 			if (!is_symbol(caar(code))) {
-				Error_0("Variable is not symbol");
+				Error_0("variable is not a symbol");
 			}
 			s_save((operator == OP_0MACRO) ? OP_1MACRO : OP_DEFMACRO1, NIL, caar(code));
 			y = cons(cdar(code), cdr(code));
 			code = cons(LAMBDA, y);
 		} else {
 			if (!is_symbol(car(code))) {
-				Error_0("Variable is not symbol");
+				Error_0("variable is not a symbol");
 			}
 			s_save((operator == OP_0MACRO) ? OP_1MACRO : OP_DEFMACRO1, NIL, car(code));
 			code = cadr(code);
@@ -4009,18 +4009,18 @@ OP_DO2:
 	case OP_SYNTAXRULES:	/* syntax-rules */
 		w = s_next_op();
 		if (w != OP_DEFSYNTAX1 && w != OP_LETSYNTAX1 && w != OP_LETRECSYNTAX1) {
-			Error_0("Malformed syntax of syntax-rules");
+			Error_0("malformed syntax-rules");
 		}
 		s_return(mk_closure(code, envir));
 
 	case OP_EXPANDPATTERN:	/* expand pattern */
 OP_EXPANDPATTERN:
 		if (!is_pair(code)) {
-			Error_0("Syntax error in syntax-rules");
+			Error_0("bad syntax in syntax-rules");
 		}
 		for (x = cdar(value); x != NIL; x = cdr(x)) {
 			if (car(x) == NIL) {
-				Error_0("Syntax error in syntax-rules");
+				Error_0("bad syntax in syntax-rules");
 			}
 			w = 0;
 			if (matchpattern(cdr(caar(x)), cdr(code), caar(value), (int *)&w)) {
@@ -4049,7 +4049,7 @@ OP_EXPANDPATTERN:
 
 	case OP_DEFSYNTAX0:		/* define-syntax */
 		if (!is_symbol(car(code))) {
-			Error_0("Variable is not symbol");
+			Error_0("variable is not a symbol");
 		}
 		args = car(code);
 		code = cadr(code);
@@ -4084,10 +4084,10 @@ OP_EXPANDPATTERN:
 			args = cons(value, args);
 			s_save(OP_LETSYNTAX1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in let-syntax :", car(code));
+				Error_1("bad binding syntax in let-syntax :", car(code));
 			}
 			if (!is_symbol(caar(code))) {
-				Error_0("Variable is not symbol");
+				Error_0("variable is not a symbol");
 			}
 			code = cadar(code);
 			args = NIL;
@@ -4123,10 +4123,10 @@ OP_EXPANDPATTERN:
 			args = cons(value, args);
 			s_save(OP_LETRECSYNTAX1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
-				Error_1("Bad syntax of binding spec in letrec-syntax :", car(code));
+				Error_1("bad binding syntax in letrec-syntax :", car(code));
 			}
 			if (!is_symbol(caar(code))) {
-				Error_0("Variable is not symbol");
+				Error_0("variable is not a symbol");
 			}
 			code = cadar(code);
 			args = NIL;
@@ -4154,7 +4154,7 @@ OP_EXPANDPATTERN:
 	case OP_CASE1:		/* case */
 		for (x = code; x != NIL; x = cdr(x)) {
 			if (!is_pair(car(x))) {
-				Error_1("Syntax error in case :", car(x));
+				Error_1("bad syntax in case :", car(x));
 			}
 			if (!is_pair(y = caar(x)))
 				break;
@@ -4225,7 +4225,7 @@ OP_EXPANDPATTERN:
 		setenvironment(envir);
 		for (mark_x = car(code); is_pair(mark_x); mark_x = cdr(mark_x), args = cdr(args)) {
 			if (args == NIL) {
-				Error_0("Few arguments");
+				Error_0("too few arguments");
 			} else {
 				y = cons(car(mark_x), car(args));
 				y = cons(y, car(envir));
@@ -4563,7 +4563,7 @@ OP_DOWINDS2:
 		for ( ; args != NIL; args = cdr(args)) {
 			double d = get_rvalue(car(args));
 			if (-DBL_MIN < d && d < DBL_MIN) {
-				Error_0("Divided by zero");
+				Error_0("division by zero");
 			}
 			if (mark_x->_isfixnum) {
 				if (car(args)->_isfixnum) {
@@ -4631,7 +4631,7 @@ OP_DOWINDS2:
 		mark_y = cadr(args);
 		w = mark_y->_isfixnum ? ivalue(mark_y) : (int32_t)rvalue(mark_y);
 		if (w == 0) {
-			Error_0("Divided by zero");
+			Error_0("division by zero");
 		}
 		if (mark_x->_isfixnum) {
 			if (mark_y->_isfixnum) {
@@ -4674,7 +4674,7 @@ OP_DOWINDS2:
 		mark_y = cadr(args);
 		w = mark_y->_isfixnum ? ivalue(mark_y) : (int32_t)rvalue(mark_y);
 		if (w == 0) {
-			Error_0("Divided by zero");
+			Error_0("division by zero");
 		}
 		if (mark_x->_isfixnum) {
 			if (mark_y->_isfixnum) {
@@ -4712,7 +4712,7 @@ OP_DOWINDS2:
 		mark_y = cadr(args);
 		w = mark_y->_isfixnum ? ivalue(mark_y) : (int32_t)rvalue(mark_y);
 		if (w == 0) {
-			Error_0("Divided by zero");
+			Error_0("division by zero");
 		}
 		if (mark_x->_isfixnum) {
 			if (mark_y->_isfixnum) {
@@ -6115,15 +6115,16 @@ OP_VECTOR:
 		if (!validargs("error", 1, 65535, TST_NONE)) Error_0(msg);
 		tmpfp = port_file(outport);
 		port_file(outport) = stderr;
-		fprintf(stderr, "Error: ");
+		fprintf(stderr, "Error - ");
 		fprintf(stderr, "%s", strvalue(car(args)));
 		args = cdr(args);
 		s_goto(OP_ERR1);
 
 	case OP_ERR1:	/* error */
 OP_ERR1:
-		putstr(" ");
+		
 		if (args != NIL) {
+		    putstr(": ");
 			s_save(OP_ERR1, cdr(args), NIL);
 			args = car(args);
 			print_flag = 1;
@@ -6133,7 +6134,8 @@ OP_ERR1:
 			flushinput();
 			port_file(outport) = tmpfp;
 			if (!interactive_repl) {
-				return -1;
+				/* return -1; */
+			    exit( 1 );
 			}
 			s_goto(OP_T0LVL);
 		}
@@ -6223,7 +6225,7 @@ OP_ERR1:
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
-		    Error_1("Unable to open file", car(args));
+		    Error_1("unable to open file", car(args));
 		    /* s_return(F); */
 		}
 		code = cadr(args);
@@ -6344,7 +6346,7 @@ OP_ERR1:
 		if (!validargs("read", 0, 1, TST_INPORT)) Error_0(msg);
 		if (is_pair(args)) {
 			if (port_file(car(args)) == NULL) {
-				Error_0("Input port was closed");
+				Error_0("input port was closed");
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
@@ -6368,7 +6370,7 @@ OP_ERR1:
 		}
 		if (is_pair(args)) {
 			if (port_file(car(args)) == NULL) {
-				Error_0("Input port was closed");
+				Error_0("input port was closed");
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
@@ -6455,7 +6457,7 @@ OP_RDSEXPR:
 			s_return(readstrexp());
 		case TOK_SHARP:
 			if ((x = mk_const(readstr("()[]{};\t\n\r "))) == NIL) {
-				Error_0("Undefined sharp expression");
+				Error_0("undefined sharp expression");
 			} else {
 				s_return(x);
 			}
@@ -6531,6 +6533,9 @@ OP_P0LIST:
 			x = mk_integer(0);
 			args = cons(args, x);
 			s_goto(OP_PVECFROM);
+		} else if (is_environment(args)) {
+		        putstr("#<ENVIRONMENT>");
+			s_return(T);
 		} else if (!is_pair(args)) {
 			printatom(args, print_flag);
 			s_return(T);
@@ -6627,7 +6632,7 @@ OP_PVECFROM:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("Unable to handle non pair element");
+				Error_0("unable to handle non pair element");
 			}
 			if (x == caar(y)) s_return(car(y));
 		}
@@ -6638,7 +6643,7 @@ OP_PVECFROM:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("Unable to handle non pair element");
+				Error_0("unable to handle non pair element");
 			}
 			if (eqv(x, caar(y))) s_return(car(y));
 		}
@@ -6649,7 +6654,7 @@ OP_PVECFROM:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("Unable to handle non pair element");
+				Error_0("unable to handle non pair element");
 			}
 			if (equal(x, caar(y))) s_return(car(y));
 		}
@@ -6743,7 +6748,7 @@ void scheme_register_syntax( enum eval_op operator, char *name, pointer environm
     y = mk_syntax( operator, name );
     x = cons( x, y );
     x = cons( x, car(environment ));
-    car( global_env ) = x;
+    car( environment ) = x;
 }
 
 pointer mk_proc( enum eval_op operator, pointer *pp )
@@ -6900,7 +6905,7 @@ void scheme_register_foreign_func( const char *name, foreign_func ff, pointer en
 	pointer s = mk_symbol(name);
 	pointer f = mk_foreign_func(ff, &s), x;
 
-	for (x = car(global_env); x != NIL; x = cdr(x)) {
+	for (x = car(environment); x != NIL; x = cdr(x)) {
 		if (caar(x) == s) {
 			cdar(x) = f;
 			return;
@@ -6908,7 +6913,7 @@ void scheme_register_foreign_func( const char *name, foreign_func ff, pointer en
 	}
 	x = cons(s, f);
 	x = cons(x, car(environment));
-	car(global_env) = x;
+	car(environment) = x;
 }
 
 static void save_from_C_call(void)

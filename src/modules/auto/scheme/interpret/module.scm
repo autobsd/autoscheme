@@ -16,40 +16,38 @@
 	  )
 
   (export interpret
+	  interpretation-environment
 	  )
 
 
   (begin
-    ;; ((environment-ref (global-environment) (string->symbol "load-modules")))
 
-;; (    (foreign-function ff_load_modules)
-;; )
+    (define interpretation-environment
+      (lambda ()
+	(let ((load-modules (foreign-function ff_load_modules))
+	      (int-env (make-environment))
+	      )
+	  
+	  (load-modules int-env)
+	)))
 
-;; (    (foreign-procedure OP_DISPLAY)
-;;  "\nthis is a message from locally registered procedure <---\n\n")
+     
+     (define interpret
+       (lambda sources
 
-    ;; (define interpretation-environment
-    ;;   (lambda ()
-
-
-    ;; 	(let ((env (environment (only (auto scheme) import define-library))))
-    ;; 	  (for-each (lambda (sym)
-    ;; 		      (let ((binding (environment-assoc (global-environment) sym)))
-    ;; 			(if (environment? (cdr binding))
-    ;; 			    (environment-define! env (car binding) (cdr binding)))))
-		    
-    ;; 		    (environment-defined-symbols (global-environment)))
-    ;; 	  env)))
-
-    
-    (define interpret
-      (lambda sources
-
-	(display "sources: ")(write sources)(newline)
+	 (display "sources: ")(write sources)(newline)
+	 (define int-env (interpretation-environment))
+	 (display "int-env: ")(write int-env)(newline)
 
 
-	;; (display "interpretation symbols: ")(write (environment-defined-symbols (interpretation-environment)))(newline)  
+	 (display "interpretation symbols: ")(write (environment-defined-symbols int-env))(newline)  
 
-	))
+	 (eval '(begin (import (only (auto scheme base) newline)
+			       (auto scheme write)) 
+		       (display "hello world")
+		       (newline))
+	        int-env)
 
-    ))
+	 ))
+
+     ))

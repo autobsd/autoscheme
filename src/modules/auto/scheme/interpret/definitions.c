@@ -4,8 +4,24 @@
  */
 static pointer ff_load_modules( pointer args )
 {
-    printf( "inside ff_load_modules( pointer args )...<----- !!!!\n" );
+    pointer environment = car( args );
 
-    return T;
-    (void )args;
+    LOAD_MODULE__auto_scheme( environment );
+    LOAD_MODULE__auto_scheme_base( environment );
+    LOAD_MODULE__auto_scheme_environment( environment );
+    LOAD_MODULE__auto_scheme_eval( environment );
+    LOAD_MODULE__auto_scheme_list( environment );
+    LOAD_MODULE__auto_scheme_write( environment );
+    LOAD_MODULE__auto_scheme_cxr( environment );
+    LOAD_MODULE__auto_scheme_string( environment );
+    LOAD_MODULE__auto_scheme_args_fold( environment );
+    LOAD_MODULE__auto_scheme_args( environment );
+    LOAD_MODULE__auto_scheme_process_context( environment );
+    LOAD_MODULE__auto_scheme_path( environment );
+    LOAD_MODULE__auto_scheme_read( environment );
+    LOAD_MODULE__auto_scheme_file( environment );
+    LOAD_MODULE__auto_scheme_compile( environment );
+    LOAD_MODULE__auto_scheme_interpret( environment );
+
+    return environment;
 }

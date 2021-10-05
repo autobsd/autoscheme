@@ -6,20 +6,18 @@
 (foreign-define (include-string "definitions.c"))
 
 
-
 (define-library (auto scheme interpret)
 
   (import (auto scheme base)
 	  (auto scheme write)
 	  (auto scheme environment)
 	  (auto scheme eval)
+	  (auto scheme file)
+	  (auto scheme read)
 	  )
-
   (export interpret
 	  interpretation-environment
 	  )
-
-
   (begin
 
     (define interpretation-environment
@@ -30,24 +28,25 @@
 	  
 	  (load-modules int-env)
 	)))
-
      
      (define interpret
        (lambda sources
 
-	 (display "sources: ")(write sources)(newline)
 	 (define int-env (interpretation-environment))
-	 (display "int-env: ")(write int-env)(newline)
+	 (environment-delete! int-env 'let)
+	 (environment-delete! int-env 'begin)
 
-
-	 (display "interpretation symbols: ")(write (environment-defined-symbols int-env))(newline)  
-
-	 (eval '(begin (import (only (auto scheme base) newline)
-			       (auto scheme write)) 
-		       (display "hello world")
-		       (newline))
-	        int-env)
-
+	 (for-each (lambda (source)
+		     (with-input-from-file 
+		      source
+		      (lambda ()
+			(let interpret-expression ((expression (read)))
+			  (cond ((not (eof-object? expression))
+				 (eval expression int-env)
+				 (interpret-expression (read)))))
+			)
+		      ))
+		   sources)
 	 ))
 
      ))

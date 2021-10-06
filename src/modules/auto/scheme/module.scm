@@ -79,9 +79,6 @@
 							     'define-library
 							     'import
 							     (string->symbol "(auto scheme)")
-							     'begin
-							     'let
 							     ))
-
    )
  (current-environment))

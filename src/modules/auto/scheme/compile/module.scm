@@ -159,47 +159,41 @@
 	;; (string-append "int " (module-function-name module-name) "()")
 	(string-append "int " (module-function-name module-name) "(pointer environment)")
 	))
-
-
+    
 
     (define compile-module-function
       (lambda (name sources)
 
-	(let* ((evaluated-expressions (string-append  "autoscheme_eval(cons(mk_symbol(\"begin\")," 
-						      (let get-expressions ((remainder sources)
-									    )
-							(cond ((null? remainder) (string-append "NIL" ))
-
-							      (else (string-append "cons(" (compile-expression (cons 'begin (with-input-from-file (car remainder) read-list)) (path-make-absolute (car remainder)) 0) ","
-										   (get-expressions (cdr remainder))
-										   ")"
-										   ))
-							      )
-							)
-
-						      "),environment);\n"))
-	       
-
+    	(let* ((statements "")
 	       )
+	  (for-each (lambda (source)
+		      
+		      (with-input-from-file 
+			  source
+			(lambda ()
+			  (let process-expression ((expression (read)))
 
-	  (string-append (module-function-prototype name) "\n"
-			 "{\n"
+			    (cond ((not (eof-object? expression))
+				   (set! statements (string-append statements 
+								   "autoscheme_eval(" (compile-expression expression source 0) ", environment);\n"))
+				   (process-expression (read))))))
 
+			))
+		    sources)
 
-			 (apply string-append *foreign-intializations*)
+    	  (string-append (module-function-prototype name) "\n"
+    			 "{\n"
+
+    			 (apply string-append *foreign-intializations*)
+
+    			 statements
+
+    			 (apply string-append *foreign-finalizations*)
+
+    			 "return 0;\n"
+    			 "}\n"
 			 
-
-			 evaluated-expressions
-
-			 (apply string-append *foreign-finalizations*)
-
-			 "return 0;\n"
-			 "}\n"
-			 
-			 ))))
-
-
-
+    			 ))))
 
 
     (define compile-module 

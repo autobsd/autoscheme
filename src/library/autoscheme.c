@@ -98,6 +98,8 @@ struct cell _UNDEF;
 pointer UNDEF = &_UNDEF;	/* special cell representing undefined */
 pointer oblist = &_NIL;	/* pointer to symbol table */
 pointer global_env;		/* pointer to global environment */
+pointer call_history;           /* pointer to call history vector */
+int call_history_pos;           /* current position within call history vector */
 struct cell _ZERO;		/* special cell representing integer 0 */
 struct cell _ONE;		/* special cell representing integer 1 */
 
@@ -1066,6 +1068,7 @@ void gc(pointer *a, pointer *b)
 	/* forward system globals */
 	oblist = forward(oblist);
 	global_env = forward(global_env);
+	call_history = forward(call_history);
 	inport = forward(inport);
 	outport = forward(outport);
 	winders = forward(winders);
@@ -1277,6 +1280,7 @@ void gc(pointer *a, pointer *b)
 	/* mark system globals */
 	mark(oblist);
 	mark(global_env);
+	mark(call_history);
 	mark(inport);
 	mark(outport);
 	mark(winders);
@@ -3115,8 +3119,14 @@ OP_EVAL:
 			Error_1("unbound variable", code);
 		} else if (is_pair(code) && !is_environment(code)) {
 			s_save(OP_E0ARGS, NIL, code);
+
+			set_vector_elem(call_history, call_history_pos++, code);
+			if( call_history_pos == CALL_HISTORY_LENGTH ) call_history_pos = 0;
+
 			code = car(code);
 			s_goto(OP_EVAL);
+		/* } else if (is_null(code)) { */
+		/*     Error_1("illegal expression", code); */
 		} else {
 			s_return(code);
 		}
@@ -3169,6 +3179,7 @@ OP_EVAL:
 
 	case OP_APPLY:		/* apply 'code' to 'args' */
 OP_APPLY:
+
 		if (is_proc(code)) {	/* PROCEDURE */
 			operator = procnum(code);
 			goto LOOP;
@@ -6114,8 +6125,9 @@ OP_VECTOR:
 	case OP_ERR0:	/* error */
 		if (!validargs("error", 1, 65535, TST_NONE)) Error_0(msg);
 		tmpfp = port_file(outport);
+		fflush(tmpfp);
 		port_file(outport) = stderr;
-		fprintf(stderr, "Error - ");
+		fprintf(stderr, "\n\nError - ");
 		fprintf(stderr, "%s", strvalue(car(args)));
 		args = cdr(args);
 		s_goto(OP_ERR1);
@@ -6132,11 +6144,15 @@ OP_ERR1:
 		} else {
 			putstr("\n");
 			flushinput();
-			port_file(outport) = tmpfp;
 			if (!interactive_repl) {
 				/* return -1; */
-			    exit( 1 );
+			    /* exit( 1 ); */
+			    s_save(OP_EMERGENCY_EXIT, cons( mk_integer( 1 ), NIL), NIL);
+			    args = cons( call_history, NIL);
+			    print_flag = 1;
+			    s_goto(OP_P0HIST);
 			}
+			port_file(outport) = tmpfp;
 			s_goto(OP_T0LVL);
 		}
 
@@ -6595,6 +6611,65 @@ OP_PVECFROM:
 			s_goto(OP_P0LIST);
 		}
 
+
+	    /* ========== printing call history ========== */
+
+	case OP_P0HIST:
+	OP_P0HIST:
+
+	    putstr( "\nCall history:\n" );
+
+	    x = mk_integer( call_history_pos - 1 );
+	    args = cons( car( args ), x );
+	    s_goto( OP_P1HIST );
+
+
+	case OP_P1HIST:
+	OP_P1HIST:
+
+	    w = ivalue( cdr( args ));
+
+	    if( w == -1 ) 
+	    {
+		ivalue( cdr( args )) = (int32_t)CALL_HISTORY_LENGTH - 1;
+		s_goto( OP_P2HIST );
+	    } 
+	    else 
+	    {
+		putstr( "\n     " );
+
+		ivalue( cdr( args )) = (int32_t)w - 1;
+		s_save( OP_P1HIST, args, NIL );
+
+		args = vector_elem( car( args ), (int)w );
+		s_goto( OP_P0LIST );
+	    }
+
+	case OP_P2HIST:
+	OP_P2HIST:
+
+	    w = ivalue( cdr( args ));
+	    x = vector_elem( car( args ), (int)w );
+
+	    if( w < call_history_pos ||  x == NIL )
+	    {
+		putstr( "\n" );
+		s_return( T );
+	    }
+	    else
+	    {
+	    	putstr( "\n     " );
+
+	    	ivalue( cdr( args )) = (int32_t)w - 1;
+	    	s_save( OP_P2HIST, args, NIL );
+
+	    	args = x;
+	    	s_goto( OP_P0LIST );
+	    }
+
+	    /* =========================================== */
+
+
 	case OP_LIST_LENGTH:	/* length */	/* a.k */
 		if (!validargs("length", 1, 1, TST_LIST)) Error_0(msg);
 		w = list_length(car(args));
@@ -6795,6 +6870,11 @@ static void init_vars_global(void)
 	/* init global_env */
 	global_env = cons(NIL, NIL);
 	setenvironment(global_env);
+	/* init call_history */
+	call_history = mk_vector(CALL_HISTORY_LENGTH);
+	{ int i = 0; for( i = 0; i < CALL_HISTORY_LENGTH; i++) set_vector_elem(call_history, i, NIL); }
+	call_history_pos = 0;
+
 	type(&_ZERO) = T_NUMBER | T_ATOM;
 	set_num_integer(&_ZERO);
 	ivalue(&_ZERO) = 0;
@@ -6848,6 +6928,7 @@ void scheme_deinit(void)
 	inport = NIL;
 	outport = NIL;
 	global_env = NIL;
+	call_history = NIL;
 	winders = NIL;
 #ifdef USE_COPYING_GC
 	gcell_list = NIL;

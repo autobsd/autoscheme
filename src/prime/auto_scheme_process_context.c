@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include "autoscheme.h"
-int LOAD_MODULE__auto_scheme_process_context(pointer environment);
+pointer LOAD_MODULE__auto_scheme_process_context(pointer environment);
 /*  This file is part of the 'AutoScheme' project.
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
@@ -54,8 +54,9 @@ static pointer ff_current_directory( pointer args )
 
 
 
- int LOAD_MODULE__auto_scheme_process_context(pointer environment)
+ pointer LOAD_MODULE__auto_scheme_process_context(pointer environment)
 {
+pointer return_value = T;
 /*  This file is part of the 'AutoScheme' project.
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
@@ -65,9 +66,9 @@ scheme_register_foreign_func( "current-directory",      ff_current_directory    
 
 
 
- autoscheme_eval(T, environment);
-autoscheme_eval(T, environment);
-autoscheme_eval(T, environment);
-autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("process"),cons(mk_symbol("context"),NIL)))),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("only"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),NIL)),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),cons( mk_symbol("quote" ),cons(mk_symbol("begin"),NIL)))))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("environment"),NIL))),NIL))),cons(cons(mk_symbol("export"),cons(cons(mk_symbol("rename"),cons(mk_symbol("_command-line"),cons(mk_symbol("command-line"),NIL))),cons(cons(mk_symbol("rename"),cons(mk_symbol("_current-directory"),cons(mk_symbol("current-directory"),NIL))),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),NIL))))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("environment-update!"),cons(cons(mk_symbol("current-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("_command-line"),NIL)),cons(cons(mk_symbol("environment-ref"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("command-line"),NIL)),NIL))),NIL)))),cons(cons(mk_symbol("environment-delete!"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("command-line"),NIL)),NIL))),cons(cons(mk_symbol("environment-update!"),cons(cons(mk_symbol("current-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("_current-directory"),NIL)),cons(cons(mk_symbol("environment-ref"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("current-directory"),NIL)),NIL))),NIL)))),cons(cons(mk_symbol("environment-delete!"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("current-directory"),NIL)),NIL))),NIL))))),NIL))))), environment);
-return 0;
+ return_value = autoscheme_eval(T, environment);
+return_value = autoscheme_eval(T, environment);
+return_value = autoscheme_eval(T, environment);
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("process"),cons(mk_symbol("context"),NIL)))),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("only"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),NIL)),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),cons( mk_symbol("quote" ),cons(mk_symbol("begin"),NIL)))))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("environment"),NIL))),NIL))),cons(cons(mk_symbol("export"),cons(cons(mk_symbol("rename"),cons(mk_symbol("_command-line"),cons(mk_symbol("command-line"),NIL))),cons(cons(mk_symbol("rename"),cons(mk_symbol("_current-directory"),cons(mk_symbol("current-directory"),NIL))),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),NIL))))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("environment-update!"),cons(cons(mk_symbol("current-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("_command-line"),NIL)),cons(cons(mk_symbol("environment-ref"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("command-line"),NIL)),NIL))),NIL)))),cons(cons(mk_symbol("environment-delete!"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("command-line"),NIL)),NIL))),cons(cons(mk_symbol("environment-update!"),cons(cons(mk_symbol("current-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("_current-directory"),NIL)),cons(cons(mk_symbol("environment-ref"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("current-directory"),NIL)),NIL))),NIL)))),cons(cons(mk_symbol("environment-delete!"),cons(cons(mk_symbol("global-environment"),NIL),cons(cons( mk_symbol("quote" ),cons(mk_symbol("current-directory"),NIL)),NIL))),NIL))))),NIL))))), environment);
+return return_value;
 }

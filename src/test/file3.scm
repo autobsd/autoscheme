@@ -6,4 +6,4 @@
 	(auto scheme base))
 
 (display "hello world\n")
-(write `(3 2 1 ,mistake))
+;; (write `(3 2 1 ,mistake))

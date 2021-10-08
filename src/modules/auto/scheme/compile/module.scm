@@ -150,14 +150,14 @@
     
     (define module-function-declaration
       (lambda (module-name)
-	;; (string-append "int " (module-function-name module-name) "(void)")
-	(string-append "int " (module-function-name module-name) "(pointer environment)")
+	;; (string-append "pointer " (module-function-name module-name) "(void)")
+	(string-append "pointer " (module-function-name module-name) "(pointer environment)")
 	))
 
     (define module-function-prototype
       (lambda (module-name)
-	;; (string-append "int " (module-function-name module-name) "()")
-	(string-append "int " (module-function-name module-name) "(pointer environment)")
+	;; (string-append "pointer " (module-function-name module-name) "()")
+	(string-append "pointer " (module-function-name module-name) "(pointer environment)")
 	))
     
 
@@ -175,7 +175,7 @@
 
 			    (cond ((not (eof-object? expression))
 				   (set! statements (string-append statements 
-								   "autoscheme_eval(" (compile-expression expression source 0) ", environment);\n"))
+								   "return_value = autoscheme_eval(" (compile-expression expression source 0) ", environment);\n"))
 				   (process-expression (read))))))
 
 			))
@@ -183,14 +183,15 @@
 
     	  (string-append (module-function-prototype name) "\n"
     			 "{\n"
-
+			 "pointer return_value = T;\n"
+			 
     			 (apply string-append *foreign-intializations*)
 
     			 statements
 
     			 (apply string-append *foreign-finalizations*)
 
-    			 "return 0;\n"
+    			 "return return_value;\n"
     			 "}\n"
 			 
     			 ))))

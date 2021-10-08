@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 #include "autoscheme.h"
-int LOAD_MODULE__auto_scheme_library(pointer environment);
-int LOAD_MODULE__auto_scheme_library(pointer environment)
+pointer LOAD_MODULE__auto_scheme_library(pointer environment);
+pointer LOAD_MODULE__auto_scheme_library(pointer environment)
 {
-return 0;
+pointer return_value = T;
+return return_value;
 }

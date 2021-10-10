@@ -3625,8 +3625,12 @@ OP_BEGIN:
 		if (istrue(value))
 			code = car(code);
 		else
-			code = cadr(code);	/* (if #f 1) ==> () because
-						 * car(NIL) = NIL */
+		    if( is_pair( cdr( code )))
+			code = cadr( code );
+		    else
+			code = F;
+			/* code = cadr(code);	/\* (if #f 1) ==> () because */
+			/* 			 * car(NIL) = NIL *\/ */
 		s_goto(OP_EVAL);
 
 	case OP_LET0:		/* let */

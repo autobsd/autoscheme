@@ -5,5 +5,6 @@
 (import (auto scheme write)
 	(auto scheme base))
 
-(display "hello world\n")
+(display "testing if syntax with no alternate:\n")
 ;; (write `(3 2 1 ,mistake))
+(write (if #f 1))(newline)

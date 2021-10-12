@@ -192,9 +192,9 @@
 	scheme_register_proc(OP_CLOSE_OUTPORT, "close-output-port", environment);
 	scheme_register_proc(OP_CLOSE_PORT, "close-port", environment);
 	scheme_register_proc(OP_INT_ENV, "interaction-environment", environment);
-	scheme_register_proc(OP_CURR_ENV, "current-environment", environment);
 
-	scheme_register_proc(OP_GLOB_ENV, "global-environment", environment);
+	/* scheme_register_proc(OP_CURR_ENV, "current-environment", environment); */
+	/* scheme_register_proc(OP_GLOB_ENV, "global-environment", environment); */
 
 	scheme_register_proc(OP_READ_CHAR, "read-char", environment);
 	scheme_register_proc(OP_PEEK_CHAR, "peek-char", environment);

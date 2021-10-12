@@ -20,4 +20,4 @@ static pointer ff_environment_rename( pointer args );
 
 static pointer ff_environment_delete_d( pointer args );
 
-pointer INITIALIZE_ENVIRONMENT_auto_scheme_environment( pointer environment );
+pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment );

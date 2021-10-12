@@ -37,7 +37,6 @@ auto_scheme_dep = \
 	$(modules_dir)/auto/scheme/syntax.c \
 	$(modules_dir)/auto/scheme/environment/declarations.h \
 	$(modules_dir)/auto/scheme/environment/definitions.c \
-	$(modules_dir)/auto/scheme/environment/initialization.c \
 	$(modules_dir)/auto/scheme/library/procedures.scm \
 	$(modules_dir)/auto/scheme/library/macros.scm \
 	$(modules_dir)/auto/scheme/library/module.scm \
@@ -47,6 +46,9 @@ auto_scheme_dep = \
 auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
 auto_scheme_environment_dep = \
 	$(auto_scheme_environment_module_scm) \
+	$(modules_dir)/auto/scheme/environment/declarations.h \
+	$(modules_dir)/auto/scheme/environment/definitions.c \
+	$(modules_dir)/auto/scheme/environment/initialization.c \
 
 
 

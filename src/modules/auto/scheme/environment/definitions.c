@@ -2,8 +2,11 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-pointer INITIALIZE_ENVIRONMENT_auto_scheme_environment( pointer environment )
+pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
 {
+    scheme_register_proc(OP_CURR_ENV, "current-environment", environment);
+    scheme_register_proc(OP_GLOB_ENV, "global-environment", environment);
+
     scheme_register_foreign_func( "make-environment",            make_environment               , environment);
     scheme_register_foreign_func( "environment?"    ,            ff_environment_p               , environment);
     scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        , environment);

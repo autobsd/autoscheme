@@ -2,9 +2,9 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(foreign-declare (include-string "environment/declarations.h"))
-(foreign-define (include-string "environment/definitions.c"))
-(foreign-initialize (include-string "environment/initialization.c")
+(foreign-declare (include-string "declarations.h"))
+
+(foreign-initialize (include-string "initialization.c")
 		    (include-string "syntax.c")
 		    (include-string "procedures.c")
 		    )

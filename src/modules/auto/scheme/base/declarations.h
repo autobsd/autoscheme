@@ -2,5 +2,4 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-INITIALIZE_LIBRARY__auto_scheme_environment( environment );
-INITIALIZE_LIBRARY__auto_scheme_base( environment );
+pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment );

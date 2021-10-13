@@ -3,8 +3,8 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (import (auto scheme write)
-	(auto scheme base))
+	(auto scheme base) 
+	)
 
-(display "testing if syntax with no alternate:\n")
-;; (write `(3 2 1 ,mistake))
-(write (if #f 1))(newline)
+(display "testing return values:\n")
+(write (define x 3))(newline)

@@ -2,7 +2,7 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-pointer LOAD_MODULE__auto_scheme( pointer environment );
+pointer LOAD_MODULE__scheme( pointer environment );
 pointer LOAD_MODULE__auto_scheme_base( pointer environment );
 pointer LOAD_MODULE__auto_scheme_environment( pointer environment );
 pointer LOAD_MODULE__auto_scheme_eval( pointer environment );

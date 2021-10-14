@@ -58,30 +58,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_CADR, "cadr", environment);
     scheme_register_proc(OP_CDAR, "cdar", environment);
     scheme_register_proc(OP_CDDR, "cddr", environment);
-    scheme_register_proc(OP_CAAAR, "caaar", environment);
-    scheme_register_proc(OP_CAADR, "caadr", environment);
-    scheme_register_proc(OP_CADAR, "cadar", environment);
-    scheme_register_proc(OP_CADDR, "caddr", environment);
-    scheme_register_proc(OP_CDAAR, "cdaar", environment);
-    scheme_register_proc(OP_CDADR, "cdadr", environment);
-    scheme_register_proc(OP_CDDAR, "cddar", environment);
-    scheme_register_proc(OP_CDDDR, "cdddr", environment);
-    scheme_register_proc(OP_CAAAAR, "caaaar", environment);
-    scheme_register_proc(OP_CAAADR, "caaadr", environment);
-    scheme_register_proc(OP_CAADAR, "caadar", environment);
-    scheme_register_proc(OP_CAADDR, "caaddr", environment);
-    scheme_register_proc(OP_CADAAR, "cadaar", environment);
-    scheme_register_proc(OP_CADADR, "cadadr", environment);
-    scheme_register_proc(OP_CADDAR, "caddar", environment);
-    scheme_register_proc(OP_CADDDR, "cadddr", environment);
-    scheme_register_proc(OP_CDAAAR, "cdaaar", environment);
-    scheme_register_proc(OP_CDAADR, "cdaadr", environment);
-    scheme_register_proc(OP_CDADAR, "cdadar", environment);
-    scheme_register_proc(OP_CDADDR, "cdaddr", environment);
-    scheme_register_proc(OP_CDDAAR, "cddaar", environment);
-    scheme_register_proc(OP_CDDADR, "cddadr", environment);
-    scheme_register_proc(OP_CDDDAR, "cdddar", environment);
-    scheme_register_proc(OP_CDDDDR, "cddddr", environment);
+  
     scheme_register_proc(OP_LIST, "list", environment);
     scheme_register_proc(OP_LISTTAIL, "list-tail", environment);
     scheme_register_proc(OP_LISTREF, "list-ref", environment);
@@ -227,9 +204,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_CLOSE_PORT, "close-port", environment);
     scheme_register_proc(OP_INT_ENV, "interaction-environment", environment);
 
-    /* scheme_register_proc(OP_CURR_ENV, "current-environment", environment); */
-    /* scheme_register_proc(OP_GLOB_ENV, "global-environment", environment); */
-
     scheme_register_proc(OP_DISPLAY, "display", environment);
     scheme_register_proc(OP_NEWLINE, "newline", environment);
 
@@ -255,6 +229,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_GENSYM, "gensym", environment);
     scheme_register_proc(OP_QUIT, "quit", environment);
     scheme_register_proc(OP_EMERGENCY_EXIT, "emergency-exit", environment);
+
+
 
     return environment;
 }

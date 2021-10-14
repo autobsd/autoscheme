@@ -8,7 +8,7 @@ pointer LOAD_MODULE__auto_scheme_environment( pointer environment );
 pointer LOAD_MODULE__auto_scheme_eval( pointer environment );
 pointer LOAD_MODULE__auto_scheme_list( pointer environment );
 pointer LOAD_MODULE__auto_scheme_write( pointer environment );
-pointer LOAD_MODULE__auto_scheme_cxr( pointer environment );
+pointer LOAD_MODULE__scheme_cxr( pointer environment );
 pointer LOAD_MODULE__auto_scheme_string( pointer environment );
 pointer LOAD_MODULE__auto_scheme_args_fold( pointer environment );
 pointer LOAD_MODULE__auto_scheme_args( pointer environment );

@@ -63,7 +63,7 @@
 			      (cond ((symbol? spec) (set! export-only (cons spec export-only)))
 				    ((and (list? spec) (= (length spec) 3) (equal? (car spec) 'rename)) 
 				     (set! export-only (cons (cadr spec) export-only))
-				     (set! export-rename (cons (cons (cadr spec) (caddr spec)) export-rename)))
+				     (set! export-rename (cons (cons (cadr spec) (car (cddr spec))) export-rename)))
 				    (else (error 'define-library "unknown export spec:" spec)))
 			      )
 			    (cdr declaration))

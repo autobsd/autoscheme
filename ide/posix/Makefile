@@ -90,9 +90,9 @@ auto_scheme_string_module_scm = $(modules_dir)/auto/scheme/string/module.scm
 auto_scheme_string_dep = \
 	$(auto_scheme_string_module_scm) \
 
-auto_scheme_cxr_module_scm = $(modules_dir)/auto/scheme/cxr/module.scm 
-auto_scheme_cxr_dep = \
-	$(auto_scheme_cxr_module_scm) \
+scheme_cxr_module_scm = $(modules_dir)/scheme/cxr/module.scm 
+scheme_cxr_dep = \
+	$(scheme_cxr_module_scm) \
 
 auto_scheme_process_context_module_scm = $(modules_dir)/auto/scheme/process/context/module.scm 
 auto_scheme_process_context_dep = \
@@ -128,6 +128,7 @@ libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
 	$(obj_dir)/scheme.o \
+	$(obj_dir)/scheme_cxr.o \
 	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme_base.o \
@@ -137,7 +138,6 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_args_fold.o \
 	$(obj_dir)/auto_scheme_args.o \
 	$(obj_dir)/auto_scheme_string.o \
-	$(obj_dir)/auto_scheme_cxr.o \
 	$(obj_dir)/auto_scheme_process_context.o \
 	$(obj_dir)/auto_scheme_path.o \
 	$(obj_dir)/auto_scheme_read.o \
@@ -148,13 +148,13 @@ libautoscheme_obj = \
 
 
 scheme_modules = scheme \
+		 scheme_cxr \
                  auto_scheme_base \
                  auto_scheme_environment \
 		 auto_scheme_library \
                  auto_scheme_eval \
                  auto_scheme_list \
                  auto_scheme_write \
-                 auto_scheme_cxr \
                  auto_scheme_string \
                  auto_scheme_args_fold \
                  auto_scheme_args \
@@ -235,12 +235,12 @@ $(gen_dir)/auto_scheme_process_context.c: $(auto_scheme_process_context_dep) $(b
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_process_context_module_scm) -n auto_scheme_process_context -o $(gen_dir)/auto_scheme_process_context.c
 
-$(obj_dir)/auto_scheme_cxr.o: $(gen_dir)/auto_scheme_cxr.c
+$(obj_dir)/scheme_cxr.o: $(gen_dir)/scheme_cxr.c
 	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_cxr.c -o $(obj_dir)/auto_scheme_cxr.o -I$(include_dir)
-$(gen_dir)/auto_scheme_cxr.c: $(auto_scheme_cxr_dep) $(bin_dir)/autoscheme-prime
+	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_cxr.c -o $(obj_dir)/scheme_cxr.o -I$(include_dir)
+$(gen_dir)/scheme_cxr.c: $(scheme_cxr_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_cxr_module_scm) -n auto_scheme_cxr -o $(gen_dir)/auto_scheme_cxr.c
+	$(bin_dir)/autoscheme-prime --compile-module $(scheme_cxr_module_scm) -n scheme_cxr -o $(gen_dir)/scheme_cxr.c
 
 $(obj_dir)/auto_scheme_string.o: $(gen_dir)/auto_scheme_string.c
 	mkdir -p $(obj_dir)
@@ -347,7 +347,7 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_file.c \
 		$(prime_dir)/auto_scheme_eval.c \
 		$(prime_dir)/auto_scheme_environment.c \
-		$(prime_dir)/auto_scheme_cxr.c \
+		$(prime_dir)/scheme_cxr.c \
 		$(prime_dir)/auto_scheme_compile.c \
 		$(prime_dir)/auto_scheme_interpret.c \
 		$(prime_dir)/auto_scheme_args.c \

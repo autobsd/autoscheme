@@ -3,7 +3,7 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define-library (auto scheme compile)
-  (import (only (auto scheme) object->string))
+  (import (only (auto scheme base) object->string))
 
   (export compile-module
 	  compile-program)
@@ -111,6 +111,9 @@
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-procedure))
 		 (string-append "mk_proc(" (object->string (cadr expression)) ",&NIL)" ))
+
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-pointer))
+		 (object->string (cadr expression)))
 
 
 

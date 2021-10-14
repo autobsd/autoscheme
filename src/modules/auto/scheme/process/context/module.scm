@@ -8,7 +8,7 @@
 
 
 (define-library (auto scheme process context)
-  (import (only (auto scheme)
+  (import (only (auto scheme base)
 		emergency-exit
 		exit
 		quote

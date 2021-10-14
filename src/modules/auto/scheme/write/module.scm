@@ -4,7 +4,7 @@
 
 (define-library (auto scheme write)
 
-  (import (only (auto scheme) display write 
+  (import (only (auto scheme base) display write 
 		begin
 		))
 

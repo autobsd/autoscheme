@@ -6,7 +6,7 @@
 
   (export read read-list)
 
-  (import (only (auto scheme) read)
+  (import (only (auto scheme base) read)
 	  (auto scheme base)
 	  )
 	

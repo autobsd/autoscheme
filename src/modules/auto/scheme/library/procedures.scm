@@ -2,6 +2,15 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+ (define object->string
+     (lambda (object)
+       (let ((string-port (open-output-string)))
+   	 (write object string-port)
+   	 (let ((output-string (get-output-string string-port)))
+   	   (close-output-port string-port)
+   	   output-string))
+       ))
+
 (define environment-import-sets!
   (lambda (target source . sets)
 

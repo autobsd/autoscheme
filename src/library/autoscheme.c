@@ -3501,7 +3501,7 @@ OP_QQUOTE1:
 			x = cons(x, car(envir));
 			car(envir) = x;
 		}
-		s_return(code);
+		s_return( value );
 
 	case OP_DEFP:	/* defined? */
 		if (!validargs("defined?", 1, 2, TST_SYMBOL TST_ENVIRONMENT)) Error_0(msg);

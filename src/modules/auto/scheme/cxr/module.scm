@@ -6,7 +6,7 @@
   
   (import (auto scheme base)
 
-	  (only (auto scheme)
+	  (only (auto scheme base)
 		caaaar
 		caaar
 		caaddr

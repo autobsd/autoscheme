@@ -54,7 +54,7 @@
       (for-each (lambda (declaration)
 		  (cond ((eq? (car declaration) 'export) (set! export-declarations (cons declaration export-declarations)))
 			((eq? (car declaration) 'import) (set! import-declarations (cons declaration import-declarations)))
-			((eq? (car declaration) 'begin) (set! begin-declarations (cons declaration begin-declarations)))
+			((eq? (car declaration) 'begin) (set! begin-declarations (append (cdr declaration) begin-declarations)))
 			(else (error 'define-library "unknown declaration type:" (car declaration)))))
 		(reverse declarations))
 
@@ -75,13 +75,12 @@
 		  )
 		import-declarations)
 
+      (for-each (lambda (declaration)
+		  (eval declaration library-environment)
+		  )
+		begin-declarations)
 
-      (eval
-       `(begin
-	  ,@begin-declarations
-	  )
-       library-environment
-       )
+     
 
       (apply environment-rename (cons (apply environment-only (cons library-environment export-only)) export-rename))
 

@@ -3996,7 +3996,8 @@ OP_DO2:
 			}
 			s_save((operator == OP_0MACRO) ? OP_1MACRO : OP_DEFMACRO1, NIL, caar(code));
 			y = cons(cdar(code), cdr(code));
-			code = cons(LAMBDA, y);
+			/* code = cons(LAMBDA, y); */
+s_return(mk_closure(y, envir));
 		} else {
 			if (!is_symbol(car(code))) {
 				Error_0("variable is not a symbol");

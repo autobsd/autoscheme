@@ -12,7 +12,6 @@
 		emergency-exit
 		exit
 		quote
-		begin
 		)
 	  (auto scheme environment)
 	  )

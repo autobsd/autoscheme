@@ -5,9 +5,7 @@
 (define-library (auto scheme eval)
 
   (import (only (auto scheme base) 
-  	        begin
   		define-macro
-  		lambda
 		eval
 		cons
 		apply

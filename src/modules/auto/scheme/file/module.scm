@@ -4,7 +4,6 @@
 
 (define-library (auto scheme file)
   (import (only (auto scheme base) open-input-file open-output-file with-input-from-file
-		begin
 		))
 
   (export open-input-file

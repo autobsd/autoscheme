@@ -5,7 +5,6 @@
 (define-library (auto scheme write)
 
   (import (only (auto scheme base) display write 
-		begin
 		))
 
   (export display write)

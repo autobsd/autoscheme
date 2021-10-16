@@ -9,6 +9,7 @@ pointer LOAD_MODULE__scheme_eval(pointer environment);
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 pointer LOAD_MODULE__scheme( pointer environment );
+pointer LOAD_MODULE__auto_scheme_macro( pointer environment );
 pointer LOAD_MODULE__auto_scheme_base( pointer environment );
 pointer LOAD_MODULE__auto_scheme_environment( pointer environment );
 pointer LOAD_MODULE__scheme_eval( pointer environment );
@@ -37,6 +38,7 @@ static pointer ff_load_modules( pointer args )
     pointer environment = car( args );
 
     LOAD_MODULE__scheme( environment );
+    LOAD_MODULE__auto_scheme_macro( environment );
     LOAD_MODULE__auto_scheme_base( environment );
     LOAD_MODULE__scheme_read( environment );
     LOAD_MODULE__auto_scheme_environment( environment );

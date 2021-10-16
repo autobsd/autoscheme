@@ -46,6 +46,9 @@ auto_scheme_environment_dep = \
 	$(modules_dir)/auto/scheme/environment/initialization.c \
 
 
+auto_scheme_macro_module_scm = $(modules_dir)/auto/scheme/macro/module.scm 
+auto_scheme_macro_dep = \
+	$(auto_scheme_macro_module_scm) \
 
 auto_scheme_base_module_scm = $(modules_dir)/auto/scheme/base/module.scm 
 auto_scheme_base_dep = \
@@ -132,6 +135,7 @@ libautoscheme_obj = \
 	$(obj_dir)/scheme_read.o \
 	$(obj_dir)/scheme_cxr.o \
 	$(obj_dir)/auto_scheme_environment.o \
+	$(obj_dir)/auto_scheme_macro.o \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/scheme_repl.o \
@@ -151,6 +155,7 @@ libautoscheme_obj = \
 
 scheme_modules = scheme \
 		 scheme_cxr \
+                 auto_scheme_macro \
                  auto_scheme_base \
                  scheme_read \
                  auto_scheme_environment \
@@ -310,6 +315,13 @@ $(gen_dir)/auto_scheme_base.c: $(auto_scheme_base_dep) $(bin_dir)/autoscheme-pri
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_base_module_scm) -n auto_scheme_base -o $(gen_dir)/auto_scheme_base.c
 
+$(obj_dir)/auto_scheme_macro.o: $(gen_dir)/auto_scheme_macro.c
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_macro.c -o $(obj_dir)/auto_scheme_macro.o -I$(include_dir)
+$(gen_dir)/auto_scheme_macro.c: $(auto_scheme_macro_dep) $(bin_dir)/autoscheme-prime
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_macro_module_scm) -n auto_scheme_macro -o $(gen_dir)/auto_scheme_macro.c
+
 $(obj_dir)/scheme.o: $(gen_dir)/scheme.c
 	mkdir -p $(obj_dir)
 	$(CC) $(strict_options_89) -c $(gen_dir)/scheme.c -o $(obj_dir)/scheme.o -I$(include_dir)
@@ -348,6 +360,7 @@ $(bin_dir)/autoscheme-prime:
 	mkdir -p $(bin_dir)
 	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 		$(prime_dir)/scheme.c \
+		$(prime_dir)/auto_scheme_macro.c \
 		$(prime_dir)/auto_scheme_base.c \
 		$(prime_dir)/auto_scheme_write.c \
 		$(prime_dir)/auto_scheme_string.c \

@@ -37,7 +37,9 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_syntax(OP_OR0, "or", environment);
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
     scheme_register_syntax(OP_0MACRO, "macro", environment);
-    scheme_register_syntax(OP_DEFMACRO0, "define-macro", environment);
+
+    /* scheme_register_syntax(OP_DEFMACRO0, "define-macro", environment); */
+
     scheme_register_syntax(OP_CASE0, "case", environment);
     scheme_register_syntax(OP_WHEN0, "when", environment);
     scheme_register_syntax(OP_UNLESS0, "unless", environment);

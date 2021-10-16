@@ -63,11 +63,11 @@ auto_scheme_library_dep = \
 
 
 
-auto_scheme_eval_module_scm = $(modules_dir)/auto/scheme/eval/module.scm 
-auto_scheme_eval_dep = \
-	$(auto_scheme_eval_module_scm) \
-	$(modules_dir)/auto/scheme/eval/declarations.h \
-	$(modules_dir)/auto/scheme/eval/definitions.c \
+scheme_eval_module_scm = $(modules_dir)/scheme/eval/module.scm 
+scheme_eval_dep = \
+	$(scheme_eval_module_scm) \
+	$(modules_dir)/scheme/eval/declarations.h \
+	$(modules_dir)/scheme/eval/definitions.c \
 
 
 
@@ -132,7 +132,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme_base.o \
-	$(obj_dir)/auto_scheme_eval.o \
+	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/auto_scheme_list.o \
 	$(obj_dir)/auto_scheme_write.o \
 	$(obj_dir)/auto_scheme_args_fold.o \
@@ -152,7 +152,7 @@ scheme_modules = scheme \
                  auto_scheme_base \
                  auto_scheme_environment \
 		 auto_scheme_library \
-                 auto_scheme_eval \
+		 scheme_eval \
                  auto_scheme_list \
                  auto_scheme_write \
                  auto_scheme_string \
@@ -277,12 +277,12 @@ $(gen_dir)/auto_scheme_list.c: $(auto_scheme_list_dep) $(bin_dir)/autoscheme-pri
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_list_module_scm) -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
 
-$(obj_dir)/auto_scheme_eval.o: $(gen_dir)/auto_scheme_eval.c
+$(obj_dir)/scheme_eval.o: $(gen_dir)/scheme_eval.c
 	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_eval.c -o $(obj_dir)/auto_scheme_eval.o -I$(include_dir)
-$(gen_dir)/auto_scheme_eval.c: $(auto_scheme_eval_dep) $(bin_dir)/autoscheme-prime
+	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_eval.c -o $(obj_dir)/scheme_eval.o -I$(include_dir)
+$(gen_dir)/scheme_eval.c: $(scheme_eval_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_eval_module_scm) -n auto_scheme_eval -o $(gen_dir)/auto_scheme_eval.c
+	$(bin_dir)/autoscheme-prime --compile-module $(scheme_eval_module_scm) -n scheme_eval -o $(gen_dir)/scheme_eval.c
 
 $(obj_dir)/auto_scheme_base.o: $(gen_dir)/auto_scheme_base.c
 	mkdir -p $(obj_dir)
@@ -345,7 +345,7 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_path.c \
 		$(prime_dir)/auto_scheme_list.c \
 		$(prime_dir)/auto_scheme_file.c \
-		$(prime_dir)/auto_scheme_eval.c \
+		$(prime_dir)/scheme_eval.c \
 		$(prime_dir)/auto_scheme_environment.c \
 		$(prime_dir)/scheme_cxr.c \
 		$(prime_dir)/auto_scheme_compile.c \

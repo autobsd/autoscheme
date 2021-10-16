@@ -5,7 +5,9 @@
 pointer LOAD_MODULE__scheme( pointer environment );
 pointer LOAD_MODULE__auto_scheme_base( pointer environment );
 pointer LOAD_MODULE__auto_scheme_environment( pointer environment );
-pointer LOAD_MODULE__auto_scheme_eval( pointer environment );
+pointer LOAD_MODULE__scheme_eval( pointer environment );
+pointer LOAD_MODULE__scheme_repl( pointer environment );
+pointer LOAD_MODULE__scheme_load( pointer environment );
 pointer LOAD_MODULE__auto_scheme_list( pointer environment );
 pointer LOAD_MODULE__auto_scheme_write( pointer environment );
 pointer LOAD_MODULE__scheme_cxr( pointer environment );

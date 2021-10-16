@@ -8,7 +8,8 @@
   (import (auto scheme base)
 	  (auto scheme write)
 	  (auto scheme environment)
-	  (auto scheme eval)
+	  (scheme eval)
+	  (scheme load)
 	  (auto scheme file)
 	  (auto scheme read)
 	  )
@@ -25,15 +26,7 @@
 	 (define int-env (environment))
 
 	 (for-each (lambda (source)
-		     (with-input-from-file 
-		      source
-		      (lambda ()
-			(let interpret-expression ((expression (read)))
-			  (cond ((not (eof-object? expression))
-				 (eval expression int-env)
-				 (interpret-expression (read)))))
-			)
-		      ))
+		     (load source int-env))
 		   sources)
 	 ))
 

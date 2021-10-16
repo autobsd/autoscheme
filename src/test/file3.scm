@@ -7,4 +7,4 @@
 	)
 
 (display "testing return values:\n")
-(write (define x 3))(newline)
+(write (define x (+ 2 2)))(newline)

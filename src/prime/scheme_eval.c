@@ -11,7 +11,9 @@ pointer LOAD_MODULE__scheme_eval(pointer environment);
 pointer LOAD_MODULE__scheme( pointer environment );
 pointer LOAD_MODULE__auto_scheme_base( pointer environment );
 pointer LOAD_MODULE__auto_scheme_environment( pointer environment );
-pointer LOAD_MODULE__auto_scheme_eval( pointer environment );
+pointer LOAD_MODULE__scheme_eval( pointer environment );
+pointer LOAD_MODULE__scheme_repl( pointer environment );
+pointer LOAD_MODULE__scheme_load( pointer environment );
 pointer LOAD_MODULE__auto_scheme_list( pointer environment );
 pointer LOAD_MODULE__auto_scheme_write( pointer environment );
 pointer LOAD_MODULE__scheme_cxr( pointer environment );
@@ -40,6 +42,8 @@ static pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_environment( environment );
     LOAD_MODULE__auto_scheme_library( environment );
     LOAD_MODULE__scheme_eval( environment );
+    LOAD_MODULE__scheme_repl( environment );
+    LOAD_MODULE__scheme_load( environment );
     LOAD_MODULE__auto_scheme_list( environment );
     LOAD_MODULE__auto_scheme_write( environment );
     LOAD_MODULE__scheme_cxr( environment );
@@ -60,6 +64,6 @@ static pointer ff_load_modules( pointer args )
 pointer return_value = T;
 return_value = autoscheme_eval(T, environment);
 return_value = autoscheme_eval(T, environment);
-return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("eval"),NIL))),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("only"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),cons(mk_symbol("define"),cons(mk_symbol("cons"),cons( mk_symbol("quasiquote" ),cons(mk_symbol("quote"),cons(mk_symbol("append"),NIL))))))),NIL)),cons(cons(mk_symbol("export"),cons(mk_symbol("environment"),cons(mk_symbol("eval"),NIL))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("define"),cons(mk_symbol("eval"),cons(mk_proc(OP_PEVAL,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("define-macro"),cons(mk_syntax(OP_DEFMACRO0,"define-macro"),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("load-modules"),cons(mk_foreign_func(ff_load_modules,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("make-environment"),cons(mk_foreign_func(make_environment,&NIL),NIL))),cons(cons(mk_symbol("define-macro"),cons(cons(mk_symbol("environment"),mk_symbol("sets")),cons(cons(mk_symbol("define"),cons(mk_symbol("_environment"),cons(cons(mk_symbol("load-modules"),cons(cons(mk_symbol("make-environment"),NIL),NIL)),NIL))),cons(cons(mk_symbol("eval"),cons(cons( mk_symbol("quasiquote" ),cons(cons(mk_symbol("import"),cons(cons( mk_symbol("unquote-splicing" ),cons(mk_symbol("sets"),NIL)),NIL)),NIL)),cons(mk_symbol("_environment"),NIL))),cons(mk_symbol("_environment"),NIL))))),NIL)))))),NIL))))), environment);
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("scheme"),cons(mk_symbol("eval"),NIL)),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("only"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),cons(mk_symbol("define"),cons(mk_symbol("cons"),cons( mk_symbol("quasiquote" ),cons(mk_symbol("quote"),cons(mk_symbol("append"),NIL))))))),NIL)),cons(cons(mk_symbol("export"),cons(mk_symbol("environment"),cons(mk_symbol("eval"),NIL))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("define"),cons(mk_symbol("eval"),cons(mk_proc(OP_PEVAL,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("define-macro"),cons(mk_syntax(OP_DEFMACRO0,"define-macro"),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("load-modules"),cons(mk_foreign_func(ff_load_modules,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("make-environment"),cons(mk_foreign_func(make_environment,&NIL),NIL))),cons(cons(mk_symbol("define-macro"),cons(cons(mk_symbol("environment"),mk_symbol("sets")),cons(cons(mk_symbol("define"),cons(mk_symbol("_environment"),cons(cons(mk_symbol("load-modules"),cons(cons(mk_symbol("make-environment"),NIL),NIL)),NIL))),cons(cons(mk_symbol("eval"),cons(cons( mk_symbol("quasiquote" ),cons(cons(mk_symbol("import"),cons(cons( mk_symbol("unquote-splicing" ),cons(mk_symbol("sets"),NIL)),NIL)),NIL)),cons(mk_symbol("_environment"),NIL))),cons(mk_symbol("_environment"),NIL))))),NIL)))))),NIL))))), environment);
 return return_value;
 }

@@ -3069,67 +3069,73 @@ LOOP:
 
 	switch (operator) {
 	case OP_EVAL:		/* main part of evalution */
-OP_EVAL:
-		if (is_symbol(code)) {	/* symbol */
-			if (syntaxnum(code) & T_DEFSYNTAX) {
-				args = car(code);
-				code = cdr(code);
-				for (x = car(envir); x != NIL; x = cdr(x)) {
-					if ((syntaxnum(caar(x)) & T_DEFSYNTAX) && cdr(caar(x)) == code) {
-						s_return(cdar(x));
-					}
-				}
-				for (x = args; x != NIL; x = cdr(x)) {
-					if (syntaxnum(x) & T_DEFSYNTAX) {
-						for (y = car(x); y != NIL; y = cdr(y)) {
-							if ((syntaxnum(caar(y)) & T_DEFSYNTAX) && cdr(caar(y)) == code) {
-								s_return(cdar(y));
-							}
-						}
-					} else {
-						for (y = car(x); y != NIL; y = cdr(y)) {
-							if ((syntaxnum(caar(y)) & T_DEFSYNTAX ? cdr(caar(y)) : caar(y)) == code) {
-								s_return(cdar(y));
-							}
-						}
-					}
-				}
-				for (x = cdr(envir); x != NIL; x = cdr(x)) {
-					for (y = car(x); y != NIL; y = cdr(y)) {
-						if (caar(y) == code) {
-							s_return(cdar(y));
-						}
-					}
-				}
-			} else {
-				for (x = envir; x != NIL; x = cdr(x)) {
-					pointer z = NIL;
-					for (y = car(x); y != NIL; z = y, y = cdr(y)) {
-						if (caar(y) == code && cdar(y) != UNDEF) {
-							if (z != NIL) {
-								cdr(z) = cdr(y);
-								cdr(y) = car(x);
-								car(x) = y;
-							}
-							s_return(cdar(y));
-						}
-					}
-				}
+	OP_EVAL:
+	    if (is_syntax(code)) {	/* syntax */
+		
+		if (syntaxnum(code) & T_DEFSYNTAX) {
+		    args = car(code);
+		    code = cdr(code);
+		    for (x = car(envir); x != NIL; x = cdr(x)) {
+			if ((syntaxnum(caar(x)) & T_DEFSYNTAX) && cdr(caar(x)) == code) {
+			    s_return(cdar(x));
 			}
-			Error_1("unbound variable", code);
-		} else if (is_pair(code) && !is_environment(code)) {
-			s_save(OP_E0ARGS, NIL, code);
+		    }
+		    for (x = args; x != NIL; x = cdr(x)) {
+			if (syntaxnum(x) & T_DEFSYNTAX) {
+			    for (y = car(x); y != NIL; y = cdr(y)) {
+				if ((syntaxnum(caar(y)) & T_DEFSYNTAX) && cdr(caar(y)) == code) {
+				    s_return(cdar(y));
+				}
+			    }
+			} else {
+			    for (y = car(x); y != NIL; y = cdr(y)) {
+				if ((syntaxnum(caar(y)) & T_DEFSYNTAX ? cdr(caar(y)) : caar(y)) == code) {
+				    s_return(cdar(y));
+				}
+			    }
+			}
+		    }
+		    for (x = cdr(envir); x != NIL; x = cdr(x)) {
+			for (y = car(x); y != NIL; y = cdr(y)) {
+			    if (caar(y) == code) {
+				s_return(cdar(y));
+			    }
+			}
+		    }
+		} else {
+		    s_return(code); 
+		}
+	    }
+			
+	    else if (is_symbol(code)) {	/* symbol */
+		for (x = envir; x != NIL; x = cdr(x)) {
+		    pointer z = NIL;
+		    for (y = car(x); y != NIL; z = y, y = cdr(y)) {
+			if (caar(y) == code && cdar(y) != UNDEF) {
+			    if (z != NIL) {
+				cdr(z) = cdr(y);
+				cdr(y) = car(x);
+				car(x) = y;
+			    }
+			    s_return(cdar(y));
+			}
+		    }
+		}
+		Error_1("unbound variable", code);
 
-			set_vector_elem(call_history, call_history_pos++, code);
-			if( call_history_pos == CALL_HISTORY_LENGTH ) call_history_pos = 0;
+	    } else if (is_pair(code) && !is_environment(code)) {
+		s_save(OP_E0ARGS, NIL, code);
 
-			code = car(code);
-			s_goto(OP_EVAL);
+		set_vector_elem(call_history, call_history_pos++, code);
+		if( call_history_pos == CALL_HISTORY_LENGTH ) call_history_pos = 0;
+
+		code = car(code);
+		s_goto(OP_EVAL);
 		/* } else if (is_null(code)) { */
 		/*     Error_1("illegal expression", code); */
-		} else {
-			s_return(code);
-		}
+	    } else {
+		s_return(code);
+	    }
 
 	case OP_E0ARGS:	/* eval arguments */
 		if (is_syntax(value)) {
@@ -6811,7 +6817,7 @@ OP_PVECFROM:
 
 /* ========== Initialization of internal keywords ========== */
 
-static pointer mk_syntax( enum eval_op operator, char *name )
+pointer mk_syntax( enum eval_op operator, char *name )
 {
     pointer x;
     x = mk_string( name );

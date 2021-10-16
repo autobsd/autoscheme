@@ -6,7 +6,7 @@
 	(auto scheme write)
 	(auto scheme args fold)
 	(auto scheme args)
-	(auto scheme cxr)
+	(scheme cxr)
 	(auto scheme process context)
 	(auto scheme string)
 	(auto scheme read)

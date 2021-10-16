@@ -257,6 +257,7 @@ pointer cons(pointer a, pointer b);
 
 pointer mk_foreign_func(foreign_func ff, pointer *pp);
 pointer mk_proc(enum eval_op operator, pointer *pp);
+pointer mk_syntax( enum eval_op operator, char *name );
 
 pointer mk_character(int c);
 pointer mk_integer(int32_t num);

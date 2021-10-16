@@ -3,7 +3,7 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (foreign-initialize "pointer library = make_environment( NIL );\n"
-		    "pointer name = mk_symbol( \"(auto scheme cxr)\" );\n"
+		    "pointer name = mk_symbol( \"(scheme cxr)\" );\n"
 
 		    "car( environment ) = cons( cons( name, library ), car( environment ));\n"
 

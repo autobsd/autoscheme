@@ -2,9 +2,6 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(foreign-declare (include-string "declarations.h"))
-(foreign-define (include-string "definitions.c"))
-
 
 (define-library (auto scheme interpret)
 
@@ -16,25 +13,16 @@
 	  (auto scheme read)
 	  )
   (export interpret
-	  interpretation-environment
+	  ;; interpretation-environment
 	  )
   (begin
 
-    (define interpretation-environment
-      (lambda ()
-	(let ((load-modules (foreign-function ff_load_modules))
-	      (int-env (make-environment))
-	      )
-	  
-	  (load-modules int-env)
-	)))
+  
      
      (define interpret
        (lambda sources
 
-	 (define int-env (interpretation-environment))
-	 (environment-delete! int-env 'let)
-	 (environment-delete! int-env 'begin)
+	 (define int-env (environment))
 
 	 (for-each (lambda (source)
 		     (with-input-from-file 

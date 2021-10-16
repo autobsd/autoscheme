@@ -13,6 +13,7 @@
 	  (auto scheme file)
 	  (auto scheme read)
 	  (auto scheme write)
+	  (scheme cxr)
 	  )
 
   (begin
@@ -111,6 +112,9 @@
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-procedure))
 		 (string-append "mk_proc(" (object->string (cadr expression)) ",&NIL)" ))
+
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-syntax))
+		 (string-append "mk_syntax(" (object->string (cadr expression)) "," (object->string (caddr expression))  ")" ))
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-pointer))
 		 (object->string (cadr expression)))

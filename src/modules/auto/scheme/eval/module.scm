@@ -2,36 +2,37 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+(foreign-declare (include-string "declarations.h"))
+(foreign-define (include-string "definitions.c"))
+
+
 (define-library (auto scheme eval)
 
   (import (only (auto scheme base) 
-  		define-macro
-		eval
-		cons
-		apply
+
+	  	define
+	  	cons
+	  	quasiquote
+	  	quote
+	  	append
   	  	)
-
-	  (only (auto scheme environment)
-		make-environment
-		global-environment
-		)
-
-	  (only (auto scheme library)
-		environment-import-sets!
-		)
-
 	  )
 
   (export environment eval)
+
   (begin
+    (define eval (foreign-procedure OP_PEVAL))
+    (define define-macro (foreign-syntax OP_DEFMACRO0 "define-macro"))
+    (define load-modules (foreign-function ff_load_modules))
+    (define make-environment (foreign-function make_environment))
 
     (define-macro (environment . sets) 
+      (define _environment (load-modules (make-environment)))
 
-      (apply environment-import-sets! (cons (make-environment) (cons (expansion-environment) sets)))
-      ;; (apply environment-import-sets! (cons (make-environment) (cons (global-environment) sets)))
-      
-      )
-
-    ))
+      (eval `(import ,@sets) _environment)
+      _environment)
+    
+    )
+  )
 
 

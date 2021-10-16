@@ -66,6 +66,8 @@ auto_scheme_library_dep = \
 auto_scheme_eval_module_scm = $(modules_dir)/auto/scheme/eval/module.scm 
 auto_scheme_eval_dep = \
 	$(auto_scheme_eval_module_scm) \
+	$(modules_dir)/auto/scheme/eval/declarations.h \
+	$(modules_dir)/auto/scheme/eval/definitions.c \
 
 
 
@@ -120,8 +122,6 @@ auto_scheme_compile_dep = \
 auto_scheme_interpret_module_scm = $(modules_dir)/auto/scheme/interpret/module.scm 
 auto_scheme_interpret_dep = \
 	$(auto_scheme_interpret_module_scm) \
-	$(modules_dir)/auto/scheme/interpret/declarations.h \
-	$(modules_dir)/auto/scheme/interpret/definitions.c \
 
 
 libautoscheme_obj = \

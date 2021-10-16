@@ -8,7 +8,7 @@ pointer LOAD_MODULE__scheme_cxr(pointer environment)
 {
 pointer return_value = T;
 pointer library = make_environment( NIL );
-pointer name = mk_symbol( "(auto scheme cxr)" );
+pointer name = mk_symbol( "(scheme cxr)" );
 car( environment ) = cons( cons( name, library ), car( environment ));
 scheme_register_proc(OP_CAAAR, "caaar", library);
 scheme_register_proc(OP_CAADR, "caadr", library);

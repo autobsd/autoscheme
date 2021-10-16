@@ -8,7 +8,7 @@
 	  (auto scheme write)
 	  (auto scheme args fold)
 	  (auto scheme string)
-	  (auto scheme cxr)
+	  (scheme cxr)
 	  )
 
   (export args-usage)

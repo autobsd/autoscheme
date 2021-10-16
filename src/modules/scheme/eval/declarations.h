@@ -20,6 +20,5 @@ pointer LOAD_MODULE__scheme_read( pointer environment );
 pointer LOAD_MODULE__auto_scheme_file( pointer environment );
 pointer LOAD_MODULE__auto_scheme_compile( pointer environment );
 pointer LOAD_MODULE__auto_scheme_interpret( pointer environment );
-pointer LOAD_MODULE__auto_scheme_library( pointer environment );
 
 static pointer ff_load_modules( pointer args );

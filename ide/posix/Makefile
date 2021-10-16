@@ -30,6 +30,11 @@ autoscheme_sources =  \
 scheme_module_scm = $(modules_dir)/scheme/module.scm 
 scheme_dep = \
 	$(scheme_module_scm) \
+	$(modules_dir)/scheme/procedures.scm \
+	$(modules_dir)/scheme/macros.scm \
+	$(modules_dir)/scheme/initialization.c \
+	$(modules_dir)/scheme/finalization.c \
+	$(modules_dir)/scheme/declarations.h \
 
 
 
@@ -48,17 +53,6 @@ auto_scheme_base_dep = \
 	$(modules_dir)/auto/scheme/base/declarations.h \
 	$(modules_dir)/auto/scheme/base/definitions.c \
 	$(modules_dir)/auto/scheme/base/initialization.c \
-
-
-
-auto_scheme_library_module_scm = $(modules_dir)/auto/scheme/library/module.scm 
-auto_scheme_library_dep = \
-	$(auto_scheme_library_module_scm) \
-	$(modules_dir)/auto/scheme/library/procedures.scm \
-	$(modules_dir)/auto/scheme/library/macros.scm \
-	$(modules_dir)/auto/scheme/library/initialization.c \
-	$(modules_dir)/auto/scheme/library/finalization.c \
-	$(modules_dir)/auto/scheme/library/declarations.h \
 
 
 
@@ -138,7 +132,6 @@ libautoscheme_obj = \
 	$(obj_dir)/scheme_read.o \
 	$(obj_dir)/scheme_cxr.o \
 	$(obj_dir)/auto_scheme_environment.o \
-	$(obj_dir)/auto_scheme_library.o \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/scheme_repl.o \
@@ -161,7 +154,6 @@ scheme_modules = scheme \
                  auto_scheme_base \
                  scheme_read \
                  auto_scheme_environment \
-		 auto_scheme_library \
 		 scheme_eval \
 		 scheme_repl \
 		 scheme_load \
@@ -325,13 +317,6 @@ $(gen_dir)/scheme.c: $(scheme_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(scheme_module_scm) -n scheme -o $(gen_dir)/scheme.c
 
-$(obj_dir)/auto_scheme_library.o: $(gen_dir)/auto_scheme_library.c
-	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_library.c -o $(obj_dir)/auto_scheme_library.o -I$(include_dir)
-$(gen_dir)/auto_scheme_library.c: $(auto_scheme_library_dep) $(bin_dir)/autoscheme-prime
-	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_library_module_scm) -n auto_scheme_library -o $(gen_dir)/auto_scheme_library.c
-
 $(obj_dir)/auto_scheme_environment.o: $(gen_dir)/auto_scheme_environment.c
 	mkdir -p $(obj_dir)
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_environment.c -o $(obj_dir)/auto_scheme_environment.o -I$(include_dir)
@@ -363,7 +348,6 @@ $(bin_dir)/autoscheme-prime:
 	mkdir -p $(bin_dir)
 	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 		$(prime_dir)/scheme.c \
-		$(prime_dir)/auto_scheme_library.c \
 		$(prime_dir)/auto_scheme_base.c \
 		$(prime_dir)/auto_scheme_write.c \
 		$(prime_dir)/auto_scheme_string.c \

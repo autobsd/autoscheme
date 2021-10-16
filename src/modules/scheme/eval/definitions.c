@@ -10,7 +10,6 @@ static pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_base( environment );
     LOAD_MODULE__scheme_read( environment );
     LOAD_MODULE__auto_scheme_environment( environment );
-    LOAD_MODULE__auto_scheme_library( environment );
     LOAD_MODULE__scheme_eval( environment );
     LOAD_MODULE__scheme_repl( environment );
     LOAD_MODULE__scheme_load( environment );

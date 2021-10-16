@@ -2,8 +2,10 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
+pointer module_environment = environment;
+
 pointer library = make_environment( NIL );
-pointer name = mk_symbol( "(auto scheme library)" );
+pointer name = mk_symbol( "(scheme)" );
 
 pointer binding = cons( name, library );
 

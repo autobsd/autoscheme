@@ -5,6 +5,7 @@
 (define-library (scheme load)
 
   (import (auto scheme base)
+	  (scheme eval)
 	  (scheme read)
 	  )
 

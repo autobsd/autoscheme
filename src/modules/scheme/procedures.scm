@@ -5,7 +5,7 @@
  (define object->string
      (lambda (object)
        (let ((string-port (open-output-string)))
-   	 (write object string-port)
+   	 (write-simple object string-port)
    	 (let ((output-string (get-output-string string-port)))
    	   (close-output-port string-port)
    	   output-string))

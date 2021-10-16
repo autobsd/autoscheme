@@ -6,6 +6,9 @@
 (foreign-initialize (include-string "initialization.c"))
 (foreign-finalize (include-string "finalization.c"))
 
+(define eval (foreign-procedure OP_PEVAL))
+(define write-simple (foreign-procedure OP_WRITE))
+
 (include "macros.scm")
 (include "procedures.scm")
 

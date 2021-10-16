@@ -187,7 +187,9 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_GEQ, ">=", environment);
     scheme_register_proc(OP_MAX, "max", environment);
     scheme_register_proc(OP_MIN, "min", environment);
-    scheme_register_proc(OP_READ, "read", environment);
+
+    /* scheme_register_proc(OP_READ, "read", environment); */
+
     scheme_register_proc(OP_CHAR_READY, "char-ready?", environment);
     scheme_register_proc(OP_WRITE_CHAR, "write-char", environment);
     scheme_register_proc(OP_WRITE, "write", environment);

@@ -11,12 +11,20 @@
   (import (auto scheme path)
 	  (auto scheme base)
 	  (auto scheme file)
-	  (auto scheme read)
+	  (scheme read)
 	  (auto scheme write)
 	  (scheme cxr)
 	  )
 
   (begin
+
+    (define read-list
+      (lambda args
+	(reverse (let read-expressions ((expressions '()))
+		   (let ((next-expression (apply read args)))
+		     (if (eof-object? next-expression) expressions
+			 (read-expressions (cons next-expression expressions))))))))
+
 
     (define compile-number
       (lambda (num)

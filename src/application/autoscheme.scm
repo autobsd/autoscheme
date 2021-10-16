@@ -9,7 +9,7 @@
 	(scheme cxr)
 	(auto scheme process context)
 	(auto scheme string)
-	(auto scheme read)
+	(scheme read)
 	(auto scheme file)
 
 	(auto scheme compile)

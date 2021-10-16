@@ -4,7 +4,9 @@
 
 (define-library (scheme load)
 
-  (import (auto scheme base))
+  (import (auto scheme base)
+	  (scheme read)
+	  )
 
   (export load)
 

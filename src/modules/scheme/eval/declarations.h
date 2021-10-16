@@ -16,7 +16,7 @@ pointer LOAD_MODULE__auto_scheme_args_fold( pointer environment );
 pointer LOAD_MODULE__auto_scheme_args( pointer environment );
 pointer LOAD_MODULE__auto_scheme_process_context( pointer environment );
 pointer LOAD_MODULE__auto_scheme_path( pointer environment );
-pointer LOAD_MODULE__auto_scheme_read( pointer environment );
+pointer LOAD_MODULE__scheme_read( pointer environment );
 pointer LOAD_MODULE__auto_scheme_file( pointer environment );
 pointer LOAD_MODULE__auto_scheme_compile( pointer environment );
 pointer LOAD_MODULE__auto_scheme_interpret( pointer environment );

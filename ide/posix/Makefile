@@ -114,9 +114,9 @@ auto_scheme_path_module_scm = $(modules_dir)/auto/scheme/path/module.scm
 auto_scheme_path_dep = \
 	$(auto_scheme_path_module_scm) \
 
-auto_scheme_read_module_scm = $(modules_dir)/auto/scheme/read/module.scm 
-auto_scheme_read_dep = \
-	$(auto_scheme_read_module_scm) \
+scheme_read_module_scm = $(modules_dir)/scheme/read/module.scm 
+scheme_read_dep = \
+	$(scheme_read_module_scm) \
 
 auto_scheme_file_module_scm = $(modules_dir)/auto/scheme/file/module.scm 
 auto_scheme_file_dep = \
@@ -135,6 +135,7 @@ libautoscheme_obj = \
 	$(obj_dir)/bignum.o \
 	$(obj_dir)/autoscheme.o \
 	$(obj_dir)/scheme.o \
+	$(obj_dir)/scheme_read.o \
 	$(obj_dir)/scheme_cxr.o \
 	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_library.o \
@@ -149,7 +150,6 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_string.o \
 	$(obj_dir)/auto_scheme_process_context.o \
 	$(obj_dir)/auto_scheme_path.o \
-	$(obj_dir)/auto_scheme_read.o \
 	$(obj_dir)/auto_scheme_file.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/auto_scheme_interpret.o \
@@ -159,6 +159,7 @@ libautoscheme_obj = \
 scheme_modules = scheme \
 		 scheme_cxr \
                  auto_scheme_base \
+                 scheme_read \
                  auto_scheme_environment \
 		 auto_scheme_library \
 		 scheme_eval \
@@ -171,7 +172,6 @@ scheme_modules = scheme \
                  auto_scheme_args \
                  auto_scheme_process_context \
                  auto_scheme_path \
-                 auto_scheme_read \
                  auto_scheme_file \
                  auto_scheme_compile \
                  auto_scheme_interpret \
@@ -225,12 +225,12 @@ $(gen_dir)/auto_scheme_file.c: $(auto_scheme_file_dep) $(bin_dir)/autoscheme-pri
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_file_module_scm) -n auto_scheme_file -o $(gen_dir)/auto_scheme_file.c
 
-$(obj_dir)/auto_scheme_read.o: $(gen_dir)/auto_scheme_read.c
+$(obj_dir)/scheme_read.o: $(gen_dir)/scheme_read.c
 	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_read.c -o $(obj_dir)/auto_scheme_read.o -I$(include_dir)
-$(gen_dir)/auto_scheme_read.c: $(auto_scheme_read_dep) $(bin_dir)/autoscheme-prime
+	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_read.c -o $(obj_dir)/scheme_read.o -I$(include_dir)
+$(gen_dir)/scheme_read.c: $(scheme_read_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_read_module_scm) -n auto_scheme_read -o $(gen_dir)/auto_scheme_read.c
+	$(bin_dir)/autoscheme-prime --compile-module $(scheme_read_module_scm) -n scheme_read -o $(gen_dir)/scheme_read.c
 
 $(obj_dir)/auto_scheme_path.o: $(gen_dir)/auto_scheme_path.c
 	mkdir -p $(obj_dir)
@@ -367,7 +367,7 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_base.c \
 		$(prime_dir)/auto_scheme_write.c \
 		$(prime_dir)/auto_scheme_string.c \
-		$(prime_dir)/auto_scheme_read.c \
+		$(prime_dir)/scheme_read.c \
 		$(prime_dir)/auto_scheme_process_context.c \
 		$(prime_dir)/auto_scheme_path.c \
 		$(prime_dir)/auto_scheme_list.c \

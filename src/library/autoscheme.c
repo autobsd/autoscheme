@@ -3269,20 +3269,6 @@ OP_APPLYCONT:
 	}
 
 	switch (operator) {
-	case OP_LOAD:		/* load */
-		if (!validargs("load", 1, 1, TST_STRING)) Error_0(msg);
-		if (port_file(inport) == stdin) {
-			fprintf(port_file(outport), "loading %s\n", strvalue(car(args)));
-		}
-		if (load_files == MAXFIL) {
-			Error_1("unable to open", car(args));
-		}
-		if ((tmpfp = fopen(strvalue(car(args)), "rb")) == NULL) {
-			Error_1("unable to open", car(args));
-		}
-		load_stack[load_files++] = inport;
-		inport = mk_port(tmpfp, port_input);
-		/* fall through */
 
 	case OP_T0LVL:	/* top level */
 OP_T0LVL:

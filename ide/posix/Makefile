@@ -128,6 +128,10 @@ auto_scheme_port_module_scm = $(modules_dir)/auto/scheme/port/module.scm
 auto_scheme_port_dep = \
 	$(auto_scheme_port_module_scm) \
 
+auto_scheme_char_module_scm = $(modules_dir)/auto/scheme/char/module.scm 
+auto_scheme_char_dep = \
+	$(auto_scheme_char_module_scm) \
+
 auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm 
 auto_scheme_compile_dep = \
 	$(auto_scheme_compile_module_scm) \
@@ -159,6 +163,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_path.o \
 	$(obj_dir)/auto_scheme_file.o \
 	$(obj_dir)/auto_scheme_port.o \
+	$(obj_dir)/auto_scheme_char.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/auto_scheme_interpret.o \
 
@@ -167,6 +172,7 @@ libautoscheme_obj = \
 scheme_modules = scheme \
                  auto_scheme_file \
                  auto_scheme_port \
+                 auto_scheme_char \
 		 scheme_cxr \
                  auto_scheme_macro \
                  auto_scheme_base \
@@ -241,6 +247,13 @@ $(obj_dir)/auto_scheme_port.o: $(gen_dir)/auto_scheme_port.c
 $(gen_dir)/auto_scheme_port.c: $(auto_scheme_port_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_port_module_scm) -n auto_scheme_port -o $(gen_dir)/auto_scheme_port.c
+
+$(obj_dir)/auto_scheme_char.o: $(gen_dir)/auto_scheme_char.c
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_char.c -o $(obj_dir)/auto_scheme_char.o -I$(include_dir)
+$(gen_dir)/auto_scheme_char.c: $(auto_scheme_char_dep) $(bin_dir)/autoscheme-prime
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_char_module_scm) -n auto_scheme_char -o $(gen_dir)/auto_scheme_char.c
 
 $(obj_dir)/scheme_read.o: $(gen_dir)/scheme_read.c
 	mkdir -p $(obj_dir)

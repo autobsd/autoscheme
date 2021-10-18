@@ -4,12 +4,12 @@
  */
 #include <limits.h>
 #include <unistd.h>
+#include <string.h>
+
+extern char **environ;
 
 extern int auto_argc;
 extern char **auto_argv;
 
 static pointer ff_command_line( pointer args );
-
-
-
-
+static pointer ff_get_environment_variables( pointer args );

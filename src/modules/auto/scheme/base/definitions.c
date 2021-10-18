@@ -396,7 +396,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_ATOMP, "atom?", environment);
     scheme_register_proc(OP_GENSYM, "gensym", environment);
     scheme_register_proc(OP_QUIT, "quit", environment);
-    scheme_register_proc(OP_EMERGENCY_EXIT, "emergency-exit", environment);
+
 
 
 

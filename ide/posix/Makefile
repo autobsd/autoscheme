@@ -105,7 +105,6 @@ auto_scheme_process_context_dep = \
 	$(auto_scheme_process_context_module_scm) \
 	$(modules_dir)/auto/scheme/process/context/declarations.h \
 	$(modules_dir)/auto/scheme/process/context/definitions.c \
-	$(modules_dir)/auto/scheme/process/context/initialization.c \
 
 auto_scheme_directory_module_scm = $(modules_dir)/auto/scheme/directory/module.scm 
 auto_scheme_directory_dep = \
@@ -164,6 +163,7 @@ scheme_modules = scheme \
 		 scheme_cxr \
                  auto_scheme_macro \
                  auto_scheme_base \
+                 auto_scheme_process_context \
                  scheme_read \
                  auto_scheme_environment \
 		 scheme_eval \
@@ -174,7 +174,6 @@ scheme_modules = scheme \
                  auto_scheme_string \
                  auto_scheme_args_fold \
                  auto_scheme_args \
-                 auto_scheme_process_context \
                  auto_scheme_directory \
                  auto_scheme_path \
                  auto_scheme_file \

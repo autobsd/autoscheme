@@ -5,8 +5,12 @@
 (import (auto scheme write)
 	(auto scheme base) 
 	(auto scheme directory)
+	(auto scheme process context)
 	)
 
-(display "testing return values:\n")
-(write (define x (+ 2 2)))(newline)
+(display "testing:\n")
+
 (write (current-directory)) (newline)
+(write (command-line))(newline)
+(write (get-environment-variables))(newline)
+(write (get-environment-variable "HOME"))(newline)

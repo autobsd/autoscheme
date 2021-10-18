@@ -4,26 +4,57 @@
 
 (foreign-declare (include-string "declarations.h"))
 (foreign-define (include-string "definitions.c"))
-(foreign-initialize (include-string "initialization.c"))
 
 
 (define-library (auto scheme process context)
-  (import (only (auto scheme base)
-		emergency-exit
-		exit
-		quote
-		)
-	  (auto scheme environment)
+
+  (import (auto scheme base)
 	  )
-  (export (rename _command-line command-line)
+
+  (export command-line
 	  emergency-exit
 	  exit
+
+	  get-environment-variables
+	  get-environment-variable
 	  )
   
 
   (begin
-    (environment-update! (current-environment) '_command-line (environment-ref (global-environment) 'command-line))
-    (environment-delete! (global-environment) 'command-line)
+
+    (define command-line (foreign-function ff_command_line))
+    (define get-environment-variables (foreign-function ff_get_environment_variables))
+
+    (define get-environment-variable 
+      (lambda (name)
+	(let ((variable (assoc name (get-environment-variables))))
+	  (and variable (cdr variable)))))
+
+    (define emergency-exit (foreign-procedure OP_EMERGENCY_EXIT)) 
+
+
+    (define exit #f)
+    (call-with-current-continuation 
+     (lambda (return)
+       (let ((obj (call-with-current-continuation 
+    		   (lambda (_exit)
+    		     (cond ((not exit)
+    			    (set! exit _exit)
+    			    (return)
+    			    )
+    			   )
+    		     ))))
+
+    	 (emergency-exit (cond ((integer? obj) obj)
+    			       ((eq? obj #f) 1)
+    			       (else 0)))
+	 
+    	 )
+       )
+     )
+
+    
+
     )
   )
 

@@ -351,7 +351,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_syntax(OP_DELAY, "delay", environment);
     scheme_register_syntax(OP_LAZY, "lazy", environment);
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
-    /* scheme_register_syntax(OP_MACRO, "macro", environment); */
     scheme_register_syntax(OP_RECEIVE0, "receive", environment);
 
     scheme_register_proc(OP_EAGER, "eager", environment);
@@ -384,7 +383,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_CHARWP, "char-whitespace?", environment);
     scheme_register_proc(OP_CHARUP, "char-upper-case?", environment);
     scheme_register_proc(OP_CHARLP, "char-lower-case?", environment);
-    scheme_register_proc(OP_ENVP, "environment?", environment);
+   
     scheme_register_proc(OP_GC, "gc", environment);
     scheme_register_proc(OP_GCVERB, "gc-verbose", environment);
     scheme_register_proc(OP_CALL_INFILE0, "call-with-input-file", environment);

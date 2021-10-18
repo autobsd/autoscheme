@@ -11,7 +11,7 @@ pointer LOAD_MODULE__auto_scheme_environment(pointer environment);
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-static pointer ff_environment_p( pointer args );
+/* static pointer ff_environment_p( pointer args ); */
 static pointer ff_environment_define_d( pointer args );
 static pointer ff_environment_undefine_d( pointer args );
 static pointer ff_environment_defined_symbols( pointer args );
@@ -37,7 +37,10 @@ pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
     scheme_register_proc(OP_GLOB_ENV, "global-environment", environment);
 
     scheme_register_foreign_func( "make-environment",            make_environment               , environment);
-    scheme_register_foreign_func( "environment?"    ,            ff_environment_p               , environment);
+    /* scheme_register_foreign_func( "environment?"    ,            ff_environment_p               , environment); */
+
+    scheme_register_proc(OP_ENVP, "environment?", environment);
+
     scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        , environment);
     scheme_register_foreign_func( "environment-undefine!",       ff_environment_undefine_d      , environment);
     scheme_register_foreign_func( "environment-defined-symbols", ff_environment_defined_symbols , environment);
@@ -53,13 +56,13 @@ pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
     return environment;
 }
 
-static pointer ff_environment_p( pointer args )
-{
-    if( is_environment( car( args )))
-	return T;
+/* static pointer ff_environment_p( pointer args ) */
+/* { */
+/*     if( is_environment( car( args ))) */
+/* 	return T; */
 
-    return F;
-}
+/*     return F; */
+/* } */
 
 static pointer environment_define_d( pointer environment, pointer symbol, pointer value )
 {

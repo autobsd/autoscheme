@@ -8,7 +8,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
     scheme_register_proc(OP_GLOB_ENV, "global-environment", environment);
 
     scheme_register_foreign_func( "make-environment",            make_environment               , environment);
-    scheme_register_foreign_func( "environment?"    ,            ff_environment_p               , environment);
+    scheme_register_proc(OP_ENVP, "environment?"                                                , environment);
     scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        , environment);
     scheme_register_foreign_func( "environment-undefine!",       ff_environment_undefine_d      , environment);
     scheme_register_foreign_func( "environment-defined-symbols", ff_environment_defined_symbols , environment);
@@ -22,14 +22,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
     scheme_register_foreign_func( "environment-rename",          ff_environment_rename          , environment);
     scheme_register_foreign_func( "environment-delete!",         ff_environment_delete_d        , environment);
     return environment;
-}
-
-static pointer ff_environment_p( pointer args )
-{
-    if( is_environment( car( args )))
-	return T;
-
-    return F;
 }
 
 static pointer environment_define_d( pointer environment, pointer symbol, pointer value )

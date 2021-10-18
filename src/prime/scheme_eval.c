@@ -26,6 +26,7 @@ pointer LOAD_MODULE__auto_scheme_directory( pointer environment );
 pointer LOAD_MODULE__auto_scheme_path( pointer environment );
 pointer LOAD_MODULE__scheme_read( pointer environment );
 pointer LOAD_MODULE__auto_scheme_file( pointer environment );
+pointer LOAD_MODULE__auto_scheme_port( pointer environment );
 pointer LOAD_MODULE__auto_scheme_compile( pointer environment );
 pointer LOAD_MODULE__auto_scheme_interpret( pointer environment );
 
@@ -39,6 +40,8 @@ static pointer ff_load_modules( pointer args )
     pointer environment = car( args );
 
     LOAD_MODULE__scheme( environment );
+    LOAD_MODULE__auto_scheme_file( environment );
+    LOAD_MODULE__auto_scheme_port( environment );
     LOAD_MODULE__auto_scheme_macro( environment );
     LOAD_MODULE__auto_scheme_base( environment );
     LOAD_MODULE__scheme_process_context( environment );
@@ -55,7 +58,6 @@ static pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_args( environment );
     LOAD_MODULE__auto_scheme_directory( environment );
     LOAD_MODULE__auto_scheme_path( environment );
-    LOAD_MODULE__auto_scheme_file( environment );
     LOAD_MODULE__auto_scheme_compile( environment );
     LOAD_MODULE__auto_scheme_interpret( environment );
 

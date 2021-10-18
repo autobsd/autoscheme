@@ -124,6 +124,10 @@ auto_scheme_file_module_scm = $(modules_dir)/auto/scheme/file/module.scm
 auto_scheme_file_dep = \
 	$(auto_scheme_file_module_scm) \
 
+auto_scheme_port_module_scm = $(modules_dir)/auto/scheme/port/module.scm 
+auto_scheme_port_dep = \
+	$(auto_scheme_port_module_scm) \
+
 auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm 
 auto_scheme_compile_dep = \
 	$(auto_scheme_compile_module_scm) \
@@ -154,12 +158,15 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_directory.o \
 	$(obj_dir)/auto_scheme_path.o \
 	$(obj_dir)/auto_scheme_file.o \
+	$(obj_dir)/auto_scheme_port.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/auto_scheme_interpret.o \
 
 
 
 scheme_modules = scheme \
+                 auto_scheme_file \
+                 auto_scheme_port \
 		 scheme_cxr \
                  auto_scheme_macro \
                  auto_scheme_base \
@@ -176,7 +183,6 @@ scheme_modules = scheme \
                  auto_scheme_args \
                  auto_scheme_directory \
                  auto_scheme_path \
-                 auto_scheme_file \
                  auto_scheme_compile \
                  auto_scheme_interpret \
 
@@ -228,6 +234,13 @@ $(obj_dir)/auto_scheme_file.o: $(gen_dir)/auto_scheme_file.c
 $(gen_dir)/auto_scheme_file.c: $(auto_scheme_file_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_file_module_scm) -n auto_scheme_file -o $(gen_dir)/auto_scheme_file.c
+
+$(obj_dir)/auto_scheme_port.o: $(gen_dir)/auto_scheme_port.c
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_port.c -o $(obj_dir)/auto_scheme_port.o -I$(include_dir)
+$(gen_dir)/auto_scheme_port.c: $(auto_scheme_port_dep) $(bin_dir)/autoscheme-prime
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_port_module_scm) -n auto_scheme_port -o $(gen_dir)/auto_scheme_port.c
 
 $(obj_dir)/scheme_read.o: $(gen_dir)/scheme_read.c
 	mkdir -p $(obj_dir)
@@ -375,6 +388,8 @@ $(bin_dir)/autoscheme-prime:
 	mkdir -p $(bin_dir)
 	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 		$(prime_dir)/scheme.c \
+		$(prime_dir)/auto_scheme_file.c \
+		$(prime_dir)/auto_scheme_port.c \
 		$(prime_dir)/auto_scheme_macro.c \
 		$(prime_dir)/auto_scheme_base.c \
 		$(prime_dir)/auto_scheme_write.c \
@@ -384,7 +399,6 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_directory.c \
 		$(prime_dir)/auto_scheme_path.c \
 		$(prime_dir)/auto_scheme_list.c \
-		$(prime_dir)/auto_scheme_file.c \
 		$(prime_dir)/scheme_eval.c \
 		$(prime_dir)/scheme_repl.c \
 		$(prime_dir)/scheme_load.c \

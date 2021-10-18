@@ -337,13 +337,19 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
 /* ************************ */
 
+  
+
+
+
     scheme_register_syntax(OP_DELAY, "delay", environment);
     scheme_register_syntax(OP_LAZY, "lazy", environment);
+    scheme_register_proc(OP_EAGER, "eager", environment);
+    scheme_register_proc(OP_FORCE, "force", environment);
+
+
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
     scheme_register_syntax(OP_RECEIVE0, "receive", environment);
 
-    scheme_register_proc(OP_EAGER, "eager", environment);
-    scheme_register_proc(OP_FORCE, "force", environment);
   
     scheme_register_proc(OP_LASTPAIR, "last-pair", environment);
     scheme_register_proc(OP_EXP, "exp", environment);
@@ -372,17 +378,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_CHARWP, "char-whitespace?", environment);
     scheme_register_proc(OP_CHARUP, "char-upper-case?", environment);
     scheme_register_proc(OP_CHARLP, "char-lower-case?", environment);
-   
     scheme_register_proc(OP_GC, "gc", environment);
     scheme_register_proc(OP_GCVERB, "gc-verbose", environment);
-    scheme_register_proc(OP_CALL_INFILE0, "call-with-input-file", environment);
-    scheme_register_proc(OP_CALL_OUTFILE0, "call-with-output-file", environment);
-    scheme_register_proc(OP_WITH_INFILE0, "with-input-from-file", environment);
-    scheme_register_proc(OP_WITH_OUTFILE0, "with-output-to-file", environment);
-    scheme_register_proc(OP_OPEN_INFILE, "open-input-file", environment);
-    scheme_register_proc(OP_OPEN_OUTFILE, "open-output-file", environment);
-    scheme_register_proc(OP_OPEN_INOUTFILE, "open-input-output-file", environment);
-    scheme_register_proc(OP_OPEN_INOUTSTRING, "open-input-output-string", environment);
     scheme_register_proc(OP_SET_INPORT, "set-input-port", environment);
     scheme_register_proc(OP_SET_OUTPORT, "set-output-port", environment);
     scheme_register_proc(OP_DEFP, "defined?", environment);

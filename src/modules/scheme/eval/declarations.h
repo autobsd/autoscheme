@@ -20,6 +20,7 @@ pointer LOAD_MODULE__auto_scheme_directory( pointer environment );
 pointer LOAD_MODULE__auto_scheme_path( pointer environment );
 pointer LOAD_MODULE__scheme_read( pointer environment );
 pointer LOAD_MODULE__auto_scheme_file( pointer environment );
+pointer LOAD_MODULE__auto_scheme_port( pointer environment );
 pointer LOAD_MODULE__auto_scheme_compile( pointer environment );
 pointer LOAD_MODULE__auto_scheme_interpret( pointer environment );
 

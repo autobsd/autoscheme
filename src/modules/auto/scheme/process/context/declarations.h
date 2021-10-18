@@ -9,7 +9,7 @@ extern int auto_argc;
 extern char **auto_argv;
 
 static pointer ff_command_line( pointer args );
-static pointer ff_current_directory( pointer args );
+
 
 
 

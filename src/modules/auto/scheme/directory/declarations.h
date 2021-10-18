@@ -2,8 +2,11 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-scheme_register_foreign_func( "command-line",            ff_command_line            , global_env);
+#include <limits.h>
+#include <unistd.h>
 
+
+static pointer ff_current_directory( pointer args );
 
 
 

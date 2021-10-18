@@ -15,21 +15,5 @@ static pointer ff_command_line( pointer args )
     ( void )args;
 }
 
-static pointer ff_current_directory( pointer args )
-{
-    /* char buff[FILENAME_MAX]; */
-    /* GetCurrentDir( buff, FILENAME_MAX ); */
-
-    char cwd[PATH_MAX];
-    if( getcwd( cwd, sizeof( cwd )) == NULL) 
-    {
-	/* perror("getcwd() error"); */
-	/* exit( 1 ); */
-    }
-
-    return mk_string( cwd );
-    ( void )args;
-}
-
 
 

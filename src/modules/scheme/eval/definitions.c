@@ -21,6 +21,7 @@ static pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_args_fold( environment );
     LOAD_MODULE__auto_scheme_args( environment );
     LOAD_MODULE__auto_scheme_process_context( environment );
+    LOAD_MODULE__auto_scheme_directory( environment );
     LOAD_MODULE__auto_scheme_path( environment );
     LOAD_MODULE__auto_scheme_file( environment );
     LOAD_MODULE__auto_scheme_compile( environment );

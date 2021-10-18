@@ -5,7 +5,7 @@
 (define-library (auto scheme path)
 
   (import (auto scheme base)
-	  (auto scheme process context)
+	  (auto scheme directory)
 	  (auto scheme write)
 	  )
 

@@ -4,7 +4,9 @@
 
 (import (auto scheme write)
 	(auto scheme base) 
+	(auto scheme directory)
 	)
 
 (display "testing return values:\n")
 (write (define x (+ 2 2)))(newline)
+(write (current-directory)) (newline)

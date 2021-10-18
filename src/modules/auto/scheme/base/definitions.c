@@ -340,7 +340,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_syntax(OP_DELAY, "delay", environment);
     scheme_register_syntax(OP_LAZY, "lazy", environment);
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
-    scheme_register_syntax(OP_0MACRO, "macro", environment);
     scheme_register_syntax(OP_RECEIVE0, "receive", environment);
 
     scheme_register_proc(OP_EAGER, "eager", environment);
@@ -384,15 +383,12 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_OPEN_OUTFILE, "open-output-file", environment);
     scheme_register_proc(OP_OPEN_INOUTFILE, "open-input-output-file", environment);
     scheme_register_proc(OP_OPEN_INOUTSTRING, "open-input-output-string", environment);
-    scheme_register_proc(OP_INT_ENV, "interaction-environment", environment);
     scheme_register_proc(OP_SET_INPORT, "set-input-port", environment);
     scheme_register_proc(OP_SET_OUTPORT, "set-output-port", environment);
     scheme_register_proc(OP_DEFP, "defined?", environment);
     scheme_register_proc(OP_MKCLOSURE, "make-closure", environment);
     scheme_register_proc(OP_GET_CLOSURE, "get-closure-code", environment);	/* a.k */
     scheme_register_proc(OP_CLOSUREP, "closure?", environment);	/* a.k */
-    scheme_register_proc(OP_MACROP, "macro?", environment);	/* a.k */
-    scheme_register_proc(OP_MACRO_EXPAND0, "macro-expand", environment);
     scheme_register_proc(OP_ATOMP, "atom?", environment);
     scheme_register_proc(OP_GENSYM, "gensym", environment);
     scheme_register_proc(OP_QUIT, "quit", environment);

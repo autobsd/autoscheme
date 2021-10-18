@@ -3,9 +3,11 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (import (auto scheme write)
-	(auto scheme base) 
+	;; (auto scheme base) 
+	(except (auto scheme base) lambda)
 	(auto scheme directory)
 	(scheme process-context)
+	(auto scheme macro)
 	)
 
 (display "testing:\n")
@@ -14,3 +16,27 @@
 (write (command-line))(newline)
 (write (get-environment-variables))(newline)
 (write (get-environment-variable "HOME"))(newline)
+
+
+(define-macro (mymac x)
+  `(+ ,x 5)
+  )
+
+(write (mymac 3)) (newline)
+(write (macro? mymac))(newline)
+
+;; (write (macro-expand '(mymac 3)))(newline)
+
+(define (add2 x)
+  (+ x 2))
+
+(write (add2 33))(newline)
+
+(define add7 
+  (macro (x)
+    (+ x 7)))
+
+(write (add7 3))(newline)
+
+
+

@@ -3440,9 +3440,10 @@ OP_QQUOTE1:
 	case OP_DEF0:	/* define */
 		if (is_pair(car(code))) {
 			y = cons(cdar(code), cdr(code));
-			y = cons(LAMBDA, y);
+			/* y = cons(LAMBDA, y); */
 			args = caar(code);
-			code = y;
+			/* code = y; */
+			code = mk_closure( y, envir );
 		} else {
 			args = car(code);
 			code = cadr(code);
@@ -3980,39 +3981,32 @@ OP_DO2:
 		setpromise(x);
 		s_return(cons(args, x));
 
-	case OP_0MACRO:		/* macro */
 	case OP_DEFMACRO0:	/* define-macro */
-		if (is_pair(car(code))) {
-			if (!is_symbol(caar(code))) {
-				Error_0("variable is not a symbol");
-			}
-			s_save((operator == OP_0MACRO) ? OP_1MACRO : OP_DEFMACRO1, NIL, caar(code));
-			y = cons(cdar(code), cdr(code));
-			/* code = cons(LAMBDA, y); */
-s_return(mk_closure(y, envir));
-		} else {
-			if (!is_symbol(car(code))) {
-				Error_0("variable is not a symbol");
-			}
-			s_save((operator == OP_0MACRO) ? OP_1MACRO : OP_DEFMACRO1, NIL, car(code));
-			code = cadr(code);
-		}
-		s_goto(OP_EVAL);
 
-	case OP_1MACRO:		/* macro */
+	    if ( !is_symbol( caar( code ))) {
+		Error_0("variable is not a symbol");
+	    }
+	    s_save( OP_DEFMACRO1, NIL, caar( code ));
+	    code = cons( cdar( code ), cdr( code ));
+	    /* fall through */
+		
+	case OP_MACRO:	/* macro */
+	    x = mk_closure( code, envir );
+	    exttype( x ) |= ( T_MACRO | T_DEFMACRO );
+	    s_return( x );
+
 	case OP_DEFMACRO1:	/* define-macro */
-		exttype(value) |= (operator == OP_1MACRO) ? T_MACRO : (T_MACRO | T_DEFMACRO);
-		for (x = car(envir); x != NIL; x = cdr(x))
-			if (caar(x) == code)
-				break;
-		if (x != NIL)
-			cdar(x) = value;
-		else {
-			x = cons(code, value);
-			x = cons(x, car(envir));
-			car(envir) = x;
-		}
-		s_return(code);
+	    for( x = car( envir ); x != NIL; x = cdr( x ))
+		if( caar( x ) == code)
+		    break;
+	    if( x != NIL )
+		cdar( x ) = value;
+	    else {
+		x = cons( code, value );
+		x = cons( x, car( envir ));
+		car( envir ) = x;
+	    }
+	    s_return( code );
 
 	case OP_SYNTAXRULES:	/* syntax-rules */
 		w = s_next_op();
@@ -6341,10 +6335,6 @@ OP_ERR1:
 		if (!validargs("close-port", 1, 1, TST_PORT)) Error_0(msg);
 		port_close(car(args));
 		s_return(T);
-
-	case OP_INT_ENV:	/* interaction-environment */
-		if (!validargs("interaction-environment", 0, 0, TST_NONE)) Error_0(msg);
-		s_return(global_env);
 
 	case OP_CURR_ENV:	/* current-environment */
 		if (!validargs("current-environment", 0, 0, TST_NONE)) Error_0(msg);

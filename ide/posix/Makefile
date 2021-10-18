@@ -100,11 +100,11 @@ scheme_cxr_module_scm = $(modules_dir)/scheme/cxr/module.scm
 scheme_cxr_dep = \
 	$(scheme_cxr_module_scm) \
 
-auto_scheme_process_context_module_scm = $(modules_dir)/auto/scheme/process/context/module.scm 
-auto_scheme_process_context_dep = \
-	$(auto_scheme_process_context_module_scm) \
-	$(modules_dir)/auto/scheme/process/context/declarations.h \
-	$(modules_dir)/auto/scheme/process/context/definitions.c \
+scheme_process_context_module_scm = $(modules_dir)/scheme/process/context/module.scm 
+scheme_process_context_dep = \
+	$(scheme_process_context_module_scm) \
+	$(modules_dir)/scheme/process/context/declarations.h \
+	$(modules_dir)/scheme/process/context/definitions.c \
 
 auto_scheme_directory_module_scm = $(modules_dir)/auto/scheme/directory/module.scm 
 auto_scheme_directory_dep = \
@@ -150,7 +150,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_args_fold.o \
 	$(obj_dir)/auto_scheme_args.o \
 	$(obj_dir)/auto_scheme_string.o \
-	$(obj_dir)/auto_scheme_process_context.o \
+	$(obj_dir)/scheme_process_context.o \
 	$(obj_dir)/auto_scheme_directory.o \
 	$(obj_dir)/auto_scheme_path.o \
 	$(obj_dir)/auto_scheme_file.o \
@@ -163,7 +163,7 @@ scheme_modules = scheme \
 		 scheme_cxr \
                  auto_scheme_macro \
                  auto_scheme_base \
-                 auto_scheme_process_context \
+                 scheme_process_context \
                  scheme_read \
                  auto_scheme_environment \
 		 scheme_eval \
@@ -243,12 +243,12 @@ $(gen_dir)/auto_scheme_path.c: $(auto_scheme_path_dep) $(bin_dir)/autoscheme-pri
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_path_module_scm) -n auto_scheme_path -o $(gen_dir)/auto_scheme_path.c
 
-$(obj_dir)/auto_scheme_process_context.o: $(gen_dir)/auto_scheme_process_context.c
+$(obj_dir)/scheme_process_context.o: $(gen_dir)/scheme_process_context.c
 	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_process_context.c -o $(obj_dir)/auto_scheme_process_context.o -I$(include_dir)
-$(gen_dir)/auto_scheme_process_context.c: $(auto_scheme_process_context_dep) $(bin_dir)/autoscheme-prime
+	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_process_context.c -o $(obj_dir)/scheme_process_context.o -I$(include_dir)
+$(gen_dir)/scheme_process_context.c: $(scheme_process_context_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_process_context_module_scm) -n auto_scheme_process_context -o $(gen_dir)/auto_scheme_process_context.c
+	$(bin_dir)/autoscheme-prime --compile-module $(scheme_process_context_module_scm) -n scheme_process_context -o $(gen_dir)/scheme_process_context.c
 
 $(obj_dir)/auto_scheme_directory.o: $(gen_dir)/auto_scheme_directory.c
 	mkdir -p $(obj_dir)
@@ -380,7 +380,7 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_write.c \
 		$(prime_dir)/auto_scheme_string.c \
 		$(prime_dir)/scheme_read.c \
-		$(prime_dir)/auto_scheme_process_context.c \
+		$(prime_dir)/scheme_process_context.c \
 		$(prime_dir)/auto_scheme_directory.c \
 		$(prime_dir)/auto_scheme_path.c \
 		$(prime_dir)/auto_scheme_list.c \

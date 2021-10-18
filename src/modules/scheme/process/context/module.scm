@@ -6,7 +6,7 @@
 (foreign-define (include-string "definitions.c"))
 
 
-(define-library (auto scheme process context)
+(define-library (scheme process-context)
 
   (import (auto scheme base)
 	  )

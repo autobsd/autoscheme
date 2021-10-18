@@ -7,7 +7,7 @@
 	(auto scheme args fold)
 	(auto scheme args)
 	(scheme cxr)
-	(auto scheme process context)
+	(scheme process-context)
 	(auto scheme string)
 	(scheme read)
 	(auto scheme file)

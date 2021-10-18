@@ -5,7 +5,7 @@
 (import (auto scheme write)
 	(auto scheme base) 
 	(auto scheme directory)
-	(auto scheme process context)
+	(scheme process-context)
 	)
 
 (display "testing:\n")

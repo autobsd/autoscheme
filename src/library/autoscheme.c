@@ -6093,7 +6093,7 @@ OP_VECTOR:
 		if (is_pair(cdr(args))) {
 			if (cadr(args) != outport) {
 				outport = cons(outport, NIL);
-				s_save(OP_SET_OUTPORT, outport, NIL);
+				s_save(OP_CURR_OUTPORT, outport, NIL);
 				outport = cadr(args);
 			}
 		}
@@ -6106,7 +6106,7 @@ OP_VECTOR:
 		if (is_pair(args)) {
 			if (car(args) != outport) {
 				outport = cons(outport, NIL);
-				s_save(OP_SET_OUTPORT, outport, NIL);
+				s_save(OP_CURR_OUTPORT, outport, NIL);
 				outport = car(args);
 			}
 		}
@@ -6225,7 +6225,8 @@ OP_ERR1:
 		s_return(inport);
 
 	case OP_CURR_OUTPORT:	/* current-output-port */
-		if (!validargs("current-output-port", 0, 0, TST_NONE)) Error_0(msg);
+		if (!validargs("current-output-port", 0, 1, TST_OUTPORT)) Error_0(msg);
+		if (is_pair(args)) outport = car(args);
 		s_return(outport);
 
 	case OP_WITH_INFILE0:	/* with-input-from-file */
@@ -6353,7 +6354,7 @@ OP_ERR1:
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
-				s_save(OP_SET_INPORT, inport, NIL);
+				s_save(OP_CURR_INPORT, inport, NIL);
 				inport = car(args);
 			}
 		}
@@ -6377,7 +6378,7 @@ OP_ERR1:
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
-				s_save(OP_SET_INPORT, inport, NIL);
+				s_save(OP_CURR_INPORT, inport, NIL);
 				inport = car(args);
 			}
 		}
@@ -6398,16 +6399,6 @@ OP_ERR1:
 			x = inport;
 		}
 		s_retbool(is_fileport(x) || is_strport(x));
-
-	case OP_SET_INPORT:		/* set-input-port */
-		if (!validargs("set-input-port", 1, 1, TST_INPORT)) Error_0(msg);
-		inport = car(args);
-		s_return(value);
-
-	case OP_SET_OUTPORT:	/* set-output-port */
-		if (!validargs("set-output-port", 1, 1, TST_OUTPORT)) Error_0(msg);
-		outport = car(args);
-		s_return(value);
 
 	case OP_RDSEXPR:
 OP_RDSEXPR:

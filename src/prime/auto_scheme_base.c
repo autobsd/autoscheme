@@ -363,8 +363,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_GCVERB, "gc-verbose", environment);
 
 
-    scheme_register_proc(OP_SET_INPORT, "set-input-port", environment);
-    scheme_register_proc(OP_SET_OUTPORT, "set-output-port", environment);
 
 
     scheme_register_proc(OP_MKCLOSURE, "make-closure", environment);

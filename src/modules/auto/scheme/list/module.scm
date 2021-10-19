@@ -3,9 +3,13 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define-library (auto scheme list)
+
   (import (auto scheme base))
+
   (export alist-delete 
 	  alist-delete!
+
+	  last-pair
 	  )
 
   (begin 
@@ -33,4 +37,10 @@
 
 	      )
 	))
+
+
+    (define last-pair (foreign-procedure OP_LASTPAIR))
+
+
+
     ))

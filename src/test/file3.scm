@@ -8,6 +8,7 @@
 	(auto scheme directory)
 	(scheme process-context)
 	(auto scheme macro)
+	(auto scheme list)
 	)
 
 (display "testing:\n")
@@ -39,4 +40,4 @@
 (write (add7 3))(newline)
 
 
-
+(write (last-pair '(a b c)))(newline)

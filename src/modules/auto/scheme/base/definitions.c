@@ -337,21 +337,15 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
 /* ************************ */
 
-  
-
-
 
     scheme_register_syntax(OP_DELAY, "delay", environment);
-    scheme_register_syntax(OP_LAZY, "lazy", environment);
-    scheme_register_proc(OP_EAGER, "eager", environment);
     scheme_register_proc(OP_FORCE, "force", environment);
 
-
+    scheme_register_syntax(OP_LAZY, "lazy", environment);
+    scheme_register_proc(OP_EAGER, "eager", environment);
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
-    scheme_register_syntax(OP_RECEIVE0, "receive", environment);
 
-  
-    scheme_register_proc(OP_LASTPAIR, "last-pair", environment);
+
     scheme_register_proc(OP_EXP, "exp", environment);
     scheme_register_proc(OP_LOG, "log", environment);
     scheme_register_proc(OP_SIN, "sin", environment);
@@ -361,35 +355,28 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_ACOS, "acos", environment);
     scheme_register_proc(OP_ATAN, "atan", environment);
     scheme_register_proc(OP_SQRT, "sqrt", environment);
-    scheme_register_proc(OP_CHARUPCASE, "char-upcase", environment);
-    scheme_register_proc(OP_CHARDNCASE, "char-downcase", environment);
-    scheme_register_proc(OP_STRCIEQU, "string-ci=?", environment);
-    scheme_register_proc(OP_STRCILSS, "string-ci<?", environment);
-    scheme_register_proc(OP_STRCIGTR, "string-ci>?", environment);
-    scheme_register_proc(OP_STRCILEQ, "string-ci<=?", environment);
-    scheme_register_proc(OP_STRCIGEQ, "string-ci>=?", environment);
-    scheme_register_proc(OP_CHARCIEQU, "char-ci=?", environment);
-    scheme_register_proc(OP_CHARCILSS, "char-ci<?", environment);
-    scheme_register_proc(OP_CHARCIGTR, "char-ci>?", environment);
-    scheme_register_proc(OP_CHARCILEQ, "char-ci<=?", environment);
-    scheme_register_proc(OP_CHARCIGEQ, "char-ci>=?", environment);
-    scheme_register_proc(OP_CHARAP, "char-alphabetic?", environment);
-    scheme_register_proc(OP_CHARNP, "char-numeric?", environment);
-    scheme_register_proc(OP_CHARWP, "char-whitespace?", environment);
-    scheme_register_proc(OP_CHARUP, "char-upper-case?", environment);
-    scheme_register_proc(OP_CHARLP, "char-lower-case?", environment);
+
+
     scheme_register_proc(OP_GC, "gc", environment);
     scheme_register_proc(OP_GCVERB, "gc-verbose", environment);
+
+
     scheme_register_proc(OP_SET_INPORT, "set-input-port", environment);
     scheme_register_proc(OP_SET_OUTPORT, "set-output-port", environment);
-    scheme_register_proc(OP_DEFP, "defined?", environment);
+
+
     scheme_register_proc(OP_MKCLOSURE, "make-closure", environment);
     scheme_register_proc(OP_GET_CLOSURE, "get-closure-code", environment);	/* a.k */
     scheme_register_proc(OP_CLOSUREP, "closure?", environment);	/* a.k */
-    scheme_register_proc(OP_ATOMP, "atom?", environment);
-    scheme_register_proc(OP_GENSYM, "gensym", environment);
-    scheme_register_proc(OP_QUIT, "quit", environment);
 
+
+    scheme_register_proc(OP_GENSYM, "gensym", environment);
+
+
+    scheme_register_syntax(OP_RECEIVE0, "receive", environment);
+    scheme_register_proc(OP_QUIT, "quit", environment);
+    scheme_register_proc(OP_DEFP, "defined?", environment);
+    scheme_register_proc(OP_ATOMP, "atom?", environment);
 
 
 

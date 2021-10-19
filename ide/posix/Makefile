@@ -132,6 +132,10 @@ auto_scheme_char_module_scm = $(modules_dir)/auto/scheme/char/module.scm
 auto_scheme_char_dep = \
 	$(auto_scheme_char_module_scm) \
 
+auto_scheme_inexact_module_scm = $(modules_dir)/auto/scheme/inexact/module.scm 
+auto_scheme_inexact_dep = \
+	$(auto_scheme_inexact_module_scm) \
+
 auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm 
 auto_scheme_compile_dep = \
 	$(auto_scheme_compile_module_scm) \
@@ -164,6 +168,7 @@ libautoscheme_obj = \
 	$(obj_dir)/auto_scheme_file.o \
 	$(obj_dir)/auto_scheme_port.o \
 	$(obj_dir)/auto_scheme_char.o \
+	$(obj_dir)/auto_scheme_inexact.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/auto_scheme_interpret.o \
 
@@ -173,6 +178,7 @@ scheme_modules = scheme \
                  auto_scheme_file \
                  auto_scheme_port \
                  auto_scheme_char \
+                 auto_scheme_inexact \
 		 scheme_cxr \
                  auto_scheme_macro \
                  auto_scheme_base \
@@ -254,6 +260,13 @@ $(obj_dir)/auto_scheme_char.o: $(gen_dir)/auto_scheme_char.c
 $(gen_dir)/auto_scheme_char.c: $(auto_scheme_char_dep) $(bin_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
 	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_char_module_scm) -n auto_scheme_char -o $(gen_dir)/auto_scheme_char.c
+
+$(obj_dir)/auto_scheme_inexact.o: $(gen_dir)/auto_scheme_inexact.c
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_inexact.c -o $(obj_dir)/auto_scheme_inexact.o -I$(include_dir)
+$(gen_dir)/auto_scheme_inexact.c: $(auto_scheme_inexact_dep) $(bin_dir)/autoscheme-prime
+	mkdir -p $(gen_dir)
+	$(bin_dir)/autoscheme-prime --compile-module $(auto_scheme_inexact_module_scm) -n auto_scheme_inexact -o $(gen_dir)/auto_scheme_inexact.c
 
 $(obj_dir)/scheme_read.o: $(gen_dir)/scheme_read.c
 	mkdir -p $(obj_dir)
@@ -411,6 +424,8 @@ $(bin_dir)/autoscheme-prime:
 		$(prime_dir)/scheme_process_context.c \
 		$(prime_dir)/auto_scheme_directory.c \
 		$(prime_dir)/auto_scheme_path.c \
+		$(prime_dir)/auto_scheme_char.c \
+		$(prime_dir)/auto_scheme_inexact.c \
 		$(prime_dir)/auto_scheme_list.c \
 		$(prime_dir)/scheme_eval.c \
 		$(prime_dir)/scheme_repl.c \

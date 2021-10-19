@@ -346,16 +346,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
 
 
-    scheme_register_proc(OP_EXP, "exp", environment);
-    scheme_register_proc(OP_LOG, "log", environment);
-    scheme_register_proc(OP_SIN, "sin", environment);
-    scheme_register_proc(OP_COS, "cos", environment);
-    scheme_register_proc(OP_TAN, "tan", environment);
-    scheme_register_proc(OP_ASIN, "asin", environment);
-    scheme_register_proc(OP_ACOS, "acos", environment);
-    scheme_register_proc(OP_ATAN, "atan", environment);
-    scheme_register_proc(OP_SQRT, "sqrt", environment);
-
+  
 
     scheme_register_proc(OP_GC, "gc", environment);
     scheme_register_proc(OP_GCVERB, "gc-verbose", environment);

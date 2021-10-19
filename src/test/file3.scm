@@ -3,8 +3,8 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (import (auto scheme write)
-	;; (auto scheme base) 
-	(except (auto scheme base) lambda)
+	(auto scheme base) 
+	;; (except (auto scheme base) lambda)
 	(auto scheme directory)
 	(scheme process-context)
 	(auto scheme macro)
@@ -41,3 +41,12 @@
 
 
 (write (last-pair '(a b c)))(newline)
+
+(write (get-closure-code (lambda () (display "message"))))(newline)
+
+(define expression (delay (display "evaluating expression now")(newline)))
+
+(display "expression defined")(newline)
+
+(force expression)
+(force expression)

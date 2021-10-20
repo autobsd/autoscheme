@@ -4,12 +4,15 @@
 
 (import (auto scheme write)
 	(auto scheme base) 
+	(auto scheme environment)
 	;; (except (auto scheme base) lambda)
 	(auto scheme directory)
 	(scheme process-context)
 	(auto scheme macro)
 	(auto scheme list)
 	(auto scheme lazy)
+	(auto scheme memory)
+	(auto scheme closure)
 	)
 
 (display "testing:\n")
@@ -23,7 +26,7 @@
 (define-macro (mymac x)
   `(+ ,x 5)
   )
-
+(write mymac) (newline)
 (write (mymac 3)) (newline)
 (write (macro? mymac))(newline)
 
@@ -34,12 +37,29 @@
 
 (write (add2 33))(newline)
 
+(write add2)(newline)
+(write (closure? add2))(newline)
+(write (procedure? add2))(newline)
+
+(define add3 (lambda (x)
+  (+ x 3)))
+
+(write add3)(newline)
+(write (closure? add3))(newline)
+(write (procedure? add3))(newline)
+
+(write environment-only)(newline)
+(write (closure? environment-only))(newline)
+(write (procedure? environment-only))(newline)
+
 (define add7 
   (macro (x)
     (+ x 7)))
 
 (write (add7 3))(newline)
 
+(gc-verbose #t)
+(collect-garbage)
 
 (write (last-pair '(a b c)))(newline)
 

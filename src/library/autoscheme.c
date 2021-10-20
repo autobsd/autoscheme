@@ -1061,7 +1061,7 @@ void gc(pointer *a, pointer *b)
 	int i;
 
 	if (gc_verbose)
-		printf("gc...");
+		printf("Starting GC...");
 
 	scan = next = to_space;
 
@@ -1181,7 +1181,7 @@ void gc(pointer *a, pointer *b)
 	}
 
 	if (gc_verbose)
-		printf(" done %zu cells are recovered.\n", fcells);
+		printf(" DONE %zu cells were recovered.\n", fcells);
 }
 
 #else /* USE_COPYING_GC */
@@ -1939,6 +1939,9 @@ static char *atom2str(pointer l, int f)
 			} else {
 				p = "#<PROMISE>";
 			}
+		} else if (is_proc(l)) {
+		    p = strvalue(strbuff);
+		    sprintf(p, "#<PROCEDURE %d>", procnum(l));
 		} else if (is_macro(l)) {
 			p = "#<MACRO>";
 		} else {

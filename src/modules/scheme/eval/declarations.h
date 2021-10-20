@@ -21,6 +21,8 @@ pointer LOAD_MODULE__auto_scheme_path( pointer environment );
 pointer LOAD_MODULE__auto_scheme_char( pointer environment );
 pointer LOAD_MODULE__auto_scheme_inexact( pointer environment );
 pointer LOAD_MODULE__auto_scheme_lazy( pointer environment );
+pointer LOAD_MODULE__auto_scheme_memory( pointer environment );
+pointer LOAD_MODULE__auto_scheme_closure( pointer environment );
 pointer LOAD_MODULE__scheme_read( pointer environment );
 pointer LOAD_MODULE__auto_scheme_file( pointer environment );
 pointer LOAD_MODULE__auto_scheme_port( pointer environment );

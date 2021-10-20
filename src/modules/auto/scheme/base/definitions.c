@@ -335,30 +335,12 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_ZEROP, "zero?", environment);
 
 
-/* ************************ */
+/* ******** unused ********** */
 
-
-
-  
-
-    scheme_register_proc(OP_GC, "gc", environment);
-    scheme_register_proc(OP_GCVERB, "gc-verbose", environment);
-
-
-
-
-    scheme_register_proc(OP_MKCLOSURE, "make-closure", environment);
-    scheme_register_proc(OP_GET_CLOSURE, "get-closure-code", environment);	/* a.k */
-    scheme_register_proc(OP_CLOSUREP, "closure?", environment);	/* a.k */
-
-
- 
-
-    scheme_register_syntax(OP_RECEIVE0, "receive", environment);
-    scheme_register_proc(OP_QUIT, "quit", environment);
-    scheme_register_proc(OP_DEFP, "defined?", environment);
-    scheme_register_proc(OP_ATOMP, "atom?", environment);
-
+    /* scheme_register_syntax(OP_RECEIVE0, "receive", environment); */
+    /* scheme_register_proc(OP_QUIT, "quit", environment); */
+    /* scheme_register_proc(OP_DEFP, "defined?", environment); */
+    /* scheme_register_proc(OP_ATOMP, "atom?", environment); */
 
 
     return environment;

@@ -28,6 +28,8 @@ static pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_char( environment );
     LOAD_MODULE__auto_scheme_inexact( environment );
     LOAD_MODULE__auto_scheme_lazy( environment );
+    LOAD_MODULE__auto_scheme_memory( environment );
+    LOAD_MODULE__auto_scheme_closure( environment );
     LOAD_MODULE__auto_scheme_compile( environment );
     LOAD_MODULE__auto_scheme_interpret( environment );
 

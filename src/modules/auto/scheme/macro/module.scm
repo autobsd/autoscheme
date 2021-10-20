@@ -8,6 +8,8 @@
 	  macro
 	  macro-expand
 	  macro?
+
+	  gensym
 	  )
 
   (begin
@@ -16,4 +18,6 @@
     ((foreign-syntax OP_DEF0 "define") macro (foreign-syntax OP_MACRO "macro"))
     ((foreign-syntax OP_DEF0 "define") macro-expand (foreign-procedure OP_MACRO_EXPAND0))
     ((foreign-syntax OP_DEF0 "define") macro? (foreign-procedure OP_MACROP))
+
+    ((foreign-syntax OP_DEF0 "define") gensym (foreign-procedure OP_GENSYM))
     ))

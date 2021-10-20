@@ -9,6 +9,7 @@
 	(scheme process-context)
 	(auto scheme macro)
 	(auto scheme list)
+	(auto scheme lazy)
 	)
 
 (display "testing:\n")

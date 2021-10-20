@@ -338,13 +338,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 /* ************************ */
 
 
-    scheme_register_syntax(OP_DELAY, "delay", environment);
-    scheme_register_proc(OP_FORCE, "force", environment);
-
-    scheme_register_syntax(OP_LAZY, "lazy", environment);
-    scheme_register_proc(OP_EAGER, "eager", environment);
-    scheme_register_syntax(OP_C0STREAM, "cons-stream", environment);
-
 
   
 
@@ -359,8 +352,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_proc(OP_CLOSUREP, "closure?", environment);	/* a.k */
 
 
-    scheme_register_proc(OP_GENSYM, "gensym", environment);
-
+ 
 
     scheme_register_syntax(OP_RECEIVE0, "receive", environment);
     scheme_register_proc(OP_QUIT, "quit", environment);

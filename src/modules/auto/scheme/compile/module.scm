@@ -3,7 +3,6 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define-library (auto scheme compile)
-  (import (only (auto scheme base) object->string))
 
   (export compile-module
 	  compile-program)
@@ -17,6 +16,16 @@
 	  )
 
   (begin
+
+
+    (define object->string
+      (lambda (object)
+	(let ((string-port (open-output-string)))
+	  (write-simple object string-port)
+	  (let ((output-string (get-output-string string-port)))
+	    (close-output-port string-port)
+	    output-string))
+	))
 
     (define read-list
       (lambda args

@@ -71,3 +71,5 @@
 
 (force expression)
 (force expression)
+
+(display (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme base)"))))(newline)

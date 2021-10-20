@@ -4,17 +4,20 @@
 
 (define-library (auto scheme write)
 
-  (export write-simple 
-	  (rename write-simple write)
-	  (rename display-simple display))
+  (export write-simple
+	  write
+	  display
 
+	  )
 
   (begin 
 
-        ((foreign-syntax OP_DEF0 "define") display-simple (foreign-procedure OP_DISPLAY))
-        ((foreign-syntax OP_DEF0 "define") write-simple (foreign-procedure OP_WRITE))
+    ((foreign-syntax OP_DEF0 "define") display-simple (foreign-procedure OP_DISPLAY))
+    ((foreign-syntax OP_DEF0 "define") write-simple (foreign-procedure OP_WRITE))
 
+    ((foreign-syntax OP_DEF0 "define") write write-simple)
+    ((foreign-syntax OP_DEF0 "define") display display-simple)
 
-	)
+    )
   )
 

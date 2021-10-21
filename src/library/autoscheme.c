@@ -2831,19 +2831,19 @@ static pointer mappend(pointer f, pointer l, pointer r)
 
 #define Error_0(s) BEGIN                       \
 	args = cons(mk_string((s)), NIL);          \
-	operator = LOC_ERR0;                        \
+	location = LOC_ERR0;                        \
 	goto LOOP; END
 
 #define Error_1(s, a) BEGIN                    \
 	args = cons((a), NIL);                     \
 	code = mk_string(s);                       \
 	args = cons(code, args);                   \
-	operator = LOC_ERR0;                        \
+	location = LOC_ERR0;                        \
 	goto LOOP; END
 
 /* control macros for Eval_Cycle */
 #define s_goto(a) BEGIN                        \
-	operator = (int)(a);                       \
+	location = (int)(a);                       \
 	goto a; END
 
 #ifndef USE_SCHEME_STACK
@@ -2863,7 +2863,7 @@ static pointer mappend(pointer f, pointer l, pointer r)
 	value = (a);                               \
 	if (dump == dump_base) return 0;           \
 	dump = dump_next(dump);                    \
-	operator = (int)(intptr_t)dump_op(dump);   \
+	location = (int)(intptr_t)dump_op(dump);   \
 	args = dump_args(dump);                    \
 	envir = dump_envir(dump);                  \
 	code = dump_code(dump);                    \
@@ -2909,7 +2909,7 @@ static pointer s_clone_save(void) {
 #define s_return(a) BEGIN                      \
 	value = (a);                               \
 	if (dump == NIL) return 0;                 \
-	operator = (intptr_t)ivalue(car(dump));    \
+	location = (intptr_t)ivalue(car(dump));    \
 	args = cadr(dump);                         \
 	envir = caddr(dump);                       \
 	code = cadddr(dump);                       \
@@ -3058,7 +3058,7 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 }
 
 /* kernel of this intepreter */
-static int Eval_Cycle(enum eval_location operator)
+static int Eval_Cycle(enum eval_location location)
 {
 	FILE *tmpfp = NULL;
 	int tok = 0;
@@ -3070,7 +3070,7 @@ static int Eval_Cycle(enum eval_location operator)
 LOOP:
 	c_sink = NIL;
 
-	switch (operator) {
+	switch (location) {
 	case LOC_EVAL:		/* main part of evalution */
 	LOC_EVAL:
 	    if (is_syntax(code)) {	/* syntax */
@@ -3146,7 +3146,7 @@ LOOP:
 				value = cdr(value);
 			}
 			code = cdr(code);
-			operator = syntaxnum(value) & T_SYNTAXNUM;
+			location = syntaxnum(value) & T_SYNTAXNUM;
 			goto LOOP;
 		}
 		if (is_closure(value) && is_macro(value)) {	/* macro expansion */
@@ -3190,7 +3190,7 @@ LOOP:
 LOC_APPLY:
 
 		if (is_proc(code)) {	/* PROCEDURE */
-			operator = procnum(code);
+			location = procnum(code);
 			goto LOOP;
 		} else if (is_foreign(code)) {	/* FOREIGN */
 			push_recent_alloc(args);
@@ -3271,7 +3271,7 @@ LOC_APPLYCONT:
 		break;
 	}
 
-	switch (operator) {
+	switch (location) {
 
 	case LOC_T0LVL:	/* top level */
 LOC_T0LVL:
@@ -4281,7 +4281,7 @@ LOC_EXPANDPATTERN:
 		/* fall through */
 
 	case LOC_MAP1:	/* map */
-		if (operator == LOC_MAP0) {
+		if (location == LOC_MAP0) {
 			car(args) = NIL;
 		} else {
 			car(args) = cons(value, car(args));
@@ -6080,7 +6080,7 @@ LOC_VECTOR:
 	case LOC_WRITE_CHAR:	/* write-char */
 	case LOC_WRITE:		/* write */
 	case LOC_DISPLAY:	/* display */
-		switch (operator) {
+		switch (location) {
 		case LOC_WRITE_CHAR:
 			if (!validargs("write-char", 1, 2, TST_CHAR TST_OUTPORT)) Error_0(msg);
 			break;
@@ -6101,7 +6101,7 @@ LOC_VECTOR:
 			}
 		}
 		args = car(args);
-		print_flag = (operator == LOC_WRITE) ? 1 : 0;
+		print_flag = (location == LOC_WRITE) ? 1 : 0;
 		s_goto(LOC_P0LIST);
 
 	case LOC_NEWLINE:	/* newline */
@@ -6365,7 +6365,7 @@ LOC_ERR1:
 
 	case LOC_READ_CHAR:		/* read-char */
 	case LOC_PEEK_CHAR:		/* peek-char */
-		switch (operator) {
+		switch (location) {
 		case LOC_READ_CHAR:
 			if (!validargs("read-char", 0, 1, TST_INPORT)) Error_0(msg);
 			break;
@@ -6389,7 +6389,7 @@ LOC_ERR1:
 		if (w == EOF) {
 			s_return(EOF_OBJ);
 		}
-		if (operator == LOC_PEEK_CHAR) {
+		if (location == LOC_PEEK_CHAR) {
 			backchar((int)w);
 		}
 		s_return(mk_character((int)w));
@@ -6778,7 +6778,7 @@ LOC_PVECFROM:
 		s_retbool(is_atom(car(args)));
 
 	default:
-		sprintf(msg, "%d is illegal operator", operator);
+		sprintf(msg, "%d is illegal location", location);
 		Error_0(msg);
 	}
 
@@ -6787,40 +6787,40 @@ LOC_PVECFROM:
 
 /* ========== Initialization of internal keywords ========== */
 
-pointer mk_syntax( enum eval_location operator, char *name )
+pointer mk_syntax( enum eval_location location, char *name )
 {
     pointer x;
     x = mk_string( name );
     type( x ) |= T_SYMBOL | T_SYNTAX;
-    syntaxnum( x ) = (short)operator;
+    syntaxnum( x ) = (short)location;
     return x;
 }
 
-void scheme_register_syntax( enum eval_location operator, char *name, pointer environment )
+void scheme_register_syntax( enum eval_location location, char *name, pointer environment )
 {
     pointer x,y;
 
     x = mk_symbol( name );
-    y = mk_syntax( operator, name );
+    y = mk_syntax( location, name );
     x = cons( x, y );
     x = cons( x, car(environment ));
     car( environment ) = x;
 }
 
-pointer mk_proc( enum eval_location operator, pointer *pp )
+pointer mk_proc( enum eval_location location, pointer *pp )
 {
     pointer x = get_cell( pp, &NIL );
     type( x ) = ( T_PROC | T_ATOM );
-    ivalue( x ) = operator;
+    ivalue( x ) = location;
     set_num_integer( x );
     return x;
 }
 
-void scheme_register_proc( enum eval_location operator, char *name, pointer environment )
+void scheme_register_proc( enum eval_location location, char *name, pointer environment )
 {
     pointer x, y;
     x = mk_symbol( name );
-    y = mk_proc( operator, &x );
+    y = mk_proc( location, &x );
     x = cons( x, y );
     x = cons( x, car( environment ));
     car( environment ) = x;

@@ -257,8 +257,8 @@ extern pointer global_env;
 pointer cons(pointer a, pointer b);
 
 pointer mk_foreign_func(foreign_func ff, pointer *pp);
-pointer mk_proc(enum eval_location operator, pointer *pp);
-pointer mk_syntax( enum eval_location operator, char *name );
+pointer mk_proc(enum eval_location location, pointer *pp);
+pointer mk_syntax( enum eval_location location, char *name );
 
 pointer mk_character(int c);
 pointer mk_integer(int32_t num);
@@ -298,8 +298,8 @@ int scheme_load_string(const char *cmd);
 
 
 void scheme_register_foreign_func( const char *name, foreign_func ff, pointer environment );
-void scheme_register_proc(enum eval_location operator, char *name, pointer environment);
-void scheme_register_syntax( enum eval_location operator, char *name, pointer environment );
+void scheme_register_proc(enum eval_location location, char *name, pointer environment);
+void scheme_register_syntax( enum eval_location location, char *name, pointer environment );
 
 pointer scheme_apply0(const char *procname);
 pointer scheme_apply1(const char *procname, pointer argslist);

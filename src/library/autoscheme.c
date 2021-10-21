@@ -81,7 +81,7 @@
 struct cell cell_seg[CELL_SEGSIZE * 2];
 
 /* We use 4 registers. */
-pointer args;			/* register for arguments of function */
+pointer args;			/* register for arguments of procedure */
 pointer envir;			/* stack register for current environment */
 pointer code;			/* register for current code */
 pointer dump;			/* stack register for next evaluation */
@@ -964,7 +964,7 @@ pointer set_vector_elem(pointer v, int i, pointer a)
 	}
 }
 
-pointer mk_foreign_func(foreign_func ff, pointer *pp)
+pointer mk_function(foreign_function *ff, pointer *pp)
 {
 	pointer x = get_cell(pp, &NIL);
 
@@ -6962,10 +6962,10 @@ int scheme_load_string(const char *cmd)
 }
 
 
-void scheme_register_foreign_func( const char *name, foreign_func ff, pointer environment )
+void scheme_register_function( const char *name, foreign_function *ff, pointer environment )
 {
 	pointer s = mk_symbol(name);
-	pointer f = mk_foreign_func(ff, &s), x;
+	pointer f = mk_function(ff, &s), x;
 
 	for (x = car(environment); x != NIL; x = cdr(x)) {
 		if (caar(x) == s) {
@@ -7070,7 +7070,7 @@ void FatalForeignError( char *s )
     exit( 1 );
 }
 
-/* ========== Helper Funcitons ========== */
+/* ========== Helper Functions ========== */
 
 int member( pointer object, pointer list )
 {

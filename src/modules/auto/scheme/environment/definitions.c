@@ -7,20 +7,20 @@ pointer INITIALIZE_LIBRARY__auto_scheme_environment( pointer environment )
     scheme_register_operation(LOC_CURR_ENV, "current-environment", environment);
     scheme_register_operation(LOC_GLOB_ENV, "global-environment", environment);
 
-    scheme_register_foreign_func( "make-environment",            make_environment               , environment);
+    scheme_register_function( "make-environment",            make_environment               , environment);
     scheme_register_operation(LOC_ENVP, "environment?"                                                , environment);
-    scheme_register_foreign_func( "environment-define!"  ,       ff_environment_define_d        , environment);
-    scheme_register_foreign_func( "environment-undefine!",       ff_environment_undefine_d      , environment);
-    scheme_register_foreign_func( "environment-defined-symbols", ff_environment_defined_symbols , environment);
-    scheme_register_foreign_func( "environment-assoc",           ff_environment_assoc           , environment);
-    scheme_register_foreign_func( "environment-ref",             ff_environment_ref             , environment);
-    scheme_register_foreign_func( "environment-update!",         ff_environment_update_d        , environment);
-    scheme_register_foreign_func( "environment-import!",         ff_environment_import_d        , environment);
-    scheme_register_foreign_func( "environment-only",            ff_environment_only            , environment);
-    scheme_register_foreign_func( "environment-except",          ff_environment_except          , environment);
-    scheme_register_foreign_func( "environment-prefix",          ff_environment_prefix          , environment);
-    scheme_register_foreign_func( "environment-rename",          ff_environment_rename          , environment);
-    scheme_register_foreign_func( "environment-delete!",         ff_environment_delete_d        , environment);
+    scheme_register_function( "environment-define!"  ,       ff_environment_define_d        , environment);
+    scheme_register_function( "environment-undefine!",       ff_environment_undefine_d      , environment);
+    scheme_register_function( "environment-defined-symbols", ff_environment_defined_symbols , environment);
+    scheme_register_function( "environment-assoc",           ff_environment_assoc           , environment);
+    scheme_register_function( "environment-ref",             ff_environment_ref             , environment);
+    scheme_register_function( "environment-update!",         ff_environment_update_d        , environment);
+    scheme_register_function( "environment-import!",         ff_environment_import_d        , environment);
+    scheme_register_function( "environment-only",            ff_environment_only            , environment);
+    scheme_register_function( "environment-except",          ff_environment_except          , environment);
+    scheme_register_function( "environment-prefix",          ff_environment_prefix          , environment);
+    scheme_register_function( "environment-rename",          ff_environment_rename          , environment);
+    scheme_register_function( "environment-delete!",         ff_environment_delete_d        , environment);
     return environment;
 }
 

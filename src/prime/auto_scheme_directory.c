@@ -43,6 +43,6 @@ static pointer ff_current_directory( pointer args )
 pointer return_value = T;
 return_value = autoscheme_eval(T, environment);
 return_value = autoscheme_eval(T, environment);
-return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("directory"),NIL))),cons(cons(mk_symbol("export"),cons(mk_symbol("current-directory"),NIL)),cons(cons(mk_symbol("begin"),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("current-directory"),cons(mk_foreign_func(ff_current_directory,&NIL),NIL))),NIL)),NIL)))), environment);
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("directory"),NIL))),cons(cons(mk_symbol("export"),cons(mk_symbol("current-directory"),NIL)),cons(cons(mk_symbol("begin"),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("current-directory"),cons(mk_function(ff_current_directory,&NIL),NIL))),NIL)),NIL)))), environment);
 return return_value;
 }

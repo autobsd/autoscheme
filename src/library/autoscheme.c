@@ -6807,7 +6807,7 @@ void scheme_register_syntax( enum eval_location location, char *name, pointer en
     car( environment ) = x;
 }
 
-pointer mk_proc( enum eval_location location, pointer *pp )
+pointer mk_operation( enum eval_location location, pointer *pp )
 {
     pointer x = get_cell( pp, &NIL );
     type( x ) = ( T_OPERATION | T_ATOM );
@@ -6816,11 +6816,11 @@ pointer mk_proc( enum eval_location location, pointer *pp )
     return x;
 }
 
-void scheme_register_proc( enum eval_location location, char *name, pointer environment )
+void scheme_register_operation( enum eval_location location, char *name, pointer environment )
 {
     pointer x, y;
     x = mk_symbol( name );
-    y = mk_proc( location, &x );
+    y = mk_operation( location, &x );
     x = cons( x, y );
     x = cons( x, car( environment ));
     car( environment ) = x;

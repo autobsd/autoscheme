@@ -73,3 +73,24 @@
 (force expression)
 
 (display (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme base)"))))(newline)
+
+(newline)
+(define my-param (make-parameter 5 (lambda (x) (+ x 1))))
+(display "(my-param): ")(write (my-param))(newline)
+(display "(my-param): ")(write (my-param))(newline)
+(display "(my-param 3): ")(write (my-param 3))(newline)
+(display "(my-param): ")(write (my-param))(newline)
+(display "(my-param): ")(write (my-param))(newline)
+(display "(my-param 7): ")(write (my-param 7))(newline)
+(display "(my-param): ")(write (my-param))(newline)
+
+(parameterize ((my-param 2))
+	      (display "(my-param): ")(write (my-param))(newline)
+	      )
+
+(display "(my-param): ")(write (my-param))(newline)
+
+;; (write
+;; (include_ "file1.scm" 
+;; 	  "file2.scm")
+;; )(newline)

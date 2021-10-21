@@ -10,34 +10,75 @@
 
 
 
+;; (make-parameter init converter) MULTI THREADED
+;; sets: needs to create a modification table that records thread ID and time
+;; gets: need to consult modification table and main thread table and return correct value
+
+(define make-parameter
+  (lambda (init . rest)
+    (let* ((converter (if (null? rest) #f (car rest)))
+	   (value (if converter (converter init) init)))
+
+      (lambda args
+	(cond ((null? args) value)
+	      ((and (pair? (cdr args))(not (cadr args))) (set! value (car args)))
+	      (converter (set! value (converter (car args))))
+	      (else (set! value (car args))))))))
+
+
+
+((foreign-syntax OP_DEFMACRO0 "define-macro") (parameterize associations . body)
+  (let* ((eval (foreign-procedure OP_PEVAL))
+	 (params (map (lambda (association)
+			(eval (car association) (expansion-environment)))
+		      associations))
+	 (tmp-values (map (lambda (association)
+			(eval (cadr association) (expansion-environment)))
+		      associations))
+
+	 (prev-values (map (lambda (param)
+			     (apply param '()))
+			   params)))
+
+    (dynamic-wind
+	(lambda ()
+	  (for-each (lambda (param value)
+		      (param value)
+		      )
+		    params tmp-values))
+
+	(lambda ()
+	  (for-each (lambda (statement)
+		      (eval statement (expansion-environment)))
+		    body))
+
+	(lambda ()
+	  (for-each (lambda (param value)
+		      (param value #f)
+		      )
+		    params prev-values)))))
+
+
+
 (define read-string 
   (letrec ((r7-read-string (lambda (k . rest)
 			     (if (= k 0) ""
-				 (let read-chars((s (make-string k))
-						 (i 0)
-						 (c (apply read-char rest))
-						 )
+				 (let read-chars ((s (make-string k))
+						  (i 0)
+						  (c (apply read-char rest)))
 				   
 				   (cond ((and (eof-object? c) (= i 0)) c)
 					 ((eof-object? c) (substring s 0 (+ i 1)))
-
 					 ((< i (- k 1)) (string-set! s i c) (read-chars s (+ i 1) (apply read-char rest)))
-					 
-					 (else (string-set! s i c) (substring s 0 (+ i 1))))
-				   ))))
-
+					 (else (string-set! s i c) (substring s 0 (+ i 1))))))))
 
 	   (auto-read-string (lambda args
 			       (let ((k (if (null? args) #f (car args)))
-				     (rest (if (pair? args) (cdr args) '()))
-				     )
+				     (rest (if (pair? args) (cdr args) '())))
 				 (if (not k)
 				     (let ((s (apply r7-read-string (cons 64 rest))))
-				       (if (or (eof-object? s) (zero? (string-length s)))
-					   ""
+				       (if (or (eof-object? s) (zero? (string-length s))) ""
 					   (string-append s (apply auto-read-string (cons #f rest)))))
-				     (apply r7-read-string args))
-				 )))
-	   )
-    auto-read-string
-    ))
+				     (apply r7-read-string args))))))
+
+    auto-read-string))

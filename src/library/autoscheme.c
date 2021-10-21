@@ -96,7 +96,7 @@ struct cell _EOF_OBJ;
 pointer EOF_OBJ = &_EOF_OBJ;	/* special cell representing end-of-file */
 struct cell _UNDEF;
 pointer UNDEF = &_UNDEF;	/* special cell representing undefined */
-pointer oblist = &_NIL;	/* pointer to symbol table */
+pointer symbol_list = &_NIL;	/* pointer to symbol table */
 pointer global_env;		/* pointer to global environment */
 pointer call_history;           /* pointer to call history vector */
 int call_history_pos;           /* current position within call history vector */
@@ -758,13 +758,13 @@ pointer mk_symbol(const char *name)
 {
 	pointer x, y = NIL;
 
-	/* fisrt check oblist */
-	for (x = oblist; x != NIL; y = x, x = cdr(x)) {
+	/* fisrt check symbol_list */
+	for (x = symbol_list; x != NIL; y = x, x = cdr(x)) {
 		if (!strcmp(name, symname(car(x)))) {
 			if (y != NIL) {
 				cdr(y) = cdr(x);
-				cdr(x) = oblist;
-				oblist = x;
+				cdr(x) = symbol_list;
+				symbol_list = x;
 			}
 			return car(x);
 		}
@@ -772,8 +772,8 @@ pointer mk_symbol(const char *name)
 
 	x = mk_string(name);
 	type(x) |= T_SYMBOL;
-	oblist = cons(x, oblist);
-	return car(oblist);
+	symbol_list = cons(x, symbol_list);
+	return car(symbol_list);
 }
 
 /* get new uninterned-symbol */
@@ -1066,7 +1066,7 @@ void gc(pointer *a, pointer *b)
 	scan = next = to_space;
 
 	/* forward system globals */
-	oblist = forward(oblist);
+	symbol_list = forward(symbol_list);
 	global_env = forward(global_env);
 	call_history = forward(call_history);
 	inport = forward(inport);
@@ -1278,7 +1278,7 @@ void gc(pointer *a, pointer *b)
 		printf("gc...");
 
 	/* mark system globals */
-	mark(oblist);
+	mark(symbol_list);
 	mark(global_env);
 	mark(call_history);
 	mark(inport);
@@ -6828,7 +6828,7 @@ void scheme_register_operation( enum eval_location location, char *name, pointer
 
 static void init_vars_global(void)
 {
-	oblist = NIL;
+	symbol_list = NIL;
 	winders = NIL;
 #ifdef USE_COPYING_GC
 	gcell_list = NIL;
@@ -6905,7 +6905,7 @@ void scheme_init(void)
 
 void scheme_deinit(void)
 {
-	oblist = NIL;
+	symbol_list = NIL;
 	inport = NIL;
 	outport = NIL;
 	global_env = NIL;

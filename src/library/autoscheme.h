@@ -301,13 +301,12 @@ void scheme_register_foreign_func( const char *name, foreign_func ff, pointer en
 void scheme_register_operation(enum eval_location location, char *name, pointer environment);
 void scheme_register_syntax( enum eval_location location, char *name, pointer environment );
 
-pointer scheme_apply0(const char *procname);
-pointer scheme_apply1(const char *procname, pointer argslist);
+
 pointer scheme_eval(pointer obj);
 
 pointer autoscheme_eval( pointer object, pointer environment );
 
-pointer scheme_call(pointer func, pointer argslist);
+pointer scheme_call(pointer procedure, pointer argslist);
 
 
 

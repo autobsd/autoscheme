@@ -7012,14 +7012,14 @@ static void restore_from_C_call(void)
 	c_nest = cdr(c_nest);
 }
 
-pointer scheme_call(pointer func, pointer argslist)
+pointer scheme_call(pointer procedure, pointer argslist)
 {
 	int old_repl = interactive_repl;
 	interactive_repl = 0;
 	save_from_C_call();
 	envir = global_env;
-	args = argslist;	/* assumed to be already eval'ed. */
-	code = func;		/* assumed to be already eval'ed. */
+	args = argslist;	/* assumed to be already evaluated */
+	code = procedure;	/* assumed to be already evaluated */
 	Eval_Cycle(LOC_APPLY);
 	interactive_repl = old_repl;
 	restore_from_C_call();
@@ -7053,20 +7053,6 @@ pointer autoscheme_eval( pointer object, pointer environment )
 }
 
 
-
-pointer scheme_apply0(const char *procname)
-{
-	pointer x = mk_symbol(procname);
-	return scheme_eval(cons(x, NIL));
-}
-
-pointer scheme_apply1(const char *procname, pointer argslist)
-{
-	pointer x;
-	mark_x = argslist;
-	x = mk_symbol(procname);
-	return scheme_eval(cons(x, mark_x));
-}
 
 /* ========== Error ==========  */
 

@@ -968,7 +968,7 @@ pointer mk_function(foreign_function *ff, pointer *pp)
 {
 	pointer x = get_cell(pp, &NIL);
 
-	type(x) = (T_FOREIGN | T_ATOM);
+	type(x) = (T_FUNCTION | T_ATOM);
 	exttype(x) = 0;
 	foreignfnc(x) = ff;
 	return x;
@@ -1120,7 +1120,7 @@ void gc(pointer *a, pointer *b)
 		case T_OPERATION:
 		case T_CHARACTER:
 		case T_VECTOR:
-		case T_FOREIGN:
+		case T_FUNCTION:
 			break;
 		case T_STRING:
 		case T_STRING | T_SYMBOL:
@@ -1925,7 +1925,7 @@ static char *atom2str(pointer l, int f)
 		}
 	} else if (is_operation(l)) {
 		p = strvalue(strbuff);
-		sprintf(p, "#<PROCEDURE %d>", op_loc(l));
+		sprintf(p, "#<OPERATION %d>", op_loc(l));
 	} else if (is_port(l)) {
 		if (port_file(l) != NULL) {
 			p = "#<PORT>";
@@ -1941,7 +1941,7 @@ static char *atom2str(pointer l, int f)
 			}
 		} else if (is_operation(l)) {
 		    p = strvalue(strbuff);
-		    sprintf(p, "#<PROCEDURE %d>", op_loc(l));
+		    sprintf(p, "#<OPERATION %d>", op_loc(l));
 		} else if (is_macro(l)) {
 			p = "#<MACRO>";
 		} else {
@@ -1949,9 +1949,9 @@ static char *atom2str(pointer l, int f)
 		}
 	} else if (is_continuation(l)) {
 		p = "#<CONTINUATION>";
-	} else if (is_foreign(l)) {
+	} else if (is_function(l)) {
 		p = strvalue(strbuff);
-		sprintf(p, "#<FOREIGN PROCEDURE %d>", op_loc(l));
+		sprintf(p, "#<FUNCTION %d>", op_loc(l));
 	} else {
 		p = "#<ERROR>";
 	}
@@ -3192,7 +3192,7 @@ LOC_APPLY:
 		if (is_operation(code)) {	/* PROCEDURE */
 			location = op_loc(code);
 			goto LOOP;
-		} else if (is_foreign(code)) {	/* FOREIGN */
+		} else if (is_function(code)) {	/* FOREIGN */
 			push_recent_alloc(args);
 			x = (foreignfnc(code))(args);
 			s_return(x);
@@ -6000,7 +6000,7 @@ LOC_VECTOR:
 		 * (call-with-current-continuation procedure?) ==> #t
 		 * in R^3 report sec. 6.9
 		 */
-		s_retbool(is_operation(car(args)) || is_closure(car(args))
+		s_retbool(is_operation(car(args)) || is_function(car(args)) || is_closure(car(args))
 			  || is_continuation(car(args)));
 	case LOC_PAIR:		/* pair? */
 		if (!validargs("pair?", 1, 1, TST_ANY)) Error_0(msg);

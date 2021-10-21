@@ -22,48 +22,39 @@
 ;; (write (get-environment-variables))(newline)
 ;; (write (get-environment-variable "HOME"))(newline)
 
-
-(write (macro? +))(newline)
-(write (closure? +))(newline)
-(write (procedure? +))(newline)
+(newline)
+(display "+: ")(write +)(newline)
+(display "macro?: ")(write (macro? +))(newline)
+(display "closure?: ")(write (closure? +))(newline)
+(display "procedure?: ")(write (procedure? +))(newline)
 
 
 (define-macro (mymac x)
   `(+ ,x 5)
   )
-(write mymac) (newline)
-(write (mymac 3)) (newline)
-(write (macro? mymac))(newline)
-(write (closure? mymac))(newline)
-(write (procedure? mymac))(newline)
-
-;; (write (macro-expand '(mymac 3)))(newline)
+(newline)
+(display "mymac: ")(write mymac)(newline)
+(display "macro?: ")(write (macro? mymac))(newline)
+(display "closure?: ")(write (closure? mymac))(newline)
+(display "procedure?: ")(write (procedure? mymac))(newline)
 
 (define (add2 x)
   (+ x 2))
 
-(write (add2 33))(newline)
+(newline)
+(display "add2: ")(write add2)(newline)
+(display "macro?: ")(write (macro? add2))(newline)
+(display "closure?: ")(write (closure? add2))(newline)
+(display "procedure?: ")(write (procedure? add2))(newline)
 
-(write add2)(newline)
-(write (closure? add2))(newline)
-(write (procedure? add2))(newline)
+(newline)
+(display "environment-only: ")(write environment-only)(newline)
+(display "macro?: ")(write (macro? environment-only))(newline)
+(display "closure?: ")(write (closure? environment-only))(newline)
+(display "procedure?: ")(write (procedure? environment-only))(newline)
 
-(define add3 (lambda (x)
-  (+ x 3)))
 
-(write add3)(newline)
-(write (closure? add3))(newline)
-(write (procedure? add3))(newline)
 
-(write environment-only)(newline)
-(write (closure? environment-only))(newline)
-(write (procedure? environment-only))(newline)
-
-(define add7 
-  (macro (x)
-    (+ x 7)))
-
-(write (add7 3))(newline)
 
 ;; (gc-verbose #t)
 ;; (collect-garbage)

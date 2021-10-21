@@ -127,7 +127,7 @@ struct cell {
 #define T_CHARACTER    256	/* 0000000100000000 */
 #define T_PORT         512	/* 0000001000000000 */
 #define T_VECTOR      1024	/* 0000010000000000 */
-#define T_FOREIGN     2048	/* 0000100000000000 */
+#define T_FUNCTION     2048	/* 0000100000000000 */
 #define T_MEMBLOCK    4096	/* 0001000000000000 */
 #define T_ENVIRONMENT 8192	/* 0010000000000000 */
 #define T_ATOM       16384	/* 0100000000000000 */	/* only for gc */
@@ -205,7 +205,7 @@ enum {
 
 #define is_vector(p)    (type(p) & T_VECTOR)
 
-#define is_foreign(p)   (type(p) & T_FOREIGN)
+#define is_function(p)   (type(p) & T_FUNCTION)
 #define foreignfnc(p)   ((p)->_object._ff)
 
 #define is_memblock(p)  (type(p) & T_MEMBLOCK)

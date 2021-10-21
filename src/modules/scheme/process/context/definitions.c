@@ -36,11 +36,12 @@ static pointer ff_get_environment_variables( pointer args )
 	    s = environ[i];
 	    d = strchr( s, '=' );
 	    
-	    pointer name = mk_counted_string( s, d - s );
-	    pointer value = mk_counted_string( d + 1, s + strlen( s ) - d - 1 ); 
-	    pointer pair = cons( name, value );
-	    variables = cons( pair, variables );
-
+	    {
+		pointer name = mk_counted_string( s, d - s );
+		pointer value = mk_counted_string( d + 1, s + strlen( s ) - d - 1 ); 
+		pointer pair = cons( name, value );
+		variables = cons( pair, variables );
+	    }
 	    i++;
 	}
     }

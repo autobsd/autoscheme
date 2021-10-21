@@ -13,7 +13,7 @@ car( environment ) = cons( binding, car( environment ));
 INITIALIZE_LIBRARY__auto_scheme_environment( library );
 INITIALIZE_LIBRARY__auto_scheme_base( library );
 
-scheme_register_syntax( OP_DEFMACRO0, "define-macro", library );
+scheme_register_syntax( LOC_DEFMACRO0, "define-macro", library );
 
 environment = library;
 

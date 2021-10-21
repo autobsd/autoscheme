@@ -11,8 +11,8 @@
 
   (begin
     
-    ((foreign-syntax OP_DEF0 "define") interaction-environment 
-      ((foreign-syntax OP_LAMBDA "lambda") ()
+    ((foreign-syntax LOC_DEF0 "define") interaction-environment 
+      ((foreign-syntax LOC_LAMBDA "lambda") ()
 	(environment (auto scheme base))
 	))
 

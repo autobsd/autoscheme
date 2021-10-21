@@ -13,6 +13,6 @@
 
   (begin 
     
-    ((foreign-syntax OP_DEF0 "define") current-directory (foreign-function ff_current_directory))
+    ((foreign-syntax LOC_DEF0 "define") current-directory (foreign-function ff_current_directory))
 
   ))

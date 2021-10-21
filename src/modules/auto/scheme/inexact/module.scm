@@ -17,15 +17,15 @@
 
   (begin
 
-    ((foreign-syntax OP_DEF0 "define") acos (foreign-procedure OP_ACOS))
-    ((foreign-syntax OP_DEF0 "define") asin (foreign-procedure OP_ASIN))
-    ((foreign-syntax OP_DEF0 "define") atan (foreign-procedure OP_ATAN))
-    ((foreign-syntax OP_DEF0 "define") cos (foreign-procedure OP_COS))
-    ((foreign-syntax OP_DEF0 "define") exp (foreign-procedure OP_EXP))
-    ((foreign-syntax OP_DEF0 "define") log (foreign-procedure OP_LOG))
-    ((foreign-syntax OP_DEF0 "define") sin (foreign-procedure OP_SIN))
-    ((foreign-syntax OP_DEF0 "define") sqrt (foreign-procedure OP_SQRT))
-    ((foreign-syntax OP_DEF0 "define") tan (foreign-procedure OP_TAN))
+    ((foreign-syntax LOC_DEF0 "define") acos (foreign-procedure LOC_ACOS))
+    ((foreign-syntax LOC_DEF0 "define") asin (foreign-procedure LOC_ASIN))
+    ((foreign-syntax LOC_DEF0 "define") atan (foreign-procedure LOC_ATAN))
+    ((foreign-syntax LOC_DEF0 "define") cos (foreign-procedure LOC_COS))
+    ((foreign-syntax LOC_DEF0 "define") exp (foreign-procedure LOC_EXP))
+    ((foreign-syntax LOC_DEF0 "define") log (foreign-procedure LOC_LOG))
+    ((foreign-syntax LOC_DEF0 "define") sin (foreign-procedure LOC_SIN))
+    ((foreign-syntax LOC_DEF0 "define") sqrt (foreign-procedure LOC_SQRT))
+    ((foreign-syntax LOC_DEF0 "define") tan (foreign-procedure LOC_TAN))
     
   )
 )

@@ -8,6 +8,6 @@
 
   (begin
 
-    ((foreign-syntax OP_DEF0 "define") read (foreign-procedure OP_READ))
+    ((foreign-syntax LOC_DEF0 "define") read (foreign-procedure LOC_READ))
     
     ))

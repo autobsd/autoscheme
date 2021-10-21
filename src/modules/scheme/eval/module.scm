@@ -21,8 +21,8 @@
   (export environment eval)
 
   (begin
-    (define eval (foreign-procedure OP_PEVAL))
-    (define define-macro (foreign-syntax OP_DEFMACRO0 "define-macro"))
+    (define eval (foreign-procedure LOC_PEVAL))
+    (define define-macro (foreign-syntax LOC_DEFMACRO0 "define-macro"))
     (define load-modules (foreign-function ff_load_modules))
     (define make-environment (foreign-function make_environment))
 

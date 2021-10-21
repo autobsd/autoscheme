@@ -30,7 +30,7 @@
 	(let ((variable (assoc name (get-environment-variables))))
 	  (and variable (cdr variable)))))
 
-    (define emergency-exit (foreign-procedure OP_EMERGENCY_EXIT)) 
+    (define emergency-exit (foreign-procedure LOC_EMERGENCY_EXIT)) 
 
 
     (define exit #f)

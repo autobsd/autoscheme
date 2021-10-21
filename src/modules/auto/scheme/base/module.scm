@@ -27,8 +27,8 @@
 
 
 
-((foreign-syntax OP_DEFMACRO0 "define-macro") (parameterize associations . body)
-  (let* ((eval (foreign-procedure OP_PEVAL))
+((foreign-syntax LOC_DEFMACRO0 "define-macro") (parameterize associations . body)
+  (let* ((eval (foreign-procedure LOC_PEVAL))
 	 (params (map (lambda (association)
 			(eval (car association) (expansion-environment)))
 		      associations))

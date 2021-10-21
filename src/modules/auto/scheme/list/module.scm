@@ -39,7 +39,7 @@
 	))
 
 
-    (define last-pair (foreign-procedure OP_LASTPAIR))
+    (define last-pair (foreign-procedure LOC_LASTPAIR))
 
 
 

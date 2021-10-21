@@ -14,12 +14,12 @@
 
   (begin
 
-    ((foreign-syntax OP_DEF0 "define") delay (foreign-procedure OP_DELAY))
-    ((foreign-syntax OP_DEF0 "define") force (foreign-procedure OP_FORCE))
+    ((foreign-syntax LOC_DEF0 "define") delay (foreign-procedure LOC_DELAY))
+    ((foreign-syntax LOC_DEF0 "define") force (foreign-procedure LOC_FORCE))
 
-    ;; ((foreign-syntax OP_DEF0 "define") lazy (foreign-procedure OP_LAZY))
-    ;; ((foreign-syntax OP_DEF0 "define") eager (foreign-procedure OP_EAGER))
-    ;; ((foreign-syntax OP_DEF0 "define") cons-stream (foreign-procedure OP_C0STREAM))
+    ;; ((foreign-syntax LOC_DEF0 "define") lazy (foreign-procedure LOC_LAZY))
+    ;; ((foreign-syntax LOC_DEF0 "define") eager (foreign-procedure LOC_EAGER))
+    ;; ((foreign-syntax LOC_DEF0 "define") cons-stream (foreign-procedure LOC_C0STREAM))
   )
 )
 

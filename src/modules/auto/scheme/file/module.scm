@@ -16,13 +16,13 @@
 
   (begin
 
-    ((foreign-syntax OP_DEF0 "define") call-with-input-file (foreign-procedure OP_CALL_INFILE0))
-    ((foreign-syntax OP_DEF0 "define") call-with-output-file (foreign-procedure OP_CALL_OUTFILE0))
+    ((foreign-syntax LOC_DEF0 "define") call-with-input-file (foreign-procedure LOC_CALL_INFILE0))
+    ((foreign-syntax LOC_DEF0 "define") call-with-output-file (foreign-procedure LOC_CALL_OUTFILE0))
 
-    ((foreign-syntax OP_DEF0 "define") open-input-file (foreign-procedure OP_OPEN_INFILE))
-    ((foreign-syntax OP_DEF0 "define") open-output-file (foreign-procedure OP_OPEN_OUTFILE))
+    ((foreign-syntax LOC_DEF0 "define") open-input-file (foreign-procedure LOC_OPEN_INFILE))
+    ((foreign-syntax LOC_DEF0 "define") open-output-file (foreign-procedure LOC_OPEN_OUTFILE))
 
-    ((foreign-syntax OP_DEF0 "define") with-input-from-file (foreign-procedure OP_WITH_INFILE0))
-    ((foreign-syntax OP_DEF0 "define") with-input-to-file (foreign-procedure OP_WITH_OUTFILE0))
+    ((foreign-syntax LOC_DEF0 "define") with-input-from-file (foreign-procedure LOC_WITH_INFILE0))
+    ((foreign-syntax LOC_DEF0 "define") with-input-to-file (foreign-procedure LOC_WITH_OUTFILE0))
     )
   )

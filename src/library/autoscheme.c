@@ -2831,14 +2831,14 @@ static pointer mappend(pointer f, pointer l, pointer r)
 
 #define Error_0(s) BEGIN                       \
 	args = cons(mk_string((s)), NIL);          \
-	operator = OP_ERR0;                        \
+	operator = LOC_ERR0;                        \
 	goto LOOP; END
 
 #define Error_1(s, a) BEGIN                    \
 	args = cons((a), NIL);                     \
 	code = mk_string(s);                       \
 	args = cons(code, args);                   \
-	operator = OP_ERR0;                        \
+	operator = LOC_ERR0;                        \
 	goto LOOP; END
 
 /* control macros for Eval_Cycle */
@@ -3058,7 +3058,7 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 }
 
 /* kernel of this intepreter */
-static int Eval_Cycle(enum eval_op operator)
+static int Eval_Cycle(enum eval_location operator)
 {
 	FILE *tmpfp = NULL;
 	int tok = 0;
@@ -3071,8 +3071,8 @@ LOOP:
 	c_sink = NIL;
 
 	switch (operator) {
-	case OP_EVAL:		/* main part of evalution */
-	OP_EVAL:
+	case LOC_EVAL:		/* main part of evalution */
+	LOC_EVAL:
 	    if (is_syntax(code)) {	/* syntax */
 		
 		if (syntaxnum(code) & T_DEFSYNTAX) {
@@ -3127,20 +3127,20 @@ LOOP:
 		Error_1("unbound variable", code);
 
 	    } else if (is_pair(code) && !is_environment(code)) {
-		s_save(OP_E0ARGS, NIL, code);
+		s_save(LOC_E0ARGS, NIL, code);
 
 		set_vector_elem(call_history, call_history_pos++, code);
 		if( call_history_pos == CALL_HISTORY_LENGTH ) call_history_pos = 0;
 
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 		/* } else if (is_null(code)) { */
 		/*     Error_1("illegal expression", code); */
 	    } else {
 		s_return(code);
 	    }
 
-	case OP_E0ARGS:	/* eval arguments */
+	case LOC_E0ARGS:	/* eval arguments */
 		if (is_syntax(value)) {
 			if (syntaxnum(value) & T_DEFSYNTAX) {
 				value = cdr(value);
@@ -3153,7 +3153,7 @@ LOOP:
 			if (syntaxnum(value) & T_DEFSYNTAX) {
 				args = cons(NIL, envir);
 				envir = closure_env(value);
-				s_save(OP_DOMACRO, NIL, NIL);
+				s_save(LOC_DOMACRO, NIL, NIL);
 				if (is_symbol(caar(value))) {
 					x = cons(caar(value), ELLIPSIS);
 					x = cons(x, NIL);
@@ -3161,33 +3161,33 @@ LOOP:
 					setenvironment(envir);
 					car(value) = cdar(value);
 				}
-				s_goto(OP_EXPANDPATTERN);
+				s_goto(LOC_EXPANDPATTERN);
 			} else if (exttype(value) & T_DEFMACRO) {
 				args = cdr(code);
 			} else {
 				args = cons(code, NIL);
 			}
 			code = value;
-			s_save(OP_DOMACRO, NIL, NIL);
-			s_goto(OP_APPLY);
+			s_save(LOC_DOMACRO, NIL, NIL);
+			s_goto(LOC_APPLY);
 		}
 		code = cdr(code);
 		/* fall through */
 
-	case OP_E1ARGS:	/* eval arguments */
+	case LOC_E1ARGS:	/* eval arguments */
 		if (is_pair(code)) {	/* continue */
 			args = cons(value, args);
-			s_save(OP_E1ARGS, args, cdr(code));
+			s_save(LOC_E1ARGS, args, cdr(code));
 			code = car(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		short_reverse();
 		/* fall through */
 
-	case OP_APPLY:		/* apply 'code' to 'args' */
-OP_APPLY:
+	case LOC_APPLY:		/* apply 'code' to 'args' */
+LOC_APPLY:
 
 		if (is_proc(code)) {	/* PROCEDURE */
 			operator = procnum(code);
@@ -3239,29 +3239,29 @@ OP_APPLY:
 			}
 			code = cdr(closure_code(code));
 			args = NIL;
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		} else if (is_continuation(code)) {	/* CONTINUATION */
 			code = cont_dump(code);
 			if (winders != car(code)) {
-				s_save(OP_APPLYCONT, args, code);
+				s_save(LOC_APPLYCONT, args, code);
 				args = winders;
 				code = car(code);
-				s_goto(OP_DOWINDS0);
+				s_goto(LOC_DOWINDS0);
 			}
-			s_goto(OP_APPLYCONT);
+			s_goto(LOC_APPLYCONT);
 		} else {
 		    Error_1("call of non-procedure", code);
 		}
 
-	case OP_APPLYCONT:
-OP_APPLYCONT:
+	case LOC_APPLYCONT:
+LOC_APPLYCONT:
 #ifndef USE_SCHEME_STACK
 		dump = s_clone(cdr(code));
 #else
 		dump = cdr(code);
 #endif
 		w = s_next_op();
-		if (w == OP_WITHVALUES1 || w == OP_RECEIVE1) {
+		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1) {
 			type(args) |= T_VALUES;
 			s_return(args);
 		} else {
@@ -3273,8 +3273,8 @@ OP_APPLYCONT:
 
 	switch (operator) {
 
-	case OP_T0LVL:	/* top level */
-OP_T0LVL:
+	case LOC_T0LVL:	/* top level */
+LOC_T0LVL:
 		if (port_file(inport) == NULL || is_eofport(inport)) {
 			if (is_fileport(inport) && port_file(inport) != stdin && port_file(inport) != NULL) {
 				fclose(port_file(inport));
@@ -3294,44 +3294,44 @@ OP_T0LVL:
 		dump = NIL;
 #endif
 		envir = global_env;
-		s_save(OP_VALUEPRINT, NIL, NIL);
-		s_save(OP_T1LVL, NIL, NIL);
+		s_save(LOC_VALUEPRINT, NIL, NIL);
+		s_save(LOC_T1LVL, NIL, NIL);
 		if (port_file(inport) == stdin) {
 			printf(prompt);
 		}
-		s_goto(OP_READ_INTERNAL);
+		s_goto(LOC_READ_INTERNAL);
 
-	case OP_T1LVL:	/* top level */
+	case LOC_T1LVL:	/* top level */
 		code = value;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_READ_INTERNAL:		/* read internal */
-OP_READ_INTERNAL:
+	case LOC_READ_INTERNAL:		/* read internal */
+LOC_READ_INTERNAL:
 		tok = token();
-		s_goto(OP_RDSEXPR);
+		s_goto(LOC_RDSEXPR);
 
-	case OP_VALUEPRINT:	/* print evalution result */
+	case LOC_VALUEPRINT:	/* print evalution result */
 		print_flag = 1;
 		args = value;
 		if (port_file(inport) == stdin) {
-			s_save(OP_T0LVL, NIL, NIL);
-			s_goto(OP_P0LIST);
+			s_save(LOC_T0LVL, NIL, NIL);
+			s_goto(LOC_P0LIST);
 		} else {
-			s_goto(OP_T0LVL);
+			s_goto(LOC_T0LVL);
 		}
 
-	case OP_DOMACRO:	/* do macro */
+	case LOC_DOMACRO:	/* do macro */
 		code = value;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_GENSYM:
+	case LOC_GENSYM:
 		if (!validargs("gensym", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(gensym());
 
-	case OP_LAMBDA:	/* lambda */
+	case LOC_LAMBDA:	/* lambda */
 		s_return(mk_closure(code, envir));
 
-	case OP_MKCLOSURE:	/* make-closure */
+	case LOC_MKCLOSURE:	/* make-closure */
 		if (!validargs("make-closure", 1, 2, TST_PAIR TST_ENVIRONMENT)) Error_0(msg);
 		x = car(args);
 		if (car(x) == LAMBDA) {
@@ -3344,48 +3344,48 @@ OP_READ_INTERNAL:
 		}
 		s_return(mk_closure(x, y));
 
-	case OP_QUOTE:		/* quote */
+	case LOC_QUOTE:		/* quote */
 		s_return(car(code));
 
-	case OP_QQUOTE0:	/* quasiquote */
+	case LOC_QQUOTE0:	/* quasiquote */
 		args = mk_integer(0);
 		code = car(code);
-		s_save(OP_QQUOTE9, NIL, NIL);
+		s_save(LOC_QQUOTE9, NIL, NIL);
 		/* fall through */
 
-	case OP_QQUOTE1:	/* quasiquote -- expand */
-OP_QQUOTE1:
+	case LOC_QQUOTE1:	/* quasiquote -- expand */
+LOC_QQUOTE1:
 		if (is_vector(code)) {
-			s_save(OP_QQUOTE2, NIL, NIL);
+			s_save(LOC_QQUOTE2, NIL, NIL);
 			x = NIL;
 			for (w = ivalue(code) - 1; w >= 0; w--) {
 				x = cons(vector_elem(code, (int)w), x);
 			}
 			code = x;
-			s_goto(OP_QQUOTE1);
+			s_goto(LOC_QQUOTE1);
 		} else if (!is_pair(code)) {
 			x = cons(code, NIL);
 			s_return(cons(QUOTE, x));
 		} else if (QQUOTE == car(code)) {
-			s_save(OP_QQUOTE3, NIL, NIL);
+			s_save(LOC_QQUOTE3, NIL, NIL);
 			args = mk_integer(ivalue(args) + 1);
 			code = cdr(code);
-			s_goto(OP_QQUOTE1);
+			s_goto(LOC_QQUOTE1);
 		} else if (ivalue(args) > 0) {
 			if (UNQUOTE == car(code)) {
-				s_save(OP_QQUOTE4, NIL, NIL);
+				s_save(LOC_QQUOTE4, NIL, NIL);
 				args = mk_integer(ivalue(args) - 1);
 				code = cdr(code);
-				s_goto(OP_QQUOTE1);
+				s_goto(LOC_QQUOTE1);
 			} else if (UNQUOTESP == car(code)) {
-				s_save(OP_QQUOTE5, NIL, NIL);
+				s_save(LOC_QQUOTE5, NIL, NIL);
 				args = mk_integer(ivalue(args) - 1);
 				code = cdr(code);
-				s_goto(OP_QQUOTE1);
+				s_goto(LOC_QQUOTE1);
 			} else {
-				s_save(OP_QQUOTE6, args, code);
+				s_save(LOC_QQUOTE6, args, code);
 				code = car(code);
-				s_goto(OP_QQUOTE1);
+				s_goto(LOC_QQUOTE1);
 			}
 		} else {
 			if (UNQUOTE == car(code)) {
@@ -3393,54 +3393,54 @@ OP_QQUOTE1:
 			} else if (UNQUOTESP == car(code)) {
 				Error_1("unquote-splicing outside list:", code);
 			} else if (is_pair(car(code)) && UNQUOTESP == caar(code)) {
-				s_save(OP_QQUOTE8, NIL, code);
+				s_save(LOC_QQUOTE8, NIL, code);
 				code = cdr(code);
-				s_goto(OP_QQUOTE1);
+				s_goto(LOC_QQUOTE1);
 			} else {
-				s_save(OP_QQUOTE6, args, code);
+				s_save(LOC_QQUOTE6, args, code);
 				code = car(code);
-				s_goto(OP_QQUOTE1);
+				s_goto(LOC_QQUOTE1);
 			}
 		}
 
-	case OP_QQUOTE2:	/* quasiquote -- 'vector */
+	case LOC_QQUOTE2:	/* quasiquote -- 'vector */
 		args = cons(value, NIL);
 		x = mk_symbol("vector");
 		args = cons(x, args);
 		x = mk_symbol("apply");
 		s_return(cons(x, args));
 
-	case OP_QQUOTE3:	/* quasiquote -- 'quasiquote */
+	case LOC_QQUOTE3:	/* quasiquote -- 'quasiquote */
 		x = cons(QQUOTE, NIL);
 		x = cons(QUOTE, x);
 		s_return(mcons(code, x, value));
 
-	case OP_QQUOTE4:	/* quasiquote -- 'unquote */
+	case LOC_QQUOTE4:	/* quasiquote -- 'unquote */
 		x = cons(UNQUOTE, NIL);
 		x = cons(QUOTE, x);
 		s_return(mcons(code, x, value));
 
-	case OP_QQUOTE5:	/* quasiquote -- 'unquote-splicing */
+	case LOC_QQUOTE5:	/* quasiquote -- 'unquote-splicing */
 		x = cons(UNQUOTESP, NIL);
 		x = cons(QUOTE, x);
 		s_return(mcons(code, x, value));
 
-	case OP_QQUOTE6:	/* quasiquote -- 'cons */
-		s_save(OP_QQUOTE7, value, code);
+	case LOC_QQUOTE6:	/* quasiquote -- 'cons */
+		s_save(LOC_QQUOTE7, value, code);
 		code = cdr(code);
-		s_goto(OP_QQUOTE1);
+		s_goto(LOC_QQUOTE1);
 
-	case OP_QQUOTE7:	/* quasiquote -- 'cons */
+	case LOC_QQUOTE7:	/* quasiquote -- 'cons */
 		s_return(mcons(code, args, value));
 
-	case OP_QQUOTE8:	/* quasiquote -- 'append */
+	case LOC_QQUOTE8:	/* quasiquote -- 'append */
 		s_return(mappend(code, cadar(code), value));
 
-	case OP_QQUOTE9:	/* quasiquote -- return */
+	case LOC_QQUOTE9:	/* quasiquote -- return */
 		code = value;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_DEF0:	/* define */
+	case LOC_DEF0:	/* define */
 		if (is_pair(car(code))) {
 			y = cons(cdar(code), cdr(code));
 			/* y = cons(LAMBDA, y); */
@@ -3454,11 +3454,11 @@ OP_QQUOTE1:
 		if (!is_symbol(args)) {
 			Error_0("variable is not symbol");
 		}
-		s_save(OP_DEF1, NIL, args);
+		s_save(LOC_DEF1, NIL, args);
 		args = NIL;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_DEF1:	/* define */
+	case LOC_DEF1:	/* define */
 		if (syntaxnum(code) & T_DEFSYNTAX) {
 			args = car(code);
 			code = cdr(code);
@@ -3499,7 +3499,7 @@ OP_QQUOTE1:
 		}
 		s_return( value );
 
-	case OP_DEFP:	/* defined? */
+	case LOC_DEFP:	/* defined? */
 		if (!validargs("defined?", 1, 2, TST_SYMBOL TST_ENVIRONMENT)) Error_0(msg);
 		code = car(args);
 		if (syntaxnum(code) & T_DEFSYNTAX) {
@@ -3554,12 +3554,12 @@ OP_QQUOTE1:
 		}
 		s_return(F);
 
-	case OP_SET0:		/* set! */
-		s_save(OP_SET1, NIL, car(code));
+	case LOC_SET0:		/* set! */
+		s_save(LOC_SET1, NIL, car(code));
 		code = cadr(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_SET1:		/* set! */
+	case LOC_SET1:		/* set! */
 		if (syntaxnum(code) & T_DEFSYNTAX) {
 			args = car(code);
 			code = cdr(code);
@@ -3601,23 +3601,23 @@ OP_QQUOTE1:
 		}
 		Error_1("unbound variable", code);
 
-	case OP_BEGIN:		/* begin */
-OP_BEGIN:
+	case LOC_BEGIN:		/* begin */
+LOC_BEGIN:
 		if (!is_pair(code)) {
 			s_return(code);
 		}
 		if (cdr(code) != NIL) {
-			s_save(OP_BEGIN, NIL, cdr(code));
+			s_save(LOC_BEGIN, NIL, cdr(code));
 		}
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_IF0:		/* if */
-		s_save(OP_IF1, NIL, cdr(code));
+	case LOC_IF0:		/* if */
+		s_save(LOC_IF1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_IF1:		/* if */
+	case LOC_IF1:		/* if */
 		if (istrue(value))
 			code = car(code);
 		else
@@ -3627,9 +3627,9 @@ OP_BEGIN:
 			code = F;
 			/* code = cadr(code);	/\* (if #f 1) ==> () because */
 			/* 			 * car(NIL) = NIL *\/ */
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_LET0:		/* let */
+	case LOC_LET0:		/* let */
 		args = NIL;
 		value = code;
 		code = is_symbol(car(code)) ? cadr(code) : car(code);
@@ -3638,16 +3638,16 @@ OP_BEGIN:
 		}
 		/* fall through */
 
-	case OP_LET1:		/* let (caluculate parameters) */
+	case LOC_LET1:		/* let (caluculate parameters) */
 		if (is_pair(code)) {	/* continue */
 			args = cons(value, args);
-			s_save(OP_LET1, args, cdr(code));
+			s_save(LOC_LET1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in let :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		short_reverse();
@@ -3673,47 +3673,47 @@ OP_BEGIN:
 			code = cdr(code);
 		}
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_LET0AST:	/* let* */
+	case LOC_LET0AST:	/* let* */
 		if (car(code) == NIL) {
 			envir = cons(NIL, envir);
 			setenvironment(envir);
 			code = cdr(code);
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		}
 		if (!is_pair(car(code)) || !is_pair(caar(code))) {
 			Error_1("bad binding syntax in let* :", car(code));
 		}
-		s_save(OP_LET1AST, cdr(code), car(code));
+		s_save(LOC_LET1AST, cdr(code), car(code));
 		code = cadaar(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_LET1AST:	/* let* (make new frame) */
+	case LOC_LET1AST:	/* let* (make new frame) */
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		/* fall through */
 
-	case OP_LET2AST:	/* let* (caluculate parameters) */
+	case LOC_LET2AST:	/* let* (caluculate parameters) */
 		x = cons(caar(code), value);
 		x = cons(x, car(envir));
 		car(envir) = x;
 		code = cdr(code);
 		if (is_pair(code)) {	/* continue */
-			s_save(OP_LET2AST, args, code);
+			s_save(LOC_LET2AST, args, code);
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in let* :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		} else {	/* end */
 			code = args;
 			args = NIL;
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		}
 
-	case OP_LET0REC:	/* letrec */
+	case LOC_LET0REC:	/* letrec */
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		if (!is_pair(car(code))) {
@@ -3731,16 +3731,16 @@ OP_BEGIN:
 		code = car(code);
 		/* fall through */
 
-	case OP_LET1REC:	/* letrec (caluculate parameters) */
+	case LOC_LET1REC:	/* letrec (caluculate parameters) */
 		if (is_pair(code)) {	/* continue */
 			args = cons(value, args);
-			s_save(OP_LET1REC, args, cdr(code));
+			s_save(LOC_LET1REC, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in letrec :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		short_reverse();
@@ -3754,14 +3754,14 @@ OP_BEGIN:
 		}
 		code = cdr(code);
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_LETRECAST0:	/* letrec* */
+	case LOC_LETRECAST0:	/* letrec* */
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		if (car(code) == NIL) {
 			code = cdr(code);
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		}
 		if (!is_pair(car(code))) {
 			Error_1("bad binding syntax in letrec* :", car(code));
@@ -3776,11 +3776,11 @@ OP_BEGIN:
 		if (!is_pair(caar(code)) || !is_pair(cdr(caar(code)))) {
 			Error_1("bad binding syntax in letrec* :", caar(code));
 		}
-		s_save(OP_LETRECAST1, cdr(code), car(code));
+		s_save(LOC_LETRECAST1, cdr(code), car(code));
 		code = cadaar(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_LETRECAST1:	/* letrec* (caluculate parameters) */
+	case LOC_LETRECAST1:	/* letrec* (caluculate parameters) */
 		for (y = car(envir); y != NIL; y = cdr(y)) {
 			if (caar(y) == caar(code)) {
 				cdar(y) = value;
@@ -3788,20 +3788,20 @@ OP_BEGIN:
 		}
 		code = cdr(code);
 		if (is_pair(code)) {	/* continue */
-			s_save(OP_LETRECAST1, args, code);
+			s_save(LOC_LETRECAST1, args, code);
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in letrec* :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		code = args;
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_DO0:		/* do */
+	case LOC_DO0:		/* do */
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		args = NIL;
@@ -3812,52 +3812,52 @@ OP_BEGIN:
 		}
 		/* fall through */
 
-	case OP_DO1:		/* do -- init */
+	case LOC_DO1:		/* do -- init */
 		if (is_pair(code)) {
 			args = cons(value, args);
-			s_save(OP_DO1, args, cdr(code));
+			s_save(LOC_DO1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in do :", car(code));
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		short_reverse();
 		/* fall through */
 
-	case OP_DO2:		/* do -- test */
-OP_DO2:
+	case LOC_DO2:		/* do -- test */
+LOC_DO2:
 		for (mark_x = car(code); args != NIL; mark_x = cdr(mark_x), args = cdr(args)) {
 			y = cons(caar(mark_x), car(args));
 			y = cons(y, car(envir));
 			car(envir) = y;
 		}
-		s_save(OP_DO3, NIL, code);
+		s_save(LOC_DO3, NIL, code);
 		if (!is_pair(cadr(code))) {
 			Error_1("bad binding syntax in do :", cadr(code));
 		}
 		code = car(cadr(code));
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_DO3:		/* do -- command */
+	case LOC_DO3:		/* do -- command */
 		if (value == F) {
-			s_save(OP_DO4, NIL, code);
+			s_save(LOC_DO4, NIL, code);
 			code = cddr(code);
 		} else {		/* expression */
 			code = cdr(cadr(code));
 		}
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_DO4:		/* do -- step */
+	case LOC_DO4:		/* do -- step */
 		value = code;
 		code = car(code);
 		/* fall through */
 
-	case OP_DO5:		/* do -- step */
+	case LOC_DO5:		/* do -- step */
 		if (is_pair(code)) {
 			args = cons(value, args);
-			s_save(OP_DO5, args, cdr(code));
+			s_save(LOC_DO5, args, cdr(code));
 			code = car(code);
 			if (is_pair(cddr(code))) {
 				code = caddr(code);
@@ -3865,32 +3865,32 @@ OP_DO2:
 				code = car(code);
 			}
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		short_reverse();
-		s_goto(OP_DO2);
+		s_goto(LOC_DO2);
 
-	case OP_COND0:		/* cond */
+	case LOC_COND0:		/* cond */
 		if (!is_pair(car(code))) {
 			Error_1("bad syntax in cond :", car(code));
 		}
-		s_save(OP_COND1, NIL, code);
+		s_save(LOC_COND1, NIL, code);
 		code = caar(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_COND1:		/* cond */
+	case LOC_COND1:		/* cond */
 		if (istrue(value)) {
 			if ((code = cdar(code)) == NIL) {
 				s_return(value);
 			}
-			if (cdr(code) == NIL || (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == OP_ELSE)) {
-				s_goto(OP_BEGIN);
+			if (cdr(code) == NIL || (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == LOC_ELSE)) {
+				s_goto(LOC_BEGIN);
 			}
-			s_save(OP_COND2, value, cdr(code));
+			s_save(LOC_COND2, value, cdr(code));
 			code = car(code);
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		if ((code = cdr(code)) == NIL) {
 			s_return(NIL);
@@ -3898,107 +3898,107 @@ OP_DO2:
 			if (!is_pair(car(code))) {
 				Error_1("bad syntax in cond :", car(code));
 			}
-			s_save(OP_COND1, NIL, code);
+			s_save(LOC_COND1, NIL, code);
 			code = caar(code);
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 
-	case OP_COND2:		/* cond */
-		if (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == OP_FEEDTO) {
+	case LOC_COND2:		/* cond */
+		if (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == LOC_FEEDTO) {
 			x = cons(args, NIL);
 			x = cons(QUOTE, x);
 			x = cons(x, NIL);
 			code = cons(car(code), x);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_ELSE:		/* else */
+	case LOC_ELSE:		/* else */
 		Error_0("bad syntax in else");
 
-	case OP_FEEDTO:		/* => */
+	case LOC_FEEDTO:		/* => */
 		Error_0("bad syntax in =>");
 
-	case OP_DELAY:		/* delay */
+	case LOC_DELAY:		/* delay */
 		x = cons(NIL, code);
 		code = mk_closure(x, envir);
 		setpromise(code);
 		setresultready(code);
 		/* fall through */
 
-	case OP_LAZY:		/* lazy */
+	case LOC_LAZY:		/* lazy */
 		x = cons(NIL, code);
 		x = mk_closure(x, envir);
 		setpromise(x);
 		s_return(x);
 
-	case OP_AND0:		/* and */
+	case LOC_AND0:		/* and */
 		if (code == NIL) {
 			s_return(T);
 		}
-		s_save(OP_AND1, NIL, cdr(code));
+		s_save(LOC_AND1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_AND1:		/* and */
+	case LOC_AND1:		/* and */
 		if (isfalse(value)) {
 			s_return(value);
 		} else if (code == NIL) {
 			s_return(value);
 		} else {
-			s_save(OP_AND1, NIL, cdr(code));
+			s_save(LOC_AND1, NIL, cdr(code));
 			code = car(code);
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 
-	case OP_OR0:		/* or */
+	case LOC_OR0:		/* or */
 		if (code == NIL) {
 			s_return(F);
 		}
-		s_save(OP_OR1, NIL, cdr(code));
+		s_save(LOC_OR1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_OR1:		/* or */
+	case LOC_OR1:		/* or */
 		if (istrue(value)) {
 			s_return(value);
 		} else if (code == NIL) {
 			s_return(value);
 		} else {
-			s_save(OP_OR1, NIL, cdr(code));
+			s_save(LOC_OR1, NIL, cdr(code));
 			code = car(code);
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 
-	case OP_C0STREAM:	/* cons-stream */
-		s_save(OP_C1STREAM, NIL, cdr(code));
+	case LOC_C0STREAM:	/* cons-stream */
+		s_save(LOC_C1STREAM, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_C1STREAM:	/* cons-stream */
+	case LOC_C1STREAM:	/* cons-stream */
 		args = value;	/* save value to register args for gc */
 		x = cons(NIL, code);
 		x = mk_closure(x, envir);
 		setpromise(x);
 		s_return(cons(args, x));
 
-	case OP_DEFMACRO0:	/* define-macro */
+	case LOC_DEFMACRO0:	/* define-macro */
 
 	    if ( !is_symbol( caar( code ))) {
 		Error_0("variable is not a symbol");
 	    }
-	    s_save( OP_DEFMACRO1, NIL, caar( code ));
+	    s_save( LOC_DEFMACRO1, NIL, caar( code ));
 	    code = cons( cdar( code ), cdr( code ));
 	    /* fall through */
 		
-	case OP_MACRO:	/* macro */
+	case LOC_MACRO:	/* macro */
 	    x = mk_closure( code, envir );
 	    exttype( x ) |= ( T_MACRO | T_DEFMACRO );
 	    s_return( x );
 
-	case OP_DEFMACRO1:	/* define-macro */
+	case LOC_DEFMACRO1:	/* define-macro */
 	    for( x = car( envir ); x != NIL; x = cdr( x ))
 		if( caar( x ) == code)
 		    break;
@@ -4011,15 +4011,15 @@ OP_DO2:
 	    }
 	    s_return( code );
 
-	case OP_SYNTAXRULES:	/* syntax-rules */
+	case LOC_SYNTAXRULES:	/* syntax-rules */
 		w = s_next_op();
-		if (w != OP_DEFSYNTAX1 && w != OP_LETSYNTAX1 && w != OP_LETRECSYNTAX1) {
+		if (w != LOC_DEFSYNTAX1 && w != LOC_LETSYNTAX1 && w != LOC_LETRECSYNTAX1) {
 			Error_0("malformed syntax-rules");
 		}
 		s_return(mk_closure(code, envir));
 
-	case OP_EXPANDPATTERN:	/* expand pattern */
-OP_EXPANDPATTERN:
+	case LOC_EXPANDPATTERN:	/* expand pattern */
+LOC_EXPANDPATTERN:
 		if (!is_pair(code)) {
 			Error_0("bad syntax in syntax-rules");
 		}
@@ -4052,17 +4052,17 @@ OP_EXPANDPATTERN:
 		}
 		s_return(NIL);
 
-	case OP_DEFSYNTAX0:		/* define-syntax */
+	case LOC_DEFSYNTAX0:		/* define-syntax */
 		if (!is_symbol(car(code))) {
 			Error_0("variable is not a symbol");
 		}
 		args = car(code);
 		code = cadr(code);
-		s_save(OP_DEFSYNTAX1, NIL, args);
+		s_save(LOC_DEFSYNTAX1, NIL, args);
 		args = NIL;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_DEFSYNTAX1:		/* define-syntax */
+	case LOC_DEFSYNTAX1:		/* define-syntax */
 		exttype(value) |= T_MACRO;
 		syntaxnum(value) |= T_DEFSYNTAX;
 		for (x = car(envir); x != NIL; x = cdr(x))
@@ -4077,17 +4077,17 @@ OP_EXPANDPATTERN:
 		}
 		s_return(code);
 
-	case OP_LETSYNTAX0:		/* let-syntax */
+	case LOC_LETSYNTAX0:		/* let-syntax */
 		args = NIL;
 		value = code;
 		code = car(code);
 		/* fall through */
 
-	case OP_LETSYNTAX1:		/* let-syntax */
+	case LOC_LETSYNTAX1:		/* let-syntax */
 		if (is_pair(code)) {
 			/* continue */
 			args = cons(value, args);
-			s_save(OP_LETSYNTAX1, args, cdr(code));
+			s_save(LOC_LETSYNTAX1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in let-syntax :", car(code));
 			}
@@ -4096,7 +4096,7 @@ OP_EXPANDPATTERN:
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		short_reverse();
@@ -4112,9 +4112,9 @@ OP_EXPANDPATTERN:
 		}
 		code = cdr(code);
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_LETRECSYNTAX0:	/* letrec-syntax */
+	case LOC_LETRECSYNTAX0:	/* letrec-syntax */
 		envir = cons(NIL, envir);
 		setenvironment(envir);
 		args = NIL;
@@ -4122,11 +4122,11 @@ OP_EXPANDPATTERN:
 		code = car(code);
 		/* fall through */
 
-	case OP_LETRECSYNTAX1:	/* letrec-syntax */
+	case LOC_LETRECSYNTAX1:	/* letrec-syntax */
 		if (is_pair(code)) {
 			/* continue */
 			args = cons(value, args);
-			s_save(OP_LETRECSYNTAX1, args, cdr(code));
+			s_save(LOC_LETRECSYNTAX1, args, cdr(code));
 			if (!is_pair(car(code)) || !is_pair(cdar(code))) {
 				Error_1("bad binding syntax in letrec-syntax :", car(code));
 			}
@@ -4135,7 +4135,7 @@ OP_EXPANDPATTERN:
 			}
 			code = cadar(code);
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		/* end */
 		short_reverse();
@@ -4149,14 +4149,14 @@ OP_EXPANDPATTERN:
 		}
 		code = cdr(code);
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_CASE0:		/* case */
-		s_save(OP_CASE1, NIL, cdr(code));
+	case LOC_CASE0:		/* case */
+		s_save(LOC_CASE1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_CASE1:		/* case */
+	case LOC_CASE1:		/* case */
 		for (x = code; x != NIL; x = cdr(x)) {
 			if (!is_pair(car(x))) {
 				Error_1("bad syntax in case :", car(x));
@@ -4172,54 +4172,54 @@ OP_EXPANDPATTERN:
 		if (x != NIL) {
 			if (is_pair(caar(x))) {
 				code = cdar(x);
-				s_goto(OP_BEGIN);
+				s_goto(LOC_BEGIN);
 			} else {/* else */
 				code = car(x);
-				s_save(OP_CASE2, NIL, cdr(code));
+				s_save(LOC_CASE2, NIL, cdr(code));
 				code = car(code);
-				s_goto(OP_EVAL);
+				s_goto(LOC_EVAL);
 			}
 		} else {
 			s_return(NIL);
 		}
 
-	case OP_CASE2:		/* case */
-		if (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == OP_ELSE) {
-			s_goto(OP_BEGIN);
+	case LOC_CASE2:		/* case */
+		if (is_syntax(value) && (syntaxnum(value) & T_SYNTAXNUM) == LOC_ELSE) {
+			s_goto(LOC_BEGIN);
 		} else {
 			s_return(NIL);
 		}
 
-	case OP_WHEN0:		/* when */
-		s_save(OP_WHEN1, NIL, cdr(code));
+	case LOC_WHEN0:		/* when */
+		s_save(LOC_WHEN1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_WHEN1:		/* when */
+	case LOC_WHEN1:		/* when */
 		if (istrue(value)) {
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		} else {
 			s_return(NIL);
 		}
 
-	case OP_UNLESS0:	/* unless */
-		s_save(OP_UNLESS1, NIL, cdr(code));
+	case LOC_UNLESS0:	/* unless */
+		s_save(LOC_UNLESS1, NIL, cdr(code));
 		code = car(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_UNLESS1:	/* unless */
+	case LOC_UNLESS1:	/* unless */
 		if (isfalse(value)) {
-			s_goto(OP_BEGIN);
+			s_goto(LOC_BEGIN);
 		} else {
 			s_return(NIL);
 		}
 
-	case OP_RECEIVE0:	/* receive */
-		s_save(OP_RECEIVE1, NIL, code);
+	case LOC_RECEIVE0:	/* receive */
+		s_save(LOC_RECEIVE1, NIL, code);
 		code = cadr(code);
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_RECEIVE1:	/* receive */
+	case LOC_RECEIVE1:	/* receive */
 		if (type(value) & T_VALUES) {
 			type(value) &= ~T_VALUES;
 			args = value;
@@ -4244,9 +4244,9 @@ OP_EXPANDPATTERN:
 		}
 		code = cddr(code);
 		args = NIL;
-		s_goto(OP_BEGIN);
+		s_goto(LOC_BEGIN);
 
-	case OP_PAPPLY:	/* apply */
+	case LOC_PAPPLY:	/* apply */
 		if (!validargs("apply", 2, 65535, TST_NONE)) Error_0(msg);
 		code = car(args);
 		args = cdr(args);
@@ -4266,22 +4266,22 @@ OP_EXPANDPATTERN:
 		} else {
 			args = append(args, y);
 		}
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_PEVAL:	/* eval */
+	case LOC_PEVAL:	/* eval */
 		if (!validargs("eval", 1, 2, TST_ANY TST_ENVIRONMENT)) Error_0(msg);
 		code = car(args);
 		if (is_pair(cdr(args))) envir = cadr(args);
 		args = NIL;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_MAP0:	/* map */
+	case LOC_MAP0:	/* map */
 		if (!validargs("map", 2, 65535, TST_ANY TST_LIST)) Error_0(msg);
 		code = car(args);
 		/* fall through */
 
-	case OP_MAP1:	/* map */
-		if (operator == OP_MAP0) {
+	case LOC_MAP1:	/* map */
+		if (operator == LOC_MAP0) {
 			car(args) = NIL;
 		} else {
 			car(args) = cons(value, car(args));
@@ -4294,16 +4294,16 @@ OP_EXPANDPATTERN:
 			mark_y = cons(caar(mark_x), mark_y);
 			car(mark_x) = cdar(mark_x);
 		}
-		s_save(OP_MAP1, args, code);
+		s_save(LOC_MAP1, args, code);
 		args = non_alloc_rev(NIL, mark_y);
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_FOREACH0:	/* for-each */
+	case LOC_FOREACH0:	/* for-each */
 		if (!validargs("for-each", 2, 65535, TST_ANY TST_LIST)) Error_0(msg);
 		code = car(args);
 		args = cdr(args);
 
-	case OP_FOREACH1:	/* for-each */
+	case LOC_FOREACH1:	/* for-each */
 		mark_y = NIL;
 		for (mark_x = args; mark_x != NIL; mark_x = cdr(mark_x)) {
 			if (car(mark_x) == NIL) {
@@ -4312,11 +4312,11 @@ OP_EXPANDPATTERN:
 			mark_y = cons(caar(mark_x), mark_y);
 			car(mark_x) = cdar(mark_x);
 		}
-		s_save(OP_FOREACH1, args, code);
+		s_save(LOC_FOREACH1, args, code);
 		args = non_alloc_rev(NIL, mark_y);
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_CONTINUATION:	/* call-with-current-continuation */
+	case LOC_CONTINUATION:	/* call-with-current-continuation */
 		if (!validargs("call-with-current-continuation", 1, 1, TST_NONE)) Error_0(msg);
 		code = car(args);
 #ifndef USE_SCHEME_STACK
@@ -4324,26 +4324,26 @@ OP_EXPANDPATTERN:
 #else
 		args = cons(mk_continuation(cons(winders, dump)), NIL);
 #endif
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_VALUES:			/* values */
+	case LOC_VALUES:			/* values */
 		if (!validargs("values", 0, 65535, TST_NONE)) Error_0(msg);
 		w = s_next_op();
-		if (w == OP_WITHVALUES1 || w == OP_RECEIVE1) {
+		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1) {
 			type(args) |= T_VALUES;
 			s_return(args);
 		} else {
 			s_return(args != NIL ? car(args) : NIL);
 		}
 
-	case OP_WITHVALUES0:	/* call-with-values */
+	case LOC_WITHVALUES0:	/* call-with-values */
 		if (!validargs("call-with-values", 2, 2, TST_NONE)) Error_0(msg);
-		s_save(OP_WITHVALUES1, args, code);
+		s_save(LOC_WITHVALUES1, args, code);
 		code = car(args);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_WITHVALUES1:	/* call-with-values */
+	case LOC_WITHVALUES1:	/* call-with-values */
 		code = cadr(args);
 		if (type(value) & T_VALUES) {
 			type(value) &= ~T_VALUES;
@@ -4351,80 +4351,80 @@ OP_EXPANDPATTERN:
 		} else {
 			args = cons(value, NIL);
 		}
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_DYNAMICWIND0:	/* dynamic-wind -- before */
+	case LOC_DYNAMICWIND0:	/* dynamic-wind -- before */
 		if (!validargs("dynamic-wind", 3, 3, TST_NONE)) Error_0(msg);
-		s_save(OP_DYNAMICWIND1, args, code);
+		s_save(LOC_DYNAMICWIND1, args, code);
 		code = car(args);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_DYNAMICWIND1:	/* dynamic-wind -- body */
+	case LOC_DYNAMICWIND1:	/* dynamic-wind -- body */
 		x = cons(car(args), caddr(args));
 		winders = cons(x, winders);
-		s_save(OP_DYNAMICWIND2, args, code);
+		s_save(LOC_DYNAMICWIND2, args, code);
 		code = cadr(args);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_DYNAMICWIND2:	/* dynamic-wind -- after */
+	case LOC_DYNAMICWIND2:	/* dynamic-wind -- after */
 		winders = cdr(winders);
 		value = cons(value, args);
-		s_save(OP_DYNAMICWIND3, value, code);
+		s_save(LOC_DYNAMICWIND3, value, code);
 		code = caddr(args);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_DYNAMICWIND3:	/* dynamic-wind -- return */
+	case LOC_DYNAMICWIND3:	/* dynamic-wind -- return */
 		s_return(car(args));
 
-	case OP_DOWINDS0:		/* winding -- after, before */
-OP_DOWINDS0:
+	case LOC_DOWINDS0:		/* winding -- after, before */
+LOC_DOWINDS0:
 		args = shared_tail(args, code);
 		if (winders != args && winders != NIL) {
-			s_save(OP_DOWINDS2, args, code);
+			s_save(LOC_DOWINDS2, args, code);
 			code = args;
 			args = winders;
-			s_goto(OP_DOWINDS1);
+			s_goto(LOC_DOWINDS1);
 		}
 		if (args != code && code != NIL) {
-			s_goto(OP_DOWINDS2);
+			s_goto(LOC_DOWINDS2);
 		}
 		s_return(T);
 
-	case OP_DOWINDS1:		/* winding -- after */
-OP_DOWINDS1:
+	case LOC_DOWINDS1:		/* winding -- after */
+LOC_DOWINDS1:
 		winders = args;
 		if (args != code && args != NIL) {
-			s_save(OP_DOWINDS1, cdr(args), code);
+			s_save(LOC_DOWINDS1, cdr(args), code);
 			code = cdar(args);
 			args = NIL;
-			s_goto(OP_APPLY);
+			s_goto(LOC_APPLY);
 		}
 		s_return(T);
 
-	case OP_DOWINDS2:		/* winding -- before */
-OP_DOWINDS2:
+	case LOC_DOWINDS2:		/* winding -- before */
+LOC_DOWINDS2:
 		if (args != code && code != NIL) {
-			s_save(OP_DOWINDS3, args, code);
+			s_save(LOC_DOWINDS3, args, code);
 			code = cdr(code);
-			s_goto(OP_DOWINDS2);
+			s_goto(LOC_DOWINDS2);
 		}
 		winders = code;
 		s_return(T);
 
-	case OP_DOWINDS3:		/* winding -- before */
-		s_save(OP_DOWINDS4, args, code);
+	case LOC_DOWINDS3:		/* winding -- before */
+		s_save(LOC_DOWINDS4, args, code);
 		code = caar(code);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_DOWINDS4:		/* winding -- before */
+	case LOC_DOWINDS4:		/* winding -- before */
 		winders = code;
 		s_return(T);
 
-	case OP_ADD:		/* + */
+	case LOC_ADD:		/* + */
 		if (!validargs("+", 0, 65535, TST_NUMBER)) Error_0(msg);
 		for (mark_x = mk_number(&_ZERO); args != NIL; args = cdr(args)) {
 			if (mark_x->_isfixnum) {
@@ -4473,7 +4473,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_SUB:		/* - */
+	case LOC_SUB:		/* - */
 		if (!validargs("-", 1, 65535, TST_NUMBER)) Error_0(msg);
 		if (cdr(args) == NIL) {
 			mark_x = mk_number(&_ZERO);
@@ -4528,7 +4528,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_MUL:		/* * */
+	case LOC_MUL:		/* * */
 		if (!validargs("*", 0, 65535, TST_NUMBER)) Error_0(msg);
 		for (mark_x = mk_number(&_ONE); args != NIL; args = cdr(args)) {
 			if (mark_x->_isfixnum) {
@@ -4557,7 +4557,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_DIV:		/* / */
+	case LOC_DIV:		/* / */
 		if (!validargs("/", 1, 65535, TST_NUMBER)) Error_0(msg);
 		if (cdr(args) == NIL) {
 			mark_x = mk_number(&_ONE);
@@ -4620,7 +4620,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_ABS:		/* abs */
+	case LOC_ABS:		/* abs */
 		if (!validargs("abs", 1, 1, TST_NUMBER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		if (mark_x->_isfixnum) {
@@ -4630,7 +4630,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_QUO:		/* quotient */
+	case LOC_QUO:		/* quotient */
 		if (!validargs("quotient", 2, 2, TST_INTEGER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		mark_y = cadr(args);
@@ -4673,7 +4673,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_REM:		/* remainder */
+	case LOC_REM:		/* remainder */
 		if (!validargs("remainder", 2, 2, TST_INTEGER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		mark_y = cadr(args);
@@ -4711,7 +4711,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_MOD:		/* modulo */
+	case LOC_MOD:		/* modulo */
 		if (!validargs("modulo", 2, 2, TST_INTEGER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		mark_y = cadr(args);
@@ -4772,7 +4772,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_GCD:		/* gcd */
+	case LOC_GCD:		/* gcd */
 		if (!validargs("gcd", 0, 65535, TST_NUMBER)) Error_0(msg);
 		if (args == NIL) {
 			mark_x = mk_number(&_ZERO);
@@ -4826,7 +4826,7 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_LCM:		/* lcm */
+	case LOC_LCM:		/* lcm */
 		if (!validargs("lcm", 0, 65535, TST_NUMBER)) Error_0(msg);
 		if (args == NIL) {
 			mark_x = mk_number(&_ONE);
@@ -4886,15 +4886,15 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_FLOOR:		/* floor */
+	case LOC_FLOOR:		/* floor */
 		if (!validargs("floor", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(floor(get_rvalue(car(args)))));
 
-	case OP_CEILING:	/* ceiling */
+	case LOC_CEILING:	/* ceiling */
 		if (!validargs("ceiling", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(ceil(get_rvalue(car(args)))));
 
-	case OP_TRUNCATE:	/* truncate */
+	case LOC_TRUNCATE:	/* truncate */
 		if (!validargs("truncate", 1, 1, TST_NUMBER)) Error_0(msg);
 		x = car(args);
 		if (get_rvalue(x) > 0) {
@@ -4903,7 +4903,7 @@ OP_DOWINDS2:
 			s_return(mk_real(ceil(get_rvalue(x))));
 		}
 
-	case OP_ROUND:		/* round */
+	case LOC_ROUND:		/* round */
 		if (!validargs("round", 1, 1, TST_NUMBER)) Error_0(msg);
 		x = car(args);
 		if (x->_isfixnum) {
@@ -4927,35 +4927,35 @@ OP_DOWINDS2:
 			}
 		}
 
-	case OP_EXP:		/* exp */
+	case LOC_EXP:		/* exp */
 		if (!validargs("exp", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(exp(get_rvalue(car(args)))));
 
-	case OP_LOG:		/* log */
+	case LOC_LOG:		/* log */
 		if (!validargs("log", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(log(get_rvalue(car(args)))));
 
-	case OP_SIN:		/* sin */
+	case LOC_SIN:		/* sin */
 		if (!validargs("sin", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(sin(get_rvalue(car(args)))));
 
-	case OP_COS:		/* cos */
+	case LOC_COS:		/* cos */
 		if (!validargs("cos", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(cos(get_rvalue(car(args)))));
 
-	case OP_TAN:		/* tan */
+	case LOC_TAN:		/* tan */
 		if (!validargs("tan", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(tan(get_rvalue(car(args)))));
 
-	case OP_ASIN:		/* asin */
+	case LOC_ASIN:		/* asin */
 		if (!validargs("asin", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(asin(get_rvalue(car(args)))));
 
-	case OP_ACOS:		/* acos */
+	case LOC_ACOS:		/* acos */
 		if (!validargs("acos", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(acos(get_rvalue(car(args)))));
 
-	case OP_ATAN:		/* atan */
+	case LOC_ATAN:		/* atan */
 		if (!validargs("atan", 1, 2, TST_NUMBER)) Error_0(msg);
 		if (cdr(args) == NIL) {
 			s_return(mk_real(atan(get_rvalue(car(args)))));
@@ -4963,11 +4963,11 @@ OP_DOWINDS2:
 			s_return(mk_real(atan2(get_rvalue(car(args)), get_rvalue(cadr(args)))));
 		}
 
-	case OP_SQRT:		/* sqrt */
+	case LOC_SQRT:		/* sqrt */
 		if (!validargs("sqrt", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(sqrt(get_rvalue(car(args)))));
 
-	case OP_EXPT:		/* expt */
+	case LOC_EXPT:		/* expt */
 		if (!validargs("expt", 2, 2, TST_NUMBER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		y = cadr(args);
@@ -4987,11 +4987,11 @@ OP_DOWINDS2:
 		}
 		s_return(mark_x);
 
-	case OP_EX2INEX:	/* exact->inexact */
+	case LOC_EX2INEX:	/* exact->inexact */
 		if (!validargs("exact->inexact", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_return(mk_real(get_rvalue(car(args))));
 
-	case OP_INEX2EX:	/* inexact->exact */
+	case LOC_INEX2EX:	/* inexact->exact */
 		if (!validargs("inexact->exact", 1, 1, TST_NUMBER)) Error_0(msg);
 		x = car(args);
 		if (x->_isfixnum) {
@@ -5003,7 +5003,7 @@ OP_DOWINDS2:
 			Error_1("inexact->exact: cannot express :", x);
 		}
 
-	case OP_NUM2STR:	/* number->string */
+	case LOC_NUM2STR:	/* number->string */
 		if (!validargs("number->string", 1, 2, TST_NUMBER TST_NATURAL)) Error_0(msg);
 		if (cdr(args) != NIL) {
 			w = ivalue(cadr(args));
@@ -5015,7 +5015,7 @@ OP_DOWINDS2:
 		}
 		s_return(mk_string(atom2str(car(args), (int)w)));
 
-	case OP_STR2NUM:	/* string->number */
+	case LOC_STR2NUM:	/* string->number */
 		if (!validargs("string->number", 1, 2, TST_STRING TST_NATURAL)) Error_0(msg);
 		if (cdr(args) != NIL) {
 			w = ivalue(cadr(args));
@@ -5033,100 +5033,100 @@ OP_DOWINDS2:
 			s_return(mk_integer_from_str(strvalue(car(args)), strlen(strvalue(car(args))), (int)w));
 		}
 
-	case OP_CAR:		/* car */
+	case LOC_CAR:		/* car */
 		if (!validargs("car", 1, 1, TST_PAIR)) Error_0(msg);
 		s_return(caar(args));
 
-	case OP_CDR:		/* cdr */
+	case LOC_CDR:		/* cdr */
 		if (!validargs("cdr", 1, 1, TST_PAIR)) Error_0(msg);
 		s_return(cdar(args));
 
-	case OP_CONS:		/* cons */
+	case LOC_CONS:		/* cons */
 		if (!validargs("cons", 2, 2, TST_NONE)) Error_0(msg);
 		cdr(args) = cadr(args);
 		s_return(args);
 
-	case OP_SETCAR:	/* set-car! */
+	case LOC_SETCAR:	/* set-car! */
 		if (!validargs("set-car!", 2, 2, TST_PAIR TST_ANY)) Error_0(msg);
 		caar(args) = cadr(args);
 		s_return(car(args));
 
-	case OP_SETCDR:	/* set-cdr! */
+	case LOC_SETCDR:	/* set-cdr! */
 		if (!validargs("set-cdr!", 2, 2, TST_PAIR TST_ANY)) Error_0(msg);
 		cdar(args) = cadr(args);
 		s_return(car(args));
 
-	case OP_CAAR: /* caar */
+	case LOC_CAAR: /* caar */
 		if (!validargs("caar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("caar: must be pair :", x);
 		s_return(car(x));
-	case OP_CADR: /* cadr */
+	case LOC_CADR: /* cadr */
 		if (!validargs("cadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cadr: must be pair :", x);
 		s_return(car(x));
-	case OP_CDAR: /* cdar */
+	case LOC_CDAR: /* cdar */
 		if (!validargs("cdar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cdar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDR: /* cddr */
+	case LOC_CDDR: /* cddr */
 		if (!validargs("cddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cddr: must be pair :", x);
 		s_return(cdr(x));
 
-	case OP_CAAAR: /* caaar */
+	case LOC_CAAAR: /* caaar */
 		if (!validargs("caaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("caaar: must be pair :", x);
 		x = car(x);
 		if (!is_pair(x)) Error_1("caaar: must be pair :", x);
 		s_return(car(x));
-	case OP_CAADR: /* caadr */
+	case LOC_CAADR: /* caadr */
 		if (!validargs("caadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("caadr: must be pair :", x);
 		x = car(x);
 		if (!is_pair(x)) Error_1("caadr: must be pair :", x);
 		s_return(car(x));
-	case OP_CADAR: /* cadar */
+	case LOC_CADAR: /* cadar */
 		if (!validargs("cadar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cadar: must be pair :", x);
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cadar: must be pair :", x);
 		s_return(car(x));
-	case OP_CADDR: /* caddr */
+	case LOC_CADDR: /* caddr */
 		if (!validargs("caddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("caddr: must be pair :", x);
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("caddr: must be pair :", x);
 		s_return(car(x));
-	case OP_CDAAR: /* cdaar */
+	case LOC_CDAAR: /* cdaar */
 		if (!validargs("cdaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cdaar: must be pair :", x);
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdaar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDADR: /* cdadr */
+	case LOC_CDADR: /* cdadr */
 		if (!validargs("cdadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cdadr: must be pair :", x);
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdadr: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDAR: /* cddar */
+	case LOC_CDDAR: /* cddar */
 		if (!validargs("cddar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cddar: must be pair :", x);
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cddar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDDR: /* cdddr */
+	case LOC_CDDDR: /* cdddr */
 		if (!validargs("cdddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cdddr: must be pair :", x);
@@ -5134,7 +5134,7 @@ OP_DOWINDS2:
 		if (!is_pair(x)) Error_1("cdddr: must be pair :", x);
 		s_return(cdr(x));
 
-	case OP_CAAAAR: /* caaaar */
+	case LOC_CAAAAR: /* caaaar */
 		if (!validargs("caaaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("caaaar: must be pair :", x);
@@ -5143,7 +5143,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("caaaar: must be pair :", x);
 		s_return(car(x));
-	case OP_CAAADR: /* caaadr */
+	case LOC_CAAADR: /* caaadr */
 		if (!validargs("caaadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("caaadr: must be pair :", x);
@@ -5152,7 +5152,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("caaadr: must be pair :", x);
 		s_return(car(x));
-	case OP_CAADAR: /* caadar */
+	case LOC_CAADAR: /* caadar */
 		if (!validargs("caadar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("caadar: must be pair :", x);
@@ -5161,7 +5161,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("caadar: must be pair :", x);
 		s_return(car(x));
-	case OP_CAADDR: /* caaddr */
+	case LOC_CAADDR: /* caaddr */
 		if (!validargs("caaddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("caaddr: must be pair :", x);
@@ -5170,7 +5170,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("caaddr: must be pair :", x);
 		s_return(car(x));
-	case OP_CADAAR: /* cadaar */
+	case LOC_CADAAR: /* cadaar */
 		if (!validargs("cadaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cadaar: must be pair :", x);
@@ -5179,7 +5179,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cadaar: must be pair :", x);
 		s_return(car(x));
-	case OP_CADADR: /* cadadr */
+	case LOC_CADADR: /* cadadr */
 		if (!validargs("cadadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cadadr: must be pair :", x);
@@ -5188,7 +5188,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cadadr: must be pair :", x);
 		s_return(car(x));
-	case OP_CADDAR: /* caddar */
+	case LOC_CADDAR: /* caddar */
 		if (!validargs("caddar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("caddar: must be pair :", x);
@@ -5197,7 +5197,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("caddar: must be pair :", x);
 		s_return(car(x));
-	case OP_CADDDR: /* cadddr" */
+	case LOC_CADDDR: /* cadddr" */
 		if (!validargs("cadddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cadddr: must be pair :", x);
@@ -5206,7 +5206,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cadddr: must be pair :", x);
 		s_return(car(x));
-	case OP_CDAAAR: /* cdaaar */
+	case LOC_CDAAAR: /* cdaaar */
 		if (!validargs("cdaaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cdaaar: must be pair :", x);
@@ -5215,7 +5215,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdaaar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDAADR: /* cdaadr */
+	case LOC_CDAADR: /* cdaadr */
 		if (!validargs("cdaadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cdaadr: must be pair :", x);
@@ -5224,7 +5224,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdaadr: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDADAR: /* cdadar" */
+	case LOC_CDADAR: /* cdadar" */
 		if (!validargs("cdadar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cdadar: must be pair :", x);
@@ -5233,7 +5233,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdadar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDADDR: /* cdaddr */
+	case LOC_CDADDR: /* cdaddr */
 		if (!validargs("cdaddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cdaddr: must be pair :", x);
@@ -5242,7 +5242,7 @@ OP_DOWINDS2:
 		x = car(x);
 		if (!is_pair(x)) Error_1("cdaddr: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDAAR: /* cddaar */
+	case LOC_CDDAAR: /* cddaar */
 		if (!validargs("cddaar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cddaar: must be pair :", x);
@@ -5251,7 +5251,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cddaar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDADR: /* cddadr */
+	case LOC_CDDADR: /* cddadr */
 		if (!validargs("cddadr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cddadr: must be pair :", x);
@@ -5260,7 +5260,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cddadr: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDDAR: /* cdddar */
+	case LOC_CDDDAR: /* cdddar */
 		if (!validargs("cdddar", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(car(args));
 		if (!is_pair(x)) Error_1("cdddar: must be pair :", x);
@@ -5269,7 +5269,7 @@ OP_DOWINDS2:
 		x = cdr(x);
 		if (!is_pair(x)) Error_1("cdddar: must be pair :", x);
 		s_return(cdr(x));
-	case OP_CDDDDR: /* cddddr */
+	case LOC_CDDDDR: /* cddddr */
 		if (!validargs("cddddr", 1, 1, TST_PAIR)) Error_0(msg);
 		x = cdr(car(args));
 		if (!is_pair(x)) Error_1("cddddr: must be pair :", x);
@@ -5279,11 +5279,11 @@ OP_DOWINDS2:
 		if (!is_pair(x)) Error_1("cddddr: must be pair :", x);
 		s_return(cdr(x));
 
-	case OP_LIST:		/* list */
+	case LOC_LIST:		/* list */
 		if (!validargs("list", 0, 65535, TST_NONE)) Error_0(msg);
 		s_return(args);
 
-	case OP_LISTTAIL:	/* list-tail */
+	case LOC_LISTTAIL:	/* list-tail */
 		if (!validargs("list-tail", 2, 2, TST_LIST TST_NATURAL)) Error_0(msg);
 		x = car(args);
 		w = list_length(x);
@@ -5299,7 +5299,7 @@ OP_DOWINDS2:
 		}
 		s_return(x);
 
-	case OP_LISTREF:	/* list-ref */
+	case LOC_LISTREF:	/* list-ref */
 		if (!validargs("list-ref", 2, 2, TST_LIST TST_NATURAL)) Error_0(msg);
 		x = car(args);
 		w = list_length(x);
@@ -5315,7 +5315,7 @@ OP_DOWINDS2:
 		}
 		s_return(car(x));
 
-	case OP_LASTPAIR:	/* "last-pair" */
+	case LOC_LASTPAIR:	/* "last-pair" */
 		if (!validargs("last-pair", 1, 1, TST_PAIR)) Error_0(msg);
 		x = car(args);
 		while (is_pair(cdr(x))) {
@@ -5323,23 +5323,23 @@ OP_DOWINDS2:
 		}
 		s_return(x);
 
-	case OP_CHAR2INT:	/* char->integer */
+	case LOC_CHAR2INT:	/* char->integer */
 		if (!validargs("char->integer", 1, 1, TST_CHAR)) Error_0(msg);
 		s_return(mk_integer(ivalue(car(args))));
 
-	case OP_INT2CHAR:	/* integer->char */
+	case LOC_INT2CHAR:	/* integer->char */
 		if (!validargs("integer->char", 1, 1, TST_NATURAL)) Error_0(msg);
 		s_return(mk_character((int)ivalue(car(args))));
 
-	case OP_CHARUPCASE:	/* char-upcase */
+	case LOC_CHARUPCASE:	/* char-upcase */
 		if (!validargs("char-upcase", 1, 1, TST_CHAR)) Error_0(msg);
 		s_return(mk_character(utf32_toupper((int)ivalue(car(args)))));
 
-	case OP_CHARDNCASE:	/* char-downcase */
+	case LOC_CHARDNCASE:	/* char-downcase */
 		if (!validargs("char-downcase", 1, 1, TST_CHAR)) Error_0(msg);
 		s_return(mk_character(utf32_tolower((int)ivalue(car(args)))));
 
-	case OP_MKSTRING:	/* make-string */
+	case LOC_MKSTRING:	/* make-string */
 		if (!validargs("make-string", 1, 2, TST_NATURAL TST_CHAR)) Error_0(msg);
 		if (cdr(args) != NIL) {
 			s_return(mk_empty_string((size_t)ivalue(car(args)), (int)ivalue(cadr(args))));
@@ -5347,7 +5347,7 @@ OP_DOWINDS2:
 			s_return(mk_empty_string((size_t)ivalue(car(args)), ' '));
 		}
 
-	case OP_STRING:		/* string */
+	case LOC_STRING:		/* string */
 		if (!validargs("string", 0, 65535, TST_CHAR)) Error_0(msg);
 		for (w = 0, x = args; x != NIL; x = cdr(x)) {
 			w += utf32_to_utf8((int)ivalue(car(x)), NULL);
@@ -5359,11 +5359,11 @@ OP_DOWINDS2:
 		strvalue(y)[w] = '\0';
 		s_return(y);
 
-	case OP_STRLEN:		/* string-length */
+	case LOC_STRLEN:		/* string-length */
 		if (!validargs("string-length", 1, 1, TST_STRING)) Error_0(msg);
 		s_return(mk_integer((int32_t)utf8_strlen(strvalue(car(args)))));
 
-	case OP_STRREF:		/* string-ref */
+	case LOC_STRREF:		/* string-ref */
 		if (!validargs("string-ref", 2, 2, TST_STRING TST_NATURAL)) Error_0(msg);
 		w = utf8_strref(strvalue(car(args)), (size_t)ivalue(cadr(args)));
 		if (w == -1) {
@@ -5371,7 +5371,7 @@ OP_DOWINDS2:
 		}
 		s_return(mk_character((int)w));
 
-	case OP_STRSET:		/* string-set! */
+	case LOC_STRSET:		/* string-set! */
 		if (!validargs("string-set!", 3, 3, TST_STRING TST_NATURAL TST_CHAR)) Error_0(msg);
 		w = utf8_strpos(strvalue(car(args)), (size_t)ivalue(cadr(args)));
 		if (w == -1 || strvalue(car(args))[w] == '\0') {
@@ -5395,39 +5395,39 @@ OP_DOWINDS2:
 		}
 		s_return(car(args));
 
-	case OP_STREQU:		/* string=? */
+	case LOC_STREQU:		/* string=? */
 		if (!validargs("string=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(strcmp(strvalue(car(args)), strvalue(cadr(args))) == 0);
-	case OP_STRLSS:		/* string<? */
+	case LOC_STRLSS:		/* string<? */
 		if (!validargs("string<?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(strcmp(strvalue(car(args)), strvalue(cadr(args))) < 0);
-	case OP_STRGTR:		/* string>? */
+	case LOC_STRGTR:		/* string>? */
 		if (!validargs("string>?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(strcmp(strvalue(car(args)), strvalue(cadr(args))) > 0);
-	case OP_STRLEQ:		/* string<=? */
+	case LOC_STRLEQ:		/* string<=? */
 		if (!validargs("string<=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(strcmp(strvalue(car(args)), strvalue(cadr(args))) <= 0);
-	case OP_STRGEQ:		/* string>=? */
+	case LOC_STRGEQ:		/* string>=? */
 		if (!validargs("string>=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(strcmp(strvalue(car(args)), strvalue(cadr(args))) >= 0);
 
-	case OP_STRCIEQU:	/* string-ci=? */
+	case LOC_STRCIEQU:	/* string-ci=? */
 		if (!validargs("string-ci=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(utf8_stricmp(strvalue(car(args)), strvalue(cadr(args))) == 0);
-	case OP_STRCILSS:		/* string-ci<? */
+	case LOC_STRCILSS:		/* string-ci<? */
 		if (!validargs("string-ci<?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(utf8_stricmp(strvalue(car(args)), strvalue(cadr(args))) < 0);
-	case OP_STRCIGTR:		/* string-ci>? */
+	case LOC_STRCIGTR:		/* string-ci>? */
 		if (!validargs("string-ci>?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(utf8_stricmp(strvalue(car(args)), strvalue(cadr(args))) > 0);
-	case OP_STRCILEQ:		/* string-ci<=? */
+	case LOC_STRCILEQ:		/* string-ci<=? */
 		if (!validargs("string-ci<=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(utf8_stricmp(strvalue(car(args)), strvalue(cadr(args))) <= 0);
-	case OP_STRCIGEQ:		/* string-ci>=? */
+	case LOC_STRCIGEQ:		/* string-ci>=? */
 		if (!validargs("string-ci>=?", 2, 2, TST_STRING TST_STRING)) Error_0(msg);
 		s_retbool(utf8_stricmp(strvalue(car(args)), strvalue(cadr(args))) >= 0);
 
-	case OP_SUBSTR:		/* substring */
+	case LOC_SUBSTR:		/* substring */
 		if (!validargs("substring", 2, 3, TST_STRING TST_NATURAL)) Error_0(msg);
 		w = utf8_strlen(strvalue(car(args)));
 		if (ivalue(cadr(args)) > w) {
@@ -5448,7 +5448,7 @@ OP_DOWINDS2:
 		}
 		s_return(x);
 
-	case OP_STRAPPEND:	/* string-append */
+	case LOC_STRAPPEND:	/* string-append */
 		if (!validargs("string-append", 0, 65535, TST_STRING)) Error_0(msg);
 		for (w = 0, x = args; x != NIL; x = cdr(x)) {
 			w += strlength(car(x));
@@ -5461,7 +5461,7 @@ OP_DOWINDS2:
 		strvalue(y)[w] = '\0';
 		s_return(y);
 
-	case OP_STR2LIST:	/* string->list */
+	case LOC_STR2LIST:	/* string->list */
 		if (!validargs("string->list", 1, 1, TST_STRING)) Error_0(msg);
 		code = NIL;
 		w = 0;
@@ -5473,7 +5473,7 @@ OP_DOWINDS2:
 		}
 		s_return(non_alloc_rev(NIL, code));
 
-	case OP_LIST2STR:	/* list->string */
+	case LOC_LIST2STR:	/* list->string */
 		if (!validargs("list->string", 1, 1, TST_LIST)) Error_0(msg);
 		if (list_length(car(args)) < 0) {
 			Error_1("list->string: not a proper list:", car(args));
@@ -5491,11 +5491,11 @@ OP_DOWINDS2:
 		strvalue(y)[w] = '\0';
 		s_return(y);
 
-	case OP_STRCOPY:	/* string-copy */
+	case LOC_STRCOPY:	/* string-copy */
 		if (!validargs("string-copy", 1, 1, TST_STRING)) Error_0(msg);
 		s_return(mk_string(strvalue(car(args))));
 
-	case OP_STRFILL:	/* string-fill! */
+	case LOC_STRFILL:	/* string-fill! */
 		if (!validargs("string-fill!", 2, 2, TST_STRING TST_CHAR)) Error_0(msg);
 		x = car(args);
 		w = utf8_strlen(strvalue(x));
@@ -5514,8 +5514,8 @@ OP_DOWINDS2:
 		}
 		s_return(x);
 
-	case OP_VECTOR:		/* vector */
-OP_VECTOR:
+	case LOC_VECTOR:		/* vector */
+LOC_VECTOR:
 		if (!validargs("vector", 0, 65535, TST_NONE)) Error_0(msg);
 		w = list_length(args);
 		if (w < 0) {
@@ -5527,7 +5527,7 @@ OP_VECTOR:
 		}
 		s_return(y);
 
-	case OP_MKVECTOR:	/* make-vector */
+	case LOC_MKVECTOR:	/* make-vector */
 		if (!validargs("make-vector", 1, 2, TST_NATURAL TST_ANY)) Error_0(msg);
 		w = ivalue(car(args));
 		x = mk_vector((int)w);
@@ -5536,11 +5536,11 @@ OP_VECTOR:
 		}
 		s_return(x);
 
-	case OP_VECLEN:		/* vector-length */
+	case LOC_VECLEN:		/* vector-length */
 		if (!validargs("vector-length", 1, 1, TST_VECTOR)) Error_0(msg);
 		s_return(mk_integer(ivalue(car(args))));
 
-	case OP_VECREF:		/* vector-ref */
+	case LOC_VECREF:		/* vector-ref */
 		if (!validargs("vector-ref", 2, 2, TST_VECTOR TST_NATURAL)) Error_0(msg);
 		w = ivalue(cadr(args));
 		if (w >= ivalue(car(args))) {
@@ -5548,7 +5548,7 @@ OP_VECTOR:
 		}
 		s_return(vector_elem(car(args), (int)w));
 
-	case OP_VECSET:		/* vector-set! */
+	case LOC_VECSET:		/* vector-set! */
 		if (!validargs("vector-set!", 3, 3, TST_VECTOR TST_NATURAL TST_ANY)) Error_0(msg);
 		w = ivalue(cadr(args));
 		if (w >= ivalue(car(args))) {
@@ -5557,7 +5557,7 @@ OP_VECTOR:
 		set_vector_elem(car(args), (int)w, caddr(args));
 		s_return(car(args));
 
-	case OP_VEC2LIST:		/* vector->list */
+	case LOC_VEC2LIST:		/* vector->list */
 		if (!validargs("vector->list", 1, 1, TST_VECTOR)) Error_0(msg);
 		y = NIL;
 		for (w = ivalue(car(args)) - 1; w >= 0; w--) {
@@ -5565,7 +5565,7 @@ OP_VECTOR:
 		}
 		s_return(y);
 
-	case OP_LIST2VEC:		/* list->vector */
+	case LOC_LIST2VEC:		/* list->vector */
 		if (!validargs("list->vector", 1, 1, TST_LIST)) Error_0(msg);
 		args = car(args);
 		w = list_length(args);
@@ -5578,35 +5578,35 @@ OP_VECTOR:
 		}
 		s_return(y);
 
-	case OP_VECFILL:	/* vector-fill! */
+	case LOC_VECFILL:	/* vector-fill! */
 		if (!validargs("vector-fill!", 2, 2, TST_VECTOR TST_ANY)) Error_0(msg);
 		for (x = car(args), w = ivalue(x) - 1; w >= 0; w--) {
 			set_vector_elem(car(args), (int)w, cadr(args));
 		}
 		s_return(car(args));
 
-	case OP_NOT:		/* not */
+	case LOC_NOT:		/* not */
 		if (!validargs("not", 1, 1, TST_NONE)) Error_0(msg);
 		s_retbool(isfalse(car(args)));
-	case OP_BOOL:		/* boolean? */
+	case LOC_BOOL:		/* boolean? */
 		if (!validargs("boolean?", 1, 1, TST_NONE)) Error_0(msg);
 		s_retbool(car(args) == F || car(args) == T);
-	case OP_NULL:		/* null? */
+	case LOC_NULL:		/* null? */
 		if (!validargs("null?", 1, 1, TST_NONE)) Error_0(msg);
 		s_retbool(car(args) == NIL);
-	case OP_EOFOBJP:	/* eof-object? */
+	case LOC_EOFOBJP:	/* eof-object? */
 		if (!validargs("eof-object?", 1, 1, TST_NONE)) Error_0(msg);
 		s_retbool(car(args) == EOF_OBJ);
-	case OP_ZEROP:		/* zero? */
+	case LOC_ZEROP:		/* zero? */
 		if (!validargs("zero?", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_retbool(nvalue(car(args)) == 0);
-	case OP_POSP:		/* positive? */
+	case LOC_POSP:		/* positive? */
 		if (!validargs("positive?", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_retbool(nvalue(car(args)) > 0);
-	case OP_NEGP:		/* negative? */
+	case LOC_NEGP:		/* negative? */
 		if (!validargs("negative?", 1, 1, TST_NUMBER)) Error_0(msg);
 		s_retbool(nvalue(car(args)) < 0);
-	case OP_ODD:		/* odd? */
+	case LOC_ODD:		/* odd? */
 		if (!validargs("odd?", 1, 1, TST_INTEGER)) Error_0(msg);
 		if (car(args)->_isfixnum) {
 			if (bignum(car(args)) == NIL) {
@@ -5617,7 +5617,7 @@ OP_VECTOR:
 		} else {
 			s_retbool((int64_t)rvalue(car(args)) % 2 != 0);
 		}
-	case OP_EVEN:		/* even? */
+	case LOC_EVEN:		/* even? */
 		if (!validargs("even?", 1, 1, TST_INTEGER)) Error_0(msg);
 		if (car(args)->_isfixnum) {
 			if (bignum(car(args)) == NIL) {
@@ -5628,7 +5628,7 @@ OP_VECTOR:
 		} else {
 			s_retbool((int64_t)rvalue(car(args)) % 2 == 0);
 		}
-	case OP_NEQ:		/* = */
+	case LOC_NEQ:		/* = */
 		if (!validargs("=", 2, 65535, TST_NUMBER)) Error_0(msg);
 		for (x = car(args), args = cdr(args); args != NIL; args = cdr(args)) {
 			y = car(args);
@@ -5656,7 +5656,7 @@ OP_VECTOR:
 		}
 		s_return(T);
 
-	case OP_LESS:		/* < */
+	case LOC_LESS:		/* < */
 		if (!validargs("<", 2, 65535, TST_NUMBER)) Error_0(msg);
 		for (x = car(args), args = cdr(args); args != NIL; x = y, args = cdr(args)) {
 			y = car(args);
@@ -5690,7 +5690,7 @@ OP_VECTOR:
 		}
 		s_return(T);
 
-	case OP_GRE:		/* > */
+	case LOC_GRE:		/* > */
 		if (!validargs(">", 2, 65535, TST_NUMBER)) Error_0(msg);
 		for (x = car(args), args = cdr(args); args != NIL; x = y, args = cdr(args)) {
 			y = car(args);
@@ -5724,7 +5724,7 @@ OP_VECTOR:
 		}
 		s_return(T);
 
-	case OP_LEQ:		/* <= */
+	case LOC_LEQ:		/* <= */
 		if (!validargs("<=", 2, 65535, TST_NUMBER)) Error_0(msg);
 		for (x = car(args), args = cdr(args); args != NIL; x = y, args = cdr(args)) {
 			y = car(args);
@@ -5758,7 +5758,7 @@ OP_VECTOR:
 		}
 		s_return(T);
 
-	case OP_GEQ:		/* >= */
+	case LOC_GEQ:		/* >= */
 		if (!validargs(">=", 2, 65535, TST_NUMBER)) Error_0(msg);
 		for (x = car(args), args = cdr(args); args != NIL; x = y, args = cdr(args)) {
 			y = car(args);
@@ -5792,7 +5792,7 @@ OP_VECTOR:
 		}
 		s_return(T);
 
-	case OP_MAX:		/* max */
+	case LOC_MAX:		/* max */
 		if (!validargs("max", 1, 65535, TST_NUMBER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		for (mark_y = cdr(args); mark_y != NIL; mark_y = cdr(mark_y)) {
@@ -5855,7 +5855,7 @@ OP_VECTOR:
 		}
 		s_return(mark_x);
 
-	case OP_MIN:		/* min */
+	case LOC_MIN:		/* min */
 		if (!validargs("min", 1, 65535, TST_NUMBER)) Error_0(msg);
 		mark_x = mk_number(car(args));
 		for (mark_y = cdr(args); mark_y != NIL; mark_y = cdr(mark_y)) {
@@ -5918,82 +5918,82 @@ OP_VECTOR:
 		}
 		s_return(mark_x);
 
-	case OP_SYMBOL:		/* symbol? */
+	case LOC_SYMBOL:		/* symbol? */
 		if (!validargs("symbol?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_symbol(car(args)));
-	case OP_SYM2STR:	/* symbol->string */
+	case LOC_SYM2STR:	/* symbol->string */
 		if (!validargs("symbol->string", 1, 1, TST_SYMBOL)) Error_0(msg);
 		s_return(mk_string(symname(car(args))));
-	case OP_STR2SYM:	/* string->symbol */
+	case LOC_STR2SYM:	/* string->symbol */
 		if (!validargs("string->symbol", 1, 1, TST_STRING)) Error_0(msg);
 		s_return(mk_symbol(strvalue(car(args))));
-	case OP_NUMBER:		/* number? */
+	case LOC_NUMBER:		/* number? */
 		if (!validargs("number?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_number(car(args)));
-	case OP_STRINGP:	/* string? */
+	case LOC_STRINGP:	/* string? */
 		if (!validargs("string?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_string(car(args)));
-	case OP_INTEGER:	/* integer? */
+	case LOC_INTEGER:	/* integer? */
 		if (!validargs("integer?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_integer(car(args)));
-	case OP_REAL:		/* real? */
+	case LOC_REAL:		/* real? */
 		if (!validargs("real?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_number(car(args)));
-	case OP_EXACT:		/* exact? */
+	case LOC_EXACT:		/* exact? */
 		if (!validargs("exact?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_number(car(args)) && car(args)->_isfixnum);
-	case OP_INEXACT:	/* inexact? */
+	case LOC_INEXACT:	/* inexact? */
 		if (!validargs("inexact?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(!is_number(car(args)) || !car(args)->_isfixnum);
-	case OP_CHAR:		/* char? */
+	case LOC_CHAR:		/* char? */
 		if (!validargs("char?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_character(car(args)));
-	case OP_CHAREQU:	/* char=? */
+	case LOC_CHAREQU:	/* char=? */
 		if (!validargs("char=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(ivalue(car(args)) == ivalue(cadr(args)));
-	case OP_CHARLSS:	/* char<? */
+	case LOC_CHARLSS:	/* char<? */
 		if (!validargs("char<?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(ivalue(car(args)) < ivalue(cadr(args)));
-	case OP_CHARGTR:	/* char>? */
+	case LOC_CHARGTR:	/* char>? */
 		if (!validargs("char>?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(ivalue(car(args)) > ivalue(cadr(args)));
-	case OP_CHARLEQ:	/* char<=? */
+	case LOC_CHARLEQ:	/* char<=? */
 		if (!validargs("char<=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(ivalue(car(args)) <= ivalue(cadr(args)));
-	case OP_CHARGEQ:	/* char>=? */
+	case LOC_CHARGEQ:	/* char>=? */
 		if (!validargs("char>=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(ivalue(car(args)) >= ivalue(cadr(args)));
-	case OP_CHARCIEQU:	/* char-ci=? */
+	case LOC_CHARCIEQU:	/* char-ci=? */
 		if (!validargs("char-ci=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_tolower((int)ivalue(car(args))) == utf32_tolower((int)ivalue(cadr(args))));
-	case OP_CHARCILSS:	/* char-ci<? */
+	case LOC_CHARCILSS:	/* char-ci<? */
 		if (!validargs("char-ci<?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_tolower((int)ivalue(car(args))) < utf32_tolower((int)ivalue(cadr(args))));
-	case OP_CHARCIGTR:	/* char-ci>? */
+	case LOC_CHARCIGTR:	/* char-ci>? */
 		if (!validargs("char-ci>?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_tolower((int)ivalue(car(args))) > utf32_tolower((int)ivalue(cadr(args))));
-	case OP_CHARCILEQ:	/* char-ci<=? */
+	case LOC_CHARCILEQ:	/* char-ci<=? */
 		if (!validargs("char-ci<=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_tolower((int)ivalue(car(args))) <= utf32_tolower((int)ivalue(cadr(args))));
-	case OP_CHARCIGEQ:	/* char-ci>=? */
+	case LOC_CHARCIGEQ:	/* char-ci>=? */
 		if (!validargs("char-ci>=?", 2, 2, TST_CHAR TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_tolower((int)ivalue(car(args))) >= utf32_tolower((int)ivalue(cadr(args))));
-	case OP_CHARAP:		/* char-alphabetic? */
+	case LOC_CHARAP:		/* char-alphabetic? */
 		if (!validargs("char-alphabetic?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_isalpha((int)ivalue(car(args))));
-	case OP_CHARNP:		/* char-numeric? */
+	case LOC_CHARNP:		/* char-numeric? */
 		if (!validargs("char-numeric?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_isdigit((int)ivalue(car(args))));
-	case OP_CHARWP:		/* char-whitespace? */
+	case LOC_CHARWP:		/* char-whitespace? */
 		if (!validargs("char-whitespace?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_isspace((int)ivalue(car(args))));
-	case OP_CHARUP:		/* char-upper-case? */
+	case LOC_CHARUP:		/* char-upper-case? */
 		if (!validargs("char-upper-case?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_isupper((int)ivalue(car(args))));
-	case OP_CHARLP:		/* char-lower-case? */
+	case LOC_CHARLP:		/* char-lower-case? */
 		if (!validargs("char-lower-case?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_islower((int)ivalue(car(args))));
-	case OP_PROC:		/* procedure? */
+	case LOC_PROC:		/* procedure? */
 		if (!validargs("procedure?", 1, 1, TST_ANY)) Error_0(msg);
 		/*--
 		 * continuation should be procedure by the example
@@ -6002,38 +6002,38 @@ OP_VECTOR:
 		 */
 		s_retbool(is_proc(car(args)) || is_closure(car(args))
 			  || is_continuation(car(args)));
-	case OP_PAIR:		/* pair? */
+	case LOC_PAIR:		/* pair? */
 		if (!validargs("pair?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_pair(car(args)));
-	case OP_LISTP:		/* list? */
+	case LOC_LISTP:		/* list? */
 		if (!validargs("list?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(list_length(car(args)) >= 0);
-	case OP_PORTP:		/* port? */
+	case LOC_PORTP:		/* port? */
 		if (!validargs("port?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_port(car(args)));
-	case OP_INPORTP:	/* input-port? */
+	case LOC_INPORTP:	/* input-port? */
 		if (!validargs("input-port?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_inport(car(args)));
-	case OP_OUTPORTP:	/* output-port? */
+	case LOC_OUTPORTP:	/* output-port? */
 		if (!validargs("output-port?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_outport(car(args)));
-	case OP_VECTORP:	/* vector? */
+	case LOC_VECTORP:	/* vector? */
 		if (!validargs("vector?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_vector(car(args)));
-	case OP_ENVP:		/* environment? */
+	case LOC_ENVP:		/* environment? */
 		if (!validargs("environment?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_environment(car(args)));
-	case OP_EQ:		/* eq? */
+	case LOC_EQ:		/* eq? */
 		if (!validargs("eq?", 2, 2, TST_ANY)) Error_0(msg);
 		s_retbool(car(args) == cadr(args));
-	case OP_EQV:		/* eqv? */
+	case LOC_EQV:		/* eqv? */
 		if (!validargs("eqv?", 2, 2, TST_ANY)) Error_0(msg);
 		s_retbool(eqv(car(args), cadr(args)));
-	case OP_EQUAL:		/* equal? */
+	case LOC_EQUAL:		/* equal? */
 		if (!validargs("equal?", 2, 2, TST_ANY)) Error_0(msg);
 		s_retbool(equal(car(args), cadr(args)));
 
-	case OP_EAGER:		/* eagar */
+	case LOC_EAGER:		/* eagar */
 		if (!validargs("eagar", 1, 1, TST_ANY)) Error_0(msg);
 		x = cons(NIL, car(args));
 		x = mk_closure(x, envir);
@@ -6041,24 +6041,24 @@ OP_VECTOR:
 		setresultready(x);
 		s_return(x);
 
-	case OP_FORCE:		/* force */
+	case LOC_FORCE:		/* force */
 		if (!validargs("force", 1, 1, TST_ANY)) Error_0(msg);
 		code = car(args);
-	OP_FORCE:
+	LOC_FORCE:
 		if (is_promise(code)) {
 			if (is_resultready(code)) {
 				s_return(cdar(code));
 			}
-			s_save(OP_FORCED, NIL, code);
+			s_save(LOC_FORCED, NIL, code);
 			args = NIL;
 			if (is_promise(cdar(code))) {
 				code = cdar(code);
 			}
-			s_goto(OP_APPLY);
+			s_goto(LOC_APPLY);
 		}
 		s_return(code);
 
-	case OP_FORCED:		/* force */
+	case LOC_FORCED:		/* force */
 		if (is_resultready(code)) {
 			s_return(cdar(code));
 		}
@@ -6075,19 +6075,19 @@ OP_VECTOR:
 				setresultready(value);
 			}
 		}
-		s_goto(OP_FORCE);
+		s_goto(LOC_FORCE);
 
-	case OP_WRITE_CHAR:	/* write-char */
-	case OP_WRITE:		/* write */
-	case OP_DISPLAY:	/* display */
+	case LOC_WRITE_CHAR:	/* write-char */
+	case LOC_WRITE:		/* write */
+	case LOC_DISPLAY:	/* display */
 		switch (operator) {
-		case OP_WRITE_CHAR:
+		case LOC_WRITE_CHAR:
 			if (!validargs("write-char", 1, 2, TST_CHAR TST_OUTPORT)) Error_0(msg);
 			break;
-		case OP_WRITE:
+		case LOC_WRITE:
 			if (!validargs("write", 1, 2, TST_ANY TST_OUTPORT)) Error_0(msg);
 			break;
-		case OP_DISPLAY:
+		case LOC_DISPLAY:
 			if (!validargs("display", 1, 2, TST_ANY TST_OUTPORT)) Error_0(msg);
 			break;
 		default:
@@ -6096,27 +6096,27 @@ OP_VECTOR:
 		if (is_pair(cdr(args))) {
 			if (cadr(args) != outport) {
 				outport = cons(outport, NIL);
-				s_save(OP_CURR_OUTPORT, outport, NIL);
+				s_save(LOC_CURR_OUTPORT, outport, NIL);
 				outport = cadr(args);
 			}
 		}
 		args = car(args);
-		print_flag = (operator == OP_WRITE) ? 1 : 0;
-		s_goto(OP_P0LIST);
+		print_flag = (operator == LOC_WRITE) ? 1 : 0;
+		s_goto(LOC_P0LIST);
 
-	case OP_NEWLINE:	/* newline */
+	case LOC_NEWLINE:	/* newline */
 		if (!validargs("newline", 0, 1, TST_OUTPORT)) Error_0(msg);
 		if (is_pair(args)) {
 			if (car(args) != outport) {
 				outport = cons(outport, NIL);
-				s_save(OP_CURR_OUTPORT, outport, NIL);
+				s_save(LOC_CURR_OUTPORT, outport, NIL);
 				outport = car(args);
 			}
 		}
 		putstr("\n");
 		s_return(T);
 
-	case OP_ERR0:	/* error */
+	case LOC_ERR0:	/* error */
 		if (!validargs("error", 1, 65535, TST_NONE)) Error_0(msg);
 		tmpfp = port_file(outport);
 		fflush(tmpfp);
@@ -6124,37 +6124,37 @@ OP_VECTOR:
 		fprintf(stderr, "\n\nError - ");
 		fprintf(stderr, "%s", strvalue(car(args)));
 		args = cdr(args);
-		s_goto(OP_ERR1);
+		s_goto(LOC_ERR1);
 
-	case OP_ERR1:	/* error */
-OP_ERR1:
+	case LOC_ERR1:	/* error */
+LOC_ERR1:
 		
 		if (args != NIL) {
 		    putstr(": ");
-			s_save(OP_ERR1, cdr(args), NIL);
+			s_save(LOC_ERR1, cdr(args), NIL);
 			args = car(args);
 			print_flag = 1;
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else {
 			putstr("\n");
 			flushinput();
 			if (!interactive_repl) {
 				/* return -1; */
 			    /* exit( 1 ); */
-			    s_save(OP_EMERGENCY_EXIT, cons( mk_integer( 1 ), NIL), NIL);
+			    s_save(LOC_EMERGENCY_EXIT, cons( mk_integer( 1 ), NIL), NIL);
 			    args = cons( call_history, NIL);
 			    print_flag = 1;
-			    s_goto(OP_P0HIST);
+			    s_goto(LOC_P0HIST);
 			}
 			port_file(outport) = tmpfp;
-			s_goto(OP_T0LVL);
+			s_goto(LOC_T0LVL);
 		}
 
-	case OP_REVERSE:	/* reverse */
+	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
 		s_return(reverse(car(args)));
 
-	case OP_APPEND:	/* append */
+	case LOC_APPEND:	/* append */
 		if (!validargs("append", 0, 65535, TST_NONE)) Error_0(msg);
 		if( args == NIL ) s_return( NIL );
 		x = reverse( args );
@@ -6167,32 +6167,32 @@ OP_ERR1:
 		}
 		s_return( x );
 
-	case OP_QUIT:		/* quit */
+	case LOC_QUIT:		/* quit */
 		if (!validargs("quit", 0, 1, TST_INTEGER)) Error_0(msg);
 		if (is_pair(args)) {
 			return (int)ivalue(car(args));
 		}
 		return 0;
 
-	case OP_EMERGENCY_EXIT:	/* emergency-exit */
+	case LOC_EMERGENCY_EXIT:	/* emergency-exit */
 		if (!validargs("emergency-exit", 0, 1, TST_INTEGER)) Error_0(msg);
 		if (is_pair(args)) {
 		    exit( (int)ivalue(car(args)));
 		}
 		exit( 0 );
 
-	case OP_GC:		/* gc */
+	case LOC_GC:		/* gc */
 		if (!validargs("gc", 0, 0, TST_NONE)) Error_0(msg);
 		gc(&NIL, &NIL);
 		s_return(T);
 
-	case OP_GCVERB:		/* gc-verbose */
+	case LOC_GCVERB:		/* gc-verbose */
 		if (!validargs("gc-verbose", 0, 1, TST_NONE)) Error_0(msg);
 		w = gc_verbose;
 		gc_verbose = (car(args) != F);
 		s_retbool(w);
 
-	case OP_CALL_INFILE0:	/* call-with-input-file */
+	case LOC_CALL_INFILE0:	/* call-with-input-file */
 		if (!validargs("call-with-input-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
@@ -6200,14 +6200,14 @@ OP_ERR1:
 		}
 		code = cadr(args);
 		args = cons(x, NIL);
-		s_save(OP_CALL_INFILE1, args, NIL);
-		s_goto(OP_APPLY);
+		s_save(LOC_CALL_INFILE1, args, NIL);
+		s_goto(LOC_APPLY);
 
-	case OP_CALL_INFILE1:	/* call-with-input-file */
+	case LOC_CALL_INFILE1:	/* call-with-input-file */
 		port_close(car(args));
 		s_return(value);
 
-	case OP_CALL_OUTFILE0:	/* call-with-output-file */
+	case LOC_CALL_OUTFILE0:	/* call-with-output-file */
 		if (!validargs("call-with-output-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_output);
 		if (x == NIL) {
@@ -6215,24 +6215,24 @@ OP_ERR1:
 		}
 		code = cadr(args);
 		args = cons(x, NIL);
-		s_save(OP_CALL_OUTFILE1, args, NIL);
-		s_goto(OP_APPLY);
+		s_save(LOC_CALL_OUTFILE1, args, NIL);
+		s_goto(LOC_APPLY);
 
-	case OP_CALL_OUTFILE1:	/* call-with-output-file */
+	case LOC_CALL_OUTFILE1:	/* call-with-output-file */
 		port_close(car(args));
 		s_return(value);
 
-	case OP_CURR_INPORT:	/* current-input-port */
+	case LOC_CURR_INPORT:	/* current-input-port */
 		if (!validargs("current-input-port", 0, 1, TST_INPORT)) Error_0(msg);
 		if (is_pair(args)) inport = car(args);
 		s_return(inport);
 
-	case OP_CURR_OUTPORT:	/* current-output-port */
+	case LOC_CURR_OUTPORT:	/* current-output-port */
 		if (!validargs("current-output-port", 0, 1, TST_OUTPORT)) Error_0(msg);
 		if (is_pair(args)) outport = car(args);
 		s_return(outport);
 
-	case OP_WITH_INFILE0:	/* with-input-from-file */
+	case LOC_WITH_INFILE0:	/* with-input-from-file */
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
@@ -6242,16 +6242,16 @@ OP_ERR1:
 		code = cadr(args);
 		args = cons(x, inport);
 		inport = car(args);
-		s_save(OP_WITH_INFILE1, args, NIL);
+		s_save(LOC_WITH_INFILE1, args, NIL);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_WITH_INFILE1:	/* with-input-from-file */
+	case LOC_WITH_INFILE1:	/* with-input-from-file */
 		port_close(car(args));
 		inport = cdr(args);
 		s_return(value);
 
-	case OP_WITH_OUTFILE0:	/* with-output-to-file */
+	case LOC_WITH_OUTFILE0:	/* with-output-to-file */
 		if (!validargs("with-output-to-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_output);
 		if (x == NIL) {
@@ -6260,16 +6260,16 @@ OP_ERR1:
 		code = cadr(args);
 		args = cons(x, outport);
 		outport = car(args);
-		s_save(OP_WITH_OUTFILE1, args, NIL);
+		s_save(LOC_WITH_OUTFILE1, args, NIL);
 		args = NIL;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_WITH_OUTFILE1:	/* with-output-to-file */
+	case LOC_WITH_OUTFILE1:	/* with-output-to-file */
 		port_close(car(args));
 		outport = cdr(args);
 		s_return(value);
 
-	case OP_OPEN_INFILE:	/* open-input-file */
+	case LOC_OPEN_INFILE:	/* open-input-file */
 		if (!validargs("open-input-file", 1, 1, TST_STRING)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
@@ -6277,7 +6277,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_OPEN_OUTFILE:	/* open-output-file */
+	case LOC_OPEN_OUTFILE:	/* open-output-file */
 		if (!validargs("open-output-file", 1, 1, TST_STRING)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_output);
 		if (x == NIL) {
@@ -6285,7 +6285,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_OPEN_INOUTFILE:	/* open-input-output-file */
+	case LOC_OPEN_INOUTFILE:	/* open-input-output-file */
 		if (!validargs("open-input-output-file", 1, 1, TST_STRING)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input | port_output);
 		if (x == NIL) {
@@ -6293,7 +6293,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_OPEN_INSTRING:	/* open-input-string */
+	case LOC_OPEN_INSTRING:	/* open-input-string */
 		if (!validargs("open-input-string", 1, 1, TST_STRING)) Error_0(msg);
 		x = port_from_string(strvalue(car(args)), port_input);
 		if (x == NIL) {
@@ -6301,7 +6301,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_OPEN_OUTSTRING:	/* open-output-string */
+	case LOC_OPEN_OUTSTRING:	/* open-output-string */
 		if (!validargs("open-output-string", 0, 0, TST_NONE)) Error_0(msg);
 		x = port_from_scratch();
 		if (x == NIL) {
@@ -6309,7 +6309,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_OPEN_INOUTSTRING:	/* open-input-output-string */
+	case LOC_OPEN_INOUTSTRING:	/* open-input-output-string */
 		if (!validargs("open-input-output-string", 1, 1, TST_STRING)) Error_0(msg);
 		x = port_from_string(strvalue(car(args)), port_input | port_output);
 		if (x == NIL) {
@@ -6317,7 +6317,7 @@ OP_ERR1:
 		}
 		s_return(x);
 
-	case OP_GET_OUTSTRING:	/* get-output-string */
+	case LOC_GET_OUTSTRING:	/* get-output-string */
 		if (!validargs("get-output-string", 1, 1, TST_OUTPORT)) Error_0(msg);
 		x = car(args);
 		if (is_strport(x) && port_file(x) != NULL) {
@@ -6325,31 +6325,31 @@ OP_ERR1:
 		}
 		s_return(F);
 
-	case OP_CLOSE_INPORT: /* close-input-port */
+	case LOC_CLOSE_INPORT: /* close-input-port */
 		if (!validargs("close-input-port", 1, 1, TST_INPORT)) Error_0(msg);
 		port_close(car(args));
 		s_return(T);
 
-	case OP_CLOSE_OUTPORT: /* close-output-port */
+	case LOC_CLOSE_OUTPORT: /* close-output-port */
 		if (!validargs("close-output-port", 1, 1, TST_OUTPORT)) Error_0(msg);
 		port_close(car(args));
 		s_return(T);
 
-	case OP_CLOSE_PORT: /* close-port */
+	case LOC_CLOSE_PORT: /* close-port */
 		if (!validargs("close-port", 1, 1, TST_PORT)) Error_0(msg);
 		port_close(car(args));
 		s_return(T);
 
-	case OP_CURR_ENV:	/* current-environment */
+	case LOC_CURR_ENV:	/* current-environment */
 		if (!validargs("current-environment", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(envir);
 
-	case OP_GLOB_ENV:	/* global-environment */
+	case LOC_GLOB_ENV:	/* global-environment */
 		if (!validargs("global-environment", 0, 0, TST_NONE)) Error_0(msg);
 		s_return(global_env);
 
 		/* ========== reading part ========== */
-	case OP_READ:			/* read */
+	case LOC_READ:			/* read */
 		if (!validargs("read", 0, 1, TST_INPORT)) Error_0(msg);
 		if (is_pair(args)) {
 			if (port_file(car(args)) == NULL) {
@@ -6357,19 +6357,19 @@ OP_ERR1:
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
-				s_save(OP_CURR_INPORT, inport, NIL);
+				s_save(LOC_CURR_INPORT, inport, NIL);
 				inport = car(args);
 			}
 		}
-		s_goto(OP_READ_INTERNAL);
+		s_goto(LOC_READ_INTERNAL);
 
-	case OP_READ_CHAR:		/* read-char */
-	case OP_PEEK_CHAR:		/* peek-char */
+	case LOC_READ_CHAR:		/* read-char */
+	case LOC_PEEK_CHAR:		/* peek-char */
 		switch (operator) {
-		case OP_READ_CHAR:
+		case LOC_READ_CHAR:
 			if (!validargs("read-char", 0, 1, TST_INPORT)) Error_0(msg);
 			break;
-		case OP_PEEK_CHAR:
+		case LOC_PEEK_CHAR:
 			if (!validargs("peek-char", 0, 1, TST_INPORT)) Error_0(msg);
 			break;
 		default:
@@ -6381,7 +6381,7 @@ OP_ERR1:
 			}
 			if (car(args) != inport) {
 				inport = cons(inport, NIL);
-				s_save(OP_CURR_INPORT, inport, NIL);
+				s_save(LOC_CURR_INPORT, inport, NIL);
 				inport = car(args);
 			}
 		}
@@ -6389,12 +6389,12 @@ OP_ERR1:
 		if (w == EOF) {
 			s_return(EOF_OBJ);
 		}
-		if (operator == OP_PEEK_CHAR) {
+		if (operator == LOC_PEEK_CHAR) {
 			backchar((int)w);
 		}
 		s_return(mk_character((int)w));
 
-	case OP_CHAR_READY:		/* char-ready? */
+	case LOC_CHAR_READY:		/* char-ready? */
 		if (!validargs("char-ready?", 0, 1, TST_INPORT)) Error_0(msg);
 		if (is_pair(args)) {
 			x = car(args);
@@ -6403,14 +6403,14 @@ OP_ERR1:
 		}
 		s_retbool(is_fileport(x) || is_strport(x));
 
-	case OP_RDSEXPR:
-OP_RDSEXPR:
+	case LOC_RDSEXPR:
+LOC_RDSEXPR:
 		if (tok == TOK_EOF) {
 			s_return(EOF_OBJ);
 		}
 		switch (tok & 0x0f) {
 		case TOK_VEC:
-			s_save(OP_RDVEC, NIL, code);
+			s_save(LOC_RDVEC, NIL, code);
 			/* fall through */
 		case TOK_LPAREN:
 			w = tok >> 4;
@@ -6424,30 +6424,30 @@ OP_RDSEXPR:
 				Error_0("syntax error -- illegal dot expression");
 			} else {
 				code = mk_integer((int32_t)w);
-				s_save(OP_RDLIST, NIL, code);
-				s_goto(OP_RDSEXPR);
+				s_save(LOC_RDLIST, NIL, code);
+				s_goto(LOC_RDSEXPR);
 			}
 		case TOK_QUOTE:
-			s_save(OP_RDQUOTE, NIL, code);
+			s_save(LOC_RDQUOTE, NIL, code);
 			tok = token();
-			s_goto(OP_RDSEXPR);
+			s_goto(LOC_RDSEXPR);
 		case TOK_BQUOTE:
 			tok = token();
 			if ((tok & 0x0f) == TOK_VEC) {
-				s_save(OP_RDQQUOTEVEC, NIL, code);
+				s_save(LOC_RDQQUOTEVEC, NIL, code);
 				tok = TOK_LPAREN | (tok >> 4);
 			} else {
-				s_save(OP_RDQQUOTE, NIL, code);
+				s_save(LOC_RDQQUOTE, NIL, code);
 			}
-			s_goto(OP_RDSEXPR);
+			s_goto(LOC_RDSEXPR);
 		case TOK_COMMA:
-			s_save(OP_RDUNQUOTE, NIL, code);
+			s_save(LOC_RDUNQUOTE, NIL, code);
 			tok = token();
-			s_goto(OP_RDSEXPR);
+			s_goto(LOC_RDSEXPR);
 		case TOK_ATMARK:
-			s_save(OP_RDUQTSP, NIL, code);
+			s_save(LOC_RDUQTSP, NIL, code);
 			tok = token();
-			s_goto(OP_RDSEXPR);
+			s_goto(LOC_RDSEXPR);
 		case TOK_ATOM:
 			s_return(mk_atom(readstr("()[]{};\t\n\r ")));
 		case TOK_DQUOTE:
@@ -6463,7 +6463,7 @@ OP_RDSEXPR:
 		}
 		break;
 
-	case OP_RDLIST:
+	case LOC_RDLIST:
 		args = cons(value, args);
 		tok = token();
 		if (tok == TOK_EOF) {
@@ -6474,15 +6474,15 @@ OP_RDSEXPR:
 			}
 			Error_0("syntax error -- unexpected parenthesis");
 		} else if (tok == TOK_DOT) {
-			s_save(OP_RDDOT, args, code);
+			s_save(LOC_RDDOT, args, code);
 			tok = token();
-			s_goto(OP_RDSEXPR);
+			s_goto(LOC_RDSEXPR);
 		} else {
-			s_save(OP_RDLIST, args, code);
-			s_goto(OP_RDSEXPR);
+			s_save(LOC_RDLIST, args, code);
+			s_goto(LOC_RDSEXPR);
 		}
 
-	case OP_RDDOT:
+	case LOC_RDDOT:
 		tok = token();
 		if ((tok & 0x0f) == TOK_RPAREN) {
 			if (ivalue(code) == (tok >> 4)) {
@@ -6493,15 +6493,15 @@ OP_RDSEXPR:
 			Error_0("syntax error -- illegal dot expression");
 		}
 
-	case OP_RDQUOTE:
+	case LOC_RDQUOTE:
 		x = cons(value, NIL);
 		s_return(cons(QUOTE, x));
 
-	case OP_RDQQUOTE:
+	case LOC_RDQQUOTE:
 		x = cons(value, NIL);
 		s_return(cons(QQUOTE, x));
 
-	case OP_RDQQUOTEVEC:
+	case LOC_RDQQUOTEVEC:
 		x = cons(value, NIL);
 		x = cons(QQUOTE, x);
 		args = cons(x, NIL);
@@ -6510,26 +6510,26 @@ OP_RDSEXPR:
 		x = mk_symbol("apply");
 		s_return(cons(x, args));
 
-	case OP_RDUNQUOTE:
+	case LOC_RDUNQUOTE:
 		x = cons(value, NIL);
 		s_return(cons(UNQUOTE, x));
 
-	case OP_RDUQTSP:
+	case LOC_RDUQTSP:
 		x = cons(value, NIL);
 		s_return(cons(UNQUOTESP, x));
 
-	case OP_RDVEC:
+	case LOC_RDVEC:
 		args = value;
-		s_goto(OP_VECTOR);
+		s_goto(LOC_VECTOR);
 
 	/* ========== printing part ========== */
-	case OP_P0LIST:
-OP_P0LIST:
+	case LOC_P0LIST:
+LOC_P0LIST:
 		if (is_vector(args)) {
 			putstr("#(");
 			x = mk_integer(0);
 			args = cons(args, x);
-			s_goto(OP_PVECFROM);
+			s_goto(LOC_PVECFROM);
 		} else if (is_environment(args)) {
 		        putstr("#<ENVIRONMENT>");
 			s_return(T);
@@ -6539,36 +6539,36 @@ OP_P0LIST:
 		} else if (car(args) == QUOTE && ok_abbrev(cdr(args))) {
 			putstr("'");
 			args = cadr(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else if (car(args) == QQUOTE && ok_abbrev(cdr(args))) {
 			putstr("`");
 			args = cadr(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else if (car(args) == UNQUOTE && ok_abbrev(cdr(args))) {
 			putstr(",");
 			args = cadr(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else if (car(args) == UNQUOTESP && ok_abbrev(cdr(args))) {
 			putstr(",@");
 			args = cadr(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else {
 			putstr("(");
-			s_save(OP_P1LIST, cdr(args), NIL);
+			s_save(LOC_P1LIST, cdr(args), NIL);
 			args = car(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		}
 
-	case OP_P1LIST:
+	case LOC_P1LIST:
 		if (is_pair(args)) {
-			s_save(OP_P1LIST, cdr(args), NIL);
+			s_save(LOC_P1LIST, cdr(args), NIL);
 			putstr(" ");
 			args = car(args);
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else if (is_vector(args)) {
-			s_save(OP_P1LIST, NIL, NIL);
+			s_save(LOC_P1LIST, NIL, NIL);
 			putstr(" . ");
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		} else {
 			if (args != NIL) {
 				putstr(" . ");
@@ -6578,56 +6578,56 @@ OP_P0LIST:
 			s_return(T);
 		}
 
-	case OP_PVECFROM:
-OP_PVECFROM:
+	case LOC_PVECFROM:
+LOC_PVECFROM:
 		w = ivalue(cdr(args));
 		if (w == ivalue(car(args))) {
 			putstr(")");
 			s_return(T);
 		} else {
 			ivalue(cdr(args)) = (int32_t)w + 1;
-			s_save(OP_PVECFROM, args, NIL);
+			s_save(LOC_PVECFROM, args, NIL);
 			args = vector_elem(car(args), (int)w);
 			if (w > 0) putstr(" ");
-			s_goto(OP_P0LIST);
+			s_goto(LOC_P0LIST);
 		}
 
 
 	    /* ========== printing call history ========== */
 
-	case OP_P0HIST:
-	OP_P0HIST:
+	case LOC_P0HIST:
+	LOC_P0HIST:
 
 	    putstr( "\nCall history:\n" );
 
 	    x = mk_integer( call_history_pos - 1 );
 	    args = cons( car( args ), x );
-	    s_goto( OP_P1HIST );
+	    s_goto( LOC_P1HIST );
 
 
-	case OP_P1HIST:
-	OP_P1HIST:
+	case LOC_P1HIST:
+	LOC_P1HIST:
 
 	    w = ivalue( cdr( args ));
 
 	    if( w == -1 ) 
 	    {
 		ivalue( cdr( args )) = (int32_t)CALL_HISTORY_LENGTH - 1;
-		s_goto( OP_P2HIST );
+		s_goto( LOC_P2HIST );
 	    } 
 	    else 
 	    {
 		putstr( "\n     " );
 
 		ivalue( cdr( args )) = (int32_t)w - 1;
-		s_save( OP_P1HIST, args, NIL );
+		s_save( LOC_P1HIST, args, NIL );
 
 		args = vector_elem( car( args ), (int)w );
-		s_goto( OP_P0LIST );
+		s_goto( LOC_P0LIST );
 	    }
 
-	case OP_P2HIST:
-	OP_P2HIST:
+	case LOC_P2HIST:
+	LOC_P2HIST:
 
 	    w = ivalue( cdr( args ));
 	    x = vector_elem( car( args ), (int)w );
@@ -6642,16 +6642,16 @@ OP_PVECFROM:
 	    	putstr( "\n     " );
 
 	    	ivalue( cdr( args )) = (int32_t)w - 1;
-	    	s_save( OP_P2HIST, args, NIL );
+	    	s_save( LOC_P2HIST, args, NIL );
 
 	    	args = x;
-	    	s_goto( OP_P0LIST );
+	    	s_goto( LOC_P0LIST );
 	    }
 
 	    /* =========================================== */
 
 
-	case OP_LIST_LENGTH:	/* length */	/* a.k */
+	case LOC_LIST_LENGTH:	/* length */	/* a.k */
 		if (!validargs("length", 1, 1, TST_LIST)) Error_0(msg);
 		w = list_length(car(args));
 		if (w < 0) {
@@ -6659,7 +6659,7 @@ OP_PVECFROM:
 		}
 		s_return(mk_integer((int32_t)w));
 
-	case OP_MEMQ:		/* memq */
+	case LOC_MEMQ:		/* memq */
 		if (!validargs("memq", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); y != NIL; y = cdr(y)) {
@@ -6667,7 +6667,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_MEMV:		/* memv */
+	case LOC_MEMV:		/* memv */
 		if (!validargs("memv", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); y != NIL; y = cdr(y)) {
@@ -6675,7 +6675,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_MEMBER:		/* member*/
+	case LOC_MEMBER:		/* member*/
 		if (!validargs("member", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); y != NIL; y = cdr(y)) {
@@ -6683,7 +6683,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_ASSQ:		/* assq */
+	case LOC_ASSQ:		/* assq */
 		if (!validargs("assq", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
@@ -6694,7 +6694,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_ASSV:		/* assv*/
+	case LOC_ASSV:		/* assv*/
 		if (!validargs("assv", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
@@ -6705,7 +6705,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_ASSOC:		/* assoc */
+	case LOC_ASSOC:		/* assoc */
 		if (!validargs("assoc", 2, 2, TST_ANY TST_LIST)) Error_0(msg);
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
@@ -6716,7 +6716,7 @@ OP_PVECFROM:
 		}
 		s_return(F);
 
-	case OP_GET_CLOSURE:	/* get-closure-code */	/* a.k */
+	case LOC_GET_CLOSURE:	/* get-closure-code */	/* a.k */
 		if (!validargs("get-closure-code", 1, 1, TST_NONE)) Error_0(msg);
 		args = car(args);
 		if (args == NIL) {
@@ -6727,7 +6727,7 @@ OP_PVECFROM:
 			s_return(F);
 		}
 
-	case OP_CLOSUREP:		/* closure? */
+	case LOC_CLOSUREP:		/* closure? */
 		if (!validargs("closure?", 1, 1, TST_NONE)) Error_0(msg);
 		/*
 		 * Note, macro object is also a closure.
@@ -6738,42 +6738,42 @@ OP_PVECFROM:
 		}
 		s_retbool(is_closure(car(args)));
 
-	case OP_MACROP:		/* macro? */
+	case LOC_MACROP:		/* macro? */
 		if (!validargs("macro?", 1, 1, TST_NONE)) Error_0(msg);
 		if (car(args) == NIL) {
 			s_return(F);
 		}
 		s_retbool(is_closure(car(args)) && is_macro(car(args)));
 
-	case OP_MACRO_EXPAND0:	/* macro-expand */
+	case LOC_MACRO_EXPAND0:	/* macro-expand */
 		if (!validargs("macro-expand", 1, 1, TST_LIST)) Error_0(msg);
-		s_save(OP_MACRO_EXPAND1, args, NIL);
+		s_save(LOC_MACRO_EXPAND1, args, NIL);
 		code = caar(args);
 		args = NIL;
-		s_goto(OP_EVAL);
+		s_goto(LOC_EVAL);
 
-	case OP_MACRO_EXPAND1:	/* macro-expand */
+	case LOC_MACRO_EXPAND1:	/* macro-expand */
 		if (is_closure(value) && is_macro(value)) {
 			code = value;
-			s_save(OP_MACRO_EXPAND2, args, code);
+			s_save(LOC_MACRO_EXPAND2, args, code);
 			code = cons(LAMBDA, closure_code(code));
 			args = NIL;
-			s_goto(OP_EVAL);
+			s_goto(LOC_EVAL);
 		}
 		s_return(car(args));
 
-	case OP_MACRO_EXPAND2:	/* macro-expand */
+	case LOC_MACRO_EXPAND2:	/* macro-expand */
 		if (syntaxnum(code) & T_DEFSYNTAX) {
 			value = code;
 			code = car(args);
-			s_goto(OP_EXPANDPATTERN);
+			s_goto(LOC_EXPANDPATTERN);
 		} else if (exttype(code) & T_DEFMACRO) {
 			args = cdar(args);
 		}
 		code = value;
-		s_goto(OP_APPLY);
+		s_goto(LOC_APPLY);
 
-	case OP_ATOMP:		/* atom? */
+	case LOC_ATOMP:		/* atom? */
 		if (!validargs("atom?", 1, 1, TST_NONE)) Error_0(msg);
 		s_retbool(is_atom(car(args)));
 
@@ -6787,7 +6787,7 @@ OP_PVECFROM:
 
 /* ========== Initialization of internal keywords ========== */
 
-pointer mk_syntax( enum eval_op operator, char *name )
+pointer mk_syntax( enum eval_location operator, char *name )
 {
     pointer x;
     x = mk_string( name );
@@ -6796,7 +6796,7 @@ pointer mk_syntax( enum eval_op operator, char *name )
     return x;
 }
 
-void scheme_register_syntax( enum eval_op operator, char *name, pointer environment )
+void scheme_register_syntax( enum eval_location operator, char *name, pointer environment )
 {
     pointer x,y;
 
@@ -6807,7 +6807,7 @@ void scheme_register_syntax( enum eval_op operator, char *name, pointer environm
     car( environment ) = x;
 }
 
-pointer mk_proc( enum eval_op operator, pointer *pp )
+pointer mk_proc( enum eval_location operator, pointer *pp )
 {
     pointer x = get_cell( pp, &NIL );
     type( x ) = ( T_PROC | T_ATOM );
@@ -6816,7 +6816,7 @@ pointer mk_proc( enum eval_op operator, pointer *pp )
     return x;
 }
 
-void scheme_register_proc( enum eval_op operator, char *name, pointer environment )
+void scheme_register_proc( enum eval_location operator, char *name, pointer environment )
 {
     pointer x, y;
     x = mk_symbol( name );
@@ -6940,9 +6940,9 @@ int scheme_load_file(FILE *fin)
 	}
 	inport = mk_port(fin, port_input);
 	if (setjmp(error_jmp) == 0) {
-		op = OP_T0LVL;
+		op = LOC_T0LVL;
 	} else {
-		op = OP_QUIT;
+		op = LOC_QUIT;
 	}
 	return Eval_Cycle(op);
 }
@@ -6954,9 +6954,9 @@ int scheme_load_string(const char *cmd)
 	interactive_repl = 0;
 	inport = port_from_string(cmd, port_input);
 	if (setjmp(error_jmp) == 0) {
-		op = OP_T0LVL;
+		op = LOC_T0LVL;
 	} else {
-		op = OP_QUIT;
+		op = LOC_QUIT;
 	}
 	return Eval_Cycle(op);
 }
@@ -7020,7 +7020,7 @@ pointer scheme_call(pointer func, pointer argslist)
 	envir = global_env;
 	args = argslist;	/* assumed to be already eval'ed. */
 	code = func;		/* assumed to be already eval'ed. */
-	Eval_Cycle(OP_APPLY);
+	Eval_Cycle(LOC_APPLY);
 	interactive_repl = old_repl;
 	restore_from_C_call();
 	return value;
@@ -7033,7 +7033,7 @@ pointer scheme_eval(pointer obj)
 	save_from_C_call();
 	args = NIL;
 	code = obj;
-	Eval_Cycle(OP_EVAL);
+	Eval_Cycle(LOC_EVAL);
 	interactive_repl = old_repl;
 	restore_from_C_call();
 	return value;
@@ -7046,7 +7046,7 @@ pointer autoscheme_eval( pointer object, pointer environment )
 	envir = environment;
 	args = NIL;
 	code = object;
-	Eval_Cycle(OP_EVAL);
+	Eval_Cycle(LOC_EVAL);
 	interactive_repl = old_repl;
 	restore_from_C_call();
 	return value;
@@ -7075,7 +7075,7 @@ void FatalError(char *s)
 	fprintf(stderr, "Fatal error: %s\n", s);
 	flushinput();
 	args = NIL;
-	longjmp(error_jmp, OP_QUIT);
+	longjmp(error_jmp, LOC_QUIT);
 }
 void FatalForeignError( char *s )
 {

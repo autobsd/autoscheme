@@ -29,26 +29,26 @@
 
   (begin
 
-    ((foreign-syntax OP_DEF0 "define") char-alphabetic? (foreign-procedure OP_CHARAP))
+    ((foreign-syntax LOC_DEF0 "define") char-alphabetic? (foreign-procedure LOC_CHARAP))
 
-    ((foreign-syntax OP_DEF0 "define") char-ci<=? (foreign-procedure OP_CHARCILEQ))
-    ((foreign-syntax OP_DEF0 "define") char-ci<? (foreign-procedure OP_CHARCILSS))
-    ((foreign-syntax OP_DEF0 "define") char-ci=? (foreign-procedure OP_STRCIGEQ))
-    ((foreign-syntax OP_DEF0 "define") char-ci>=? (foreign-procedure OP_CHARCIGEQ))
-    ((foreign-syntax OP_DEF0 "define") char-ci>? (foreign-procedure OP_CHARCIGTR))
+    ((foreign-syntax LOC_DEF0 "define") char-ci<=? (foreign-procedure LOC_CHARCILEQ))
+    ((foreign-syntax LOC_DEF0 "define") char-ci<? (foreign-procedure LOC_CHARCILSS))
+    ((foreign-syntax LOC_DEF0 "define") char-ci=? (foreign-procedure LOC_STRCIGEQ))
+    ((foreign-syntax LOC_DEF0 "define") char-ci>=? (foreign-procedure LOC_CHARCIGEQ))
+    ((foreign-syntax LOC_DEF0 "define") char-ci>? (foreign-procedure LOC_CHARCIGTR))
 
-    ((foreign-syntax OP_DEF0 "define") char-downcase (foreign-procedure OP_CHARDNCASE))
-    ((foreign-syntax OP_DEF0 "define") char-lower-case? (foreign-procedure OP_CHARLP))
-    ((foreign-syntax OP_DEF0 "define") char-numeric? (foreign-procedure OP_CHARNP))
-    ((foreign-syntax OP_DEF0 "define") char-upper-case? (foreign-procedure OP_CHARUP))
-    ((foreign-syntax OP_DEF0 "define") char-upcase (foreign-procedure OP_CHARUPCASE))
-    ((foreign-syntax OP_DEF0 "define") char-whitespace? (foreign-procedure OP_CHARWP))
+    ((foreign-syntax LOC_DEF0 "define") char-downcase (foreign-procedure LOC_CHARDNCASE))
+    ((foreign-syntax LOC_DEF0 "define") char-lower-case? (foreign-procedure LOC_CHARLP))
+    ((foreign-syntax LOC_DEF0 "define") char-numeric? (foreign-procedure LOC_CHARNP))
+    ((foreign-syntax LOC_DEF0 "define") char-upper-case? (foreign-procedure LOC_CHARUP))
+    ((foreign-syntax LOC_DEF0 "define") char-upcase (foreign-procedure LOC_CHARUPCASE))
+    ((foreign-syntax LOC_DEF0 "define") char-whitespace? (foreign-procedure LOC_CHARWP))
 
-    ((foreign-syntax OP_DEF0 "define") string-ci<=? (foreign-procedure OP_STRCILEQ))
-    ((foreign-syntax OP_DEF0 "define") string-ci<? (foreign-procedure OP_STRCILSS))
-    ((foreign-syntax OP_DEF0 "define") string-ci=? (foreign-procedure OP_STRCIEQU))
-    ((foreign-syntax OP_DEF0 "define") string-ci>=? (foreign-procedure OP_STRCIGEQ))
-    ((foreign-syntax OP_DEF0 "define") string-ci>? (foreign-procedure OP_STRCIGTR))
+    ((foreign-syntax LOC_DEF0 "define") string-ci<=? (foreign-procedure LOC_STRCILEQ))
+    ((foreign-syntax LOC_DEF0 "define") string-ci<? (foreign-procedure LOC_STRCILSS))
+    ((foreign-syntax LOC_DEF0 "define") string-ci=? (foreign-procedure LOC_STRCIEQU))
+    ((foreign-syntax LOC_DEF0 "define") string-ci>=? (foreign-procedure LOC_STRCIGEQ))
+    ((foreign-syntax LOC_DEF0 "define") string-ci>? (foreign-procedure LOC_STRCIGTR))
 
   )
 )

@@ -115,6 +115,8 @@ auto_scheme_directory_dep = \
 auto_scheme_path_module_scm = $(modules_dir)/auto/scheme/path/module.scm 
 auto_scheme_path_dep = \
 	$(auto_scheme_path_module_scm) \
+	$(modules_dir)/auto/scheme/path/declarations.h \
+	$(modules_dir)/auto/scheme/path/definitions.c \
 
 scheme_read_module_scm = $(modules_dir)/scheme/read/module.scm 
 scheme_read_dep = \

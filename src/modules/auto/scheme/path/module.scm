@@ -2,11 +2,14 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
+(foreign-declare (include-string "declarations.h"))
+(foreign-define (include-string "definitions.c"))
+
+
 (define-library (auto scheme path)
 
   (import (auto scheme base)
 	  (auto scheme directory)
-	  (auto scheme write)
 	  )
 
   (export path-directory
@@ -30,9 +33,8 @@
 	      (substring path 0 pos)))))
 
 
-    (define path-absolute?
-      (lambda (path)
-	(char=? (string-ref path 0) #\/)))
+    (define path-absolute? (foreign-function ff_path_absolute_p))
+
 
 
     (define path-make-absolute

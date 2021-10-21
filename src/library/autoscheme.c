@@ -5993,7 +5993,7 @@ LOC_VECTOR:
 	case LOC_CHARLP:		/* char-lower-case? */
 		if (!validargs("char-lower-case?", 1, 1, TST_CHAR)) Error_0(msg);
 		s_retbool(utf32_islower((int)ivalue(car(args))));
-	case LOC_PROC:		/* procedure? */
+	case LOC_PROCP:		/* procedure? */
 		if (!validargs("procedure?", 1, 1, TST_ANY)) Error_0(msg);
 		/*--
 		 * continuation should be procedure by the example

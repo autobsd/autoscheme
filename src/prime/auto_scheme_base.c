@@ -228,7 +228,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
     scheme_register_operation(LOC_PORTP, "port?", environment);
     scheme_register_operation(LOC_POSP, "positive?", environment);
-    scheme_register_operation(LOC_PROC, "procedure?", environment);
+    scheme_register_operation(LOC_PROCP, "procedure?", environment);
     scheme_register_syntax(LOC_QQUOTE0, "quasiquote", environment);
     scheme_register_syntax(LOC_QUOTE, "quote", environment);
     scheme_register_operation(LOC_QUO, "quotient", environment);

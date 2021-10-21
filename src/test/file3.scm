@@ -17,10 +17,15 @@
 
 (display "testing:\n")
 
-(write (current-directory)) (newline)
-(write (command-line))(newline)
-(write (get-environment-variables))(newline)
-(write (get-environment-variable "HOME"))(newline)
+;; (write (current-directory)) (newline)
+;; (write (command-line))(newline)
+;; (write (get-environment-variables))(newline)
+;; (write (get-environment-variable "HOME"))(newline)
+
+
+(write (macro? +))(newline)
+(write (closure? +))(newline)
+(write (procedure? +))(newline)
 
 
 (define-macro (mymac x)
@@ -29,6 +34,8 @@
 (write mymac) (newline)
 (write (mymac 3)) (newline)
 (write (macro? mymac))(newline)
+(write (closure? mymac))(newline)
+(write (procedure? mymac))(newline)
 
 ;; (write (macro-expand '(mymac 3)))(newline)
 
@@ -58,39 +65,39 @@
 
 (write (add7 3))(newline)
 
-(gc-verbose #t)
-(collect-garbage)
+;; (gc-verbose #t)
+;; (collect-garbage)
 
-(write (last-pair '(a b c)))(newline)
+;; (write (last-pair '(a b c)))(newline)
 
-(write (get-closure-code (lambda () (display "message"))))(newline)
+;; (write (get-closure-code (lambda () (display "message"))))(newline)
 
-(define expression (delay (display "evaluating expression now")(newline)))
+;; (define expression (delay (display "evaluating expression now")(newline)))
 
-(display "expression defined")(newline)
+;; (display "expression defined")(newline)
 
-(force expression)
-(force expression)
+;; (force expression)
+;; (force expression)
 
-(display (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme base)"))))(newline)
+;; (display (environment-defined-symbols (environment-ref (current-environment) (string->symbol "(auto scheme base)"))))(newline)
 
-(newline)
-(define my-param (make-parameter 5 (lambda (x) (+ x 1))))
-(display "(my-param): ")(write (my-param))(newline)
-(display "(my-param): ")(write (my-param))(newline)
-(display "(my-param 3): ")(write (my-param 3))(newline)
-(display "(my-param): ")(write (my-param))(newline)
-(display "(my-param): ")(write (my-param))(newline)
-(display "(my-param 7): ")(write (my-param 7))(newline)
-(display "(my-param): ")(write (my-param))(newline)
+;; (newline)
+;; (define my-param (make-parameter 5 (lambda (x) (+ x 1))))
+;; (display "(my-param): ")(write (my-param))(newline)
+;; (display "(my-param): ")(write (my-param))(newline)
+;; (display "(my-param 3): ")(write (my-param 3))(newline)
+;; (display "(my-param): ")(write (my-param))(newline)
+;; (display "(my-param): ")(write (my-param))(newline)
+;; (display "(my-param 7): ")(write (my-param 7))(newline)
+;; (display "(my-param): ")(write (my-param))(newline)
 
-(parameterize ((my-param 2))
-	      (display "(my-param): ")(write (my-param))(newline)
-	      )
+;; (parameterize ((my-param 2))
+;; 	      (display "(my-param): ")(write (my-param))(newline)
+;; 	      )
 
-(display "(my-param): ")(write (my-param))(newline)
+;; (display "(my-param): ")(write (my-param))(newline)
 
-;; (write
-;; (include_ "file1.scm" 
-;; 	  "file2.scm")
-;; )(newline)
+;; ;; (write
+;; ;; (include_ "file1.scm" 
+;; ;; 	  "file2.scm")
+;; ;; )(newline)

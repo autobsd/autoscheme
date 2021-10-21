@@ -116,9 +116,9 @@ struct cell {
 
 #define T_STRING         1	/* 0000000000000001 */
 #define T_NUMBER         2	/* 0000000000000010 */
-#define T_SYMBOL         4	/* 0000000000000100 */
+#define T_SYMBOL         4	/* 0000000000000100 */ 
 #define T_SYNTAX         8	/* 0000000000001000 */
-#define T_PROC          16	/* 0000000000010000 */
+#define T_OPERATION     16	/* 0000000000010000 */
 #define T_PAIR          32	/* 0000000000100000 */
 #define T_CLOSURE       64	/* 0000000001000000 */
 #define T_CONTINUATION 128	/* 0000000010000000 */
@@ -171,9 +171,9 @@ struct cell {
 #define symname(p)      strvalue(p)
 
 #define is_syntax(p)    (type(p)&T_SYNTAX)
-#define is_proc(p)      (type(p)&T_PROC)
+#define is_operation(p) (type(p)&T_OPERATION)
 #define syntaxnum(p)    (*(short *)&(p)->_extflag)
-#define procnum(p)      (int)ivalue(p)
+#define op_loc(p)      (int)ivalue(p)
 
 #define is_closure(p)   (type(p)&T_CLOSURE)
 #define is_macro(p)     (exttype(p)&T_MACRO)

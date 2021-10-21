@@ -1117,7 +1117,7 @@ void gc(pointer *a, pointer *b)
 				bignum(scan) = forward(bignum(scan));
 			}
 			break;
-		case T_PROC:
+		case T_OPERATION:
 		case T_CHARACTER:
 		case T_VECTOR:
 		case T_FOREIGN:
@@ -1923,9 +1923,9 @@ static char *atom2str(pointer l, int f)
 				break;
 			}
 		}
-	} else if (is_proc(l)) {
+	} else if (is_operation(l)) {
 		p = strvalue(strbuff);
-		sprintf(p, "#<PROCEDURE %d>", procnum(l));
+		sprintf(p, "#<PROCEDURE %d>", op_loc(l));
 	} else if (is_port(l)) {
 		if (port_file(l) != NULL) {
 			p = "#<PORT>";
@@ -1939,9 +1939,9 @@ static char *atom2str(pointer l, int f)
 			} else {
 				p = "#<PROMISE>";
 			}
-		} else if (is_proc(l)) {
+		} else if (is_operation(l)) {
 		    p = strvalue(strbuff);
-		    sprintf(p, "#<PROCEDURE %d>", procnum(l));
+		    sprintf(p, "#<PROCEDURE %d>", op_loc(l));
 		} else if (is_macro(l)) {
 			p = "#<MACRO>";
 		} else {
@@ -1951,7 +1951,7 @@ static char *atom2str(pointer l, int f)
 		p = "#<CONTINUATION>";
 	} else if (is_foreign(l)) {
 		p = strvalue(strbuff);
-		sprintf(p, "#<FOREIGN PROCEDURE %d>", procnum(l));
+		sprintf(p, "#<FOREIGN PROCEDURE %d>", op_loc(l));
 	} else {
 		p = "#<ERROR>";
 	}
@@ -3189,8 +3189,8 @@ LOOP:
 	case LOC_APPLY:		/* apply 'code' to 'args' */
 LOC_APPLY:
 
-		if (is_proc(code)) {	/* PROCEDURE */
-			location = procnum(code);
+		if (is_operation(code)) {	/* PROCEDURE */
+			location = op_loc(code);
 			goto LOOP;
 		} else if (is_foreign(code)) {	/* FOREIGN */
 			push_recent_alloc(args);
@@ -6000,7 +6000,7 @@ LOC_VECTOR:
 		 * (call-with-current-continuation procedure?) ==> #t
 		 * in R^3 report sec. 6.9
 		 */
-		s_retbool(is_proc(car(args)) || is_closure(car(args))
+		s_retbool(is_operation(car(args)) || is_closure(car(args))
 			  || is_continuation(car(args)));
 	case LOC_PAIR:		/* pair? */
 		if (!validargs("pair?", 1, 1, TST_ANY)) Error_0(msg);
@@ -6810,7 +6810,7 @@ void scheme_register_syntax( enum eval_location location, char *name, pointer en
 pointer mk_proc( enum eval_location location, pointer *pp )
 {
     pointer x = get_cell( pp, &NIL );
-    type( x ) = ( T_PROC | T_ATOM );
+    type( x ) = ( T_OPERATION | T_ATOM );
     ivalue( x ) = location;
     set_num_integer( x );
     return x;

@@ -12,7 +12,7 @@ pointer LOAD_MODULE__auto_scheme_directory(pointer environment);
 #include <unistd.h>
 
 
-static pointer ff_current_directory( pointer args );
+pointer ff_current_directory( pointer args );
 
 
 
@@ -20,7 +20,7 @@ static pointer ff_current_directory( pointer args );
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-static pointer ff_current_directory( pointer args )
+pointer ff_current_directory( pointer args )
 {
     /* char buff[FILENAME_MAX]; */
     /* GetCurrentDir( buff, FILENAME_MAX ); */

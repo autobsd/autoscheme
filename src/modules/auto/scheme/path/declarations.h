@@ -2,4 +2,8 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-static pointer ff_path_absolute_p( pointer args );
+#include <string.h>
+
+pointer ff_path_absolute_p( pointer args );
+pointer ff_path_make_absolute( pointer args );
+pointer ff_path_directory( pointer args );

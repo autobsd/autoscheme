@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 
-static pointer ff_current_directory( pointer args );
+pointer ff_current_directory( pointer args );
 
 
 

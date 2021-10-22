@@ -13,6 +13,7 @@
 	(auto scheme lazy)
 	(auto scheme memory)
 	(auto scheme closure)
+	(auto scheme path)
 	)
 
 (display "testing:\n")
@@ -38,6 +39,9 @@
 (display "closure?: ")(write (closure? mymac))(newline)
 (display "procedure?: ")(write (procedure? mymac))(newline)
 
+
+
+
 (define (add2 x)
   (+ x 2))
 
@@ -54,8 +58,10 @@
 (display "procedure?: ")(write (procedure? environment-only))(newline)
 
 
-
-
+(newline)
+(define path "/some/path/to/file.scm")
+(display "path: ")(write path)(newline)
+(display "path-directory: ")(write (path-directory path))(newline)
 ;; (gc-verbose #t)
 ;; (collect-garbage)
 

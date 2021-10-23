@@ -95,12 +95,13 @@
 ;; (display "(my-param): ")(write (my-param))(newline)
 
 
-;; (include "file2.scm")
+(include "file2.scm")
 
 
-;; (display "x: ")(write x)(newline)
-
-
-(define x (quote (a b . c) 5 5))
 (display "x: ")(write x)(newline)
-(display "(list? x): ")(write (list? x))(newline)
+
+
+
+;; (define x (quote (a b . c) 5 5))
+;; (display "x: ")(write x)(newline)
+;; (display "(list? x): ")(write (list? x))(newline)

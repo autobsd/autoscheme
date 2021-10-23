@@ -49,6 +49,11 @@
 
 
 
+    (define compile-remainder
+      (lambda (remainder source quote-level)
+	(cond ((pair? remainder) (string-append "cons(" (compile-expression (car remainder) source quote-level) "," (compile-remainder (cdr remainder) source quote-level) ")"))
+	      (else (compile-expression remainder source quote-level))
+	      )))
 
     (define compile-expression
       (lambda (expression source quote-level)
@@ -111,16 +116,16 @@
 
 
 	  (cond ((and (pair? expression) (equal? (car expression) 'quote) (zero? quote-level))
-		 (string-append "cons( mk_symbol(\"quote\" )," (compile-expression (cdr expression) source -1) ")"))
+		 (string-append "cons(mk_symbol(\"quote\")," (compile-remainder (cdr expression) source -1) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'quasiquote) (not (negative? quote-level)))
-		 (string-append "cons( mk_symbol(\"quasiquote\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
+		 (string-append "cons(mk_symbol(\"quasiquote\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
-		 (string-append "cons( mk_symbol(\"unquote\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
+		 (string-append "cons(mk_symbol(\"unquote\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'unquote-splicing) (positive? quote-level))
-		 (string-append "cons( mk_symbol(\"unquote-splicing\" )," (compile-expression (cdr expression) source (+ quote-level 1)) ")"))
+		 (string-append "cons(mk_symbol(\"unquote-splicing\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
 
 
 
@@ -151,7 +156,7 @@
 		   (compile-expression expanded-expression source _quote-level)
 		   ))
 
-		((pair? expression) (string-append "cons(" (compile-expression (car expression) source quote-level) "," (compile-expression (cdr expression) source quote-level) ")"))
+		((pair? expression) (string-append "cons(" (compile-expression (car expression) source quote-level) "," (compile-remainder (cdr expression) source quote-level) ")"))
 		((null? expression) (string-append "NIL"))
 		((boolean? expression) (if expression (string-append "T") (string-append "F")))
 		((char? expression) (string-append "mk_character(" (number->string (char->integer expression)) ")"))

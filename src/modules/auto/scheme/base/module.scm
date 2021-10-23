@@ -92,7 +92,7 @@
 ((foreign-syntax LOC_DEF0 "define") write-simple (foreign-procedure LOC_WRITE))
 
 
-(define include_ 
+(define include
   (let* ((current-directory (foreign-function ff_current_directory))
 	 (current-source (foreign-procedure LOC_CURR_SOURCE))
 

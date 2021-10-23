@@ -12,8 +12,8 @@
 
   (begin 
 
-    ((foreign-syntax LOC_DEF0 "define") display-simple (foreign-procedure LOC_DISPLAY))
-    ((foreign-syntax LOC_DEF0 "define") write-simple (foreign-procedure LOC_WRITE))
+    ((foreign-syntax LOC_DEF0 "define") display-simple (foreign-operation LOC_DISPLAY))
+    ((foreign-syntax LOC_DEF0 "define") write-simple (foreign-operation LOC_WRITE))
 
     ((foreign-syntax LOC_DEF0 "define") write write-simple)
     ((foreign-syntax LOC_DEF0 "define") display display-simple)

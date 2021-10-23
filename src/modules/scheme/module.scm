@@ -6,15 +6,15 @@
 (foreign-initialize (include-string "initialization.c"))
 (foreign-finalize (include-string "finalization.c"))
 
-(define eval (foreign-procedure LOC_PEVAL))
-(define write-simple (foreign-procedure LOC_WRITE))
+(define eval (foreign-operation LOC_PEVAL))
+(define write-simple (foreign-operation LOC_WRITE))
 
 (include "macros.scm")
 (include "procedures.scm")
 
 (environment-import! (foreign-pointer module_environment) (environment-only (current-environment) 
-									    ((foreign-procedure LOC_STR2SYM) "define-library")
-									    ((foreign-procedure LOC_STR2SYM) "import")
+									    ((foreign-operation LOC_STR2SYM) "define-library")
+									    ((foreign-operation LOC_STR2SYM) "import")
 									    ))
 
-(environment-delete! (foreign-pointer module_environment) ((foreign-procedure LOC_STR2SYM) "(scheme)"))
+(environment-delete! (foreign-pointer module_environment) ((foreign-operation LOC_STR2SYM) "(scheme)"))

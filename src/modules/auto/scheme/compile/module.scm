@@ -132,7 +132,7 @@
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-function))
 		 (string-append "mk_function(" (object->string (cadr expression)) ",&NIL)" ))
 
-		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-procedure))
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-operation))
 		 (string-append "mk_operation(" (object->string (cadr expression)) ",&NIL)" ))
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-syntax))

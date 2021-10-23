@@ -10,8 +10,8 @@
 
   (begin
 
-    ((foreign-syntax LOC_DEF0 "define") open-input-output-file (foreign-procedure LOC_OPEN_INOUTFILE))
-    ((foreign-syntax LOC_DEF0 "define") open-input-output-string (foreign-procedure LOC_OPEN_INOUTSTRING))
+    ((foreign-syntax LOC_DEF0 "define") open-input-output-file (foreign-operation LOC_OPEN_INOUTFILE))
+    ((foreign-syntax LOC_DEF0 "define") open-input-output-string (foreign-operation LOC_OPEN_INOUTSTRING))
 
     )
   )

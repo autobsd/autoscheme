@@ -28,7 +28,7 @@
 
 
 ((foreign-syntax LOC_DEFMACRO0 "define-macro") (parameterize associations . body)
-  (let* ((eval (foreign-procedure LOC_PEVAL))
+  (let* ((eval (foreign-operation LOC_PEVAL))
 	 (params (map (lambda (association)
 			(eval (car association) (expansion-environment)))
 		      associations))
@@ -89,21 +89,21 @@
 
 
 
-((foreign-syntax LOC_DEF0 "define") write-simple (foreign-procedure LOC_WRITE))
+((foreign-syntax LOC_DEF0 "define") write-simple (foreign-operation LOC_WRITE))
 
 
 (define include
   (let* ((current-directory (foreign-function ff_current_directory))
-	 (current-source (foreign-procedure LOC_CURR_SOURCE))
+	 (current-source (foreign-operation LOC_CURR_SOURCE))
 
 	 (macro (foreign-syntax LOC_MACRO "macro"))
 
 	 (path-make-absolute (foreign-function ff_path_make_absolute))
 	 (path-directory (foreign-function ff_path_directory))
 
-	 (with-input-from-file (foreign-procedure LOC_WITH_INFILE0))
-	 (eval (foreign-procedure LOC_PEVAL))
-	 (read (foreign-procedure LOC_READ))
+	 (with-input-from-file (foreign-operation LOC_WITH_INFILE0))
+	 (eval (foreign-operation LOC_PEVAL))
+	 (read (foreign-operation LOC_READ))
 	 )
 
     (macro filenames

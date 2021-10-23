@@ -16,8 +16,8 @@
 
     ((foreign-syntax LOC_DEF0 "define") define-macro (foreign-syntax LOC_DEFMACRO0 "define-macro"))
     ((foreign-syntax LOC_DEF0 "define") macro (foreign-syntax LOC_MACRO "macro"))
-    ((foreign-syntax LOC_DEF0 "define") macro-expand (foreign-procedure LOC_MACRO_EXPAND0))
-    ((foreign-syntax LOC_DEF0 "define") macro? (foreign-procedure LOC_MACROP))
+    ((foreign-syntax LOC_DEF0 "define") macro-expand (foreign-operation LOC_MACRO_EXPAND0))
+    ((foreign-syntax LOC_DEF0 "define") macro? (foreign-operation LOC_MACROP))
 
-    ((foreign-syntax LOC_DEF0 "define") gensym (foreign-procedure LOC_GENSYM))
+    ((foreign-syntax LOC_DEF0 "define") gensym (foreign-operation LOC_GENSYM))
     ))

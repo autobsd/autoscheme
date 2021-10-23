@@ -10,8 +10,8 @@
 
   (begin
 
-    ((foreign-syntax LOC_DEF0 "define") gc (foreign-procedure LOC_GC))
-    ((foreign-syntax LOC_DEF0 "define") gc-verbose (foreign-procedure LOC_GCVERB))
+    ((foreign-syntax LOC_DEF0 "define") gc (foreign-operation LOC_GC))
+    ((foreign-syntax LOC_DEF0 "define") gc-verbose (foreign-operation LOC_GCVERB))
 
 
   )

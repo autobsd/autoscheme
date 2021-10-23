@@ -17,7 +17,7 @@
   (export load)
 
   (begin
-    (define current-source (foreign-procedure LOC_CURR_SOURCE))
+    (define current-source (foreign-operation LOC_CURR_SOURCE))
 
     (define path-make-absolute (foreign-function ff_path_make_absolute))
     (define path-directory (foreign-function ff_path_directory))

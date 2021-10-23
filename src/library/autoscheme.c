@@ -103,8 +103,9 @@ int call_history_pos;           /* current position within call history vector *
 struct cell _ZERO;		/* special cell representing integer 0 */
 struct cell _ONE;		/* special cell representing integer 1 */
 
-pointer inport = &_NIL;		/* pointer to current-input-port */
-pointer outport = &_NIL;	/* pointer to current-output-port */
+pointer current_inport = &_NIL;	/* pointer to current-input-port */
+pointer current_outport = &_NIL;/* pointer to current-output-port */
+pointer current_source = &_NIL; /* pointer to current-source */
 
 pointer winders = &_NIL;	/* pointer to winders list */
 
@@ -1069,8 +1070,9 @@ void gc(pointer *a, pointer *b)
 	symbol_list = forward(symbol_list);
 	global_env = forward(global_env);
 	call_history = forward(call_history);
-	inport = forward(inport);
-	outport = forward(outport);
+	current_inport = forward(current_inport);
+	current_outport = forward(current_outport);
+	current_source = forward(current_source);
 	winders = forward(winders);
 	strbuff = forward(strbuff);
 
@@ -1281,8 +1283,9 @@ void gc(pointer *a, pointer *b)
 	mark(symbol_list);
 	mark(global_env);
 	mark(call_history);
-	mark(inport);
-	mark(outport);
+	mark(current_inport);
+	mark(current_outport);
+	mark(current_source);
 	mark(winders);
 	mark(strbuff);
 
@@ -1436,29 +1439,29 @@ static int inchar(void)
 {
 	int c;
 
-	if (port_file(inport) == NULL || is_eofport(inport)) {
+	if (port_file(current_inport) == NULL || is_eofport(current_inport)) {
 		return EOF;
 	}
-	if (is_fileport(inport)) {
-		if (feof(port_file(inport))) {
-			inport->_isfixnum |= port_eof;
+	if (is_fileport(current_inport)) {
+		if (feof(port_file(current_inport))) {
+			current_inport->_isfixnum |= port_eof;
 			return EOF;
 		}
 
-		c = utf8_fgetc(port_file(inport));
+		c = utf8_fgetc(port_file(current_inport));
 		if (c == EOF) {
-			inport->_isfixnum |= port_eof;
-			if (port_file(inport) == stdin) {
+			current_inport->_isfixnum |= port_eof;
+			if (port_file(current_inport) == stdin) {
 				fprintf(stderr, "Good-bye\n");
-				port_file(inport) = NULL;
+				port_file(current_inport) = NULL;
 			}
 		}
 	} else {
-		if (port_curr(inport) == strvalue(car(inport)) + strlength(car(inport))) {
-			inport->_isfixnum |= port_eof;
+		if (port_curr(current_inport) == strvalue(car(current_inport)) + strlength(car(current_inport))) {
+			current_inport->_isfixnum |= port_eof;
 			return EOF;
 		} else {
-			port_curr(inport) += utf8_get_next(port_curr(inport), &c);
+			port_curr(current_inport) += utf8_get_next(port_curr(current_inport), &c);
 		}
 	}
 	return c;
@@ -1468,17 +1471,17 @@ static int inchar(void)
 static void flushinput(void)
 {
 	while (1) {
-		if (is_fileport(inport) && port_file(inport) != stdin && port_file(inport) != NULL) {
-			fclose(port_file(inport));
-			port_file(inport) = NULL;
+		if (is_fileport(current_inport) && port_file(current_inport) != stdin && port_file(current_inport) != NULL) {
+			fclose(port_file(current_inport));
+			port_file(current_inport) = NULL;
 		}
 		if (load_files == 1) {
 			break;
 		}
-		inport = load_stack[--load_files];
+		current_inport = load_stack[--load_files];
 	}
 
-	inport = load_stack[0];
+	current_inport = load_stack[0];
 }
 
 /* check c is delimiter */
@@ -1495,30 +1498,30 @@ static int isdelim(char *s, int c)
 static void backchar(int c)
 {
 	if (c != EOF) {
-		if (is_fileport(inport)) {
+		if (is_fileport(current_inport)) {
 			char utf8[4];
 			size_t n = utf32_to_utf8(c, utf8);
 			while (n > 0) {
-				internal_ungetc(utf8[--n], port_file(inport));
+				internal_ungetc(utf8[--n], port_file(current_inport));
 			}
-		} else if (port_curr(inport) != strvalue(car(inport))) {
-			port_curr(inport) -= utf32_to_utf8(c, NULL);
+		} else if (port_curr(current_inport) != strvalue(car(current_inport))) {
+			port_curr(current_inport) -= utf32_to_utf8(c, NULL);
 		}
 	}
 }
 
 static void putstr(const char *s)
 {
-	if (is_fileport(outport)) {
-		fputs(s, port_file(outport));
+	if (is_fileport(current_outport)) {
+		fputs(s, port_file(current_outport));
 	} else {
-		char *endp = strvalue(car(outport)) + strlength(car(outport));
+		char *endp = strvalue(car(current_outport)) + strlength(car(current_outport));
 		while (*s) {
-			if (port_curr(outport) < endp) {
-				*port_curr(outport)++ = *s++;
-				if (port_curr(outport) == endp) {
-					outport = realloc_port_string(outport);
-					endp = strvalue(car(outport)) + strlength(car(outport));
+			if (port_curr(current_outport) < endp) {
+				*port_curr(current_outport)++ = *s++;
+				if (port_curr(current_outport) == endp) {
+					current_outport = realloc_port_string(current_outport);
+					endp = strvalue(car(current_outport)) + strlength(car(current_outport));
 				}
 			}
 		}
@@ -1527,14 +1530,14 @@ static void putstr(const char *s)
 
 static void putcharacter(const int c)
 {
-	if (is_fileport(outport)) {
-		fputc(c, port_file(outport));
+	if (is_fileport(current_outport)) {
+		fputc(c, port_file(current_outport));
 	} else {
-		char *endp = strvalue(car(outport)) + strlength(car(outport));
-		if (port_curr(outport) < endp) {
-			*port_curr(outport)++ = (unsigned char)c;
-			if (port_curr(outport) == endp) {
-				outport = realloc_port_string(outport);
+		char *endp = strvalue(car(current_outport)) + strlength(car(current_outport));
+		if (port_curr(current_outport) < endp) {
+			*port_curr(current_outport)++ = (unsigned char)c;
+			if (port_curr(current_outport) == endp) {
+				current_outport = realloc_port_string(current_outport);
 			}
 		}
 	}
@@ -3275,17 +3278,17 @@ LOC_APPLYCONT:
 
 	case LOC_T0LVL:	/* top level */
 LOC_T0LVL:
-		if (port_file(inport) == NULL || is_eofport(inport)) {
-			if (is_fileport(inport) && port_file(inport) != stdin && port_file(inport) != NULL) {
-				fclose(port_file(inport));
-				port_file(inport) = NULL;
+		if (port_file(current_inport) == NULL || is_eofport(current_inport)) {
+			if (is_fileport(current_inport) && port_file(current_inport) != stdin && port_file(current_inport) != NULL) {
+				fclose(port_file(current_inport));
+				port_file(current_inport) = NULL;
 			}
 			if (load_files == 1) {
 				break;
 			}
-			inport = load_stack[--load_files];
+			current_inport = load_stack[--load_files];
 		}
-		if (port_file(inport) == stdin) {
+		if (port_file(current_inport) == stdin) {
 			putstr("\n");
 		}
 #ifndef USE_SCHEME_STACK
@@ -3296,7 +3299,7 @@ LOC_T0LVL:
 		envir = global_env;
 		s_save(LOC_VALUEPRINT, NIL, NIL);
 		s_save(LOC_T1LVL, NIL, NIL);
-		if (port_file(inport) == stdin) {
+		if (port_file(current_inport) == stdin) {
 			printf(prompt);
 		}
 		s_goto(LOC_READ_INTERNAL);
@@ -3313,7 +3316,7 @@ LOC_READ_INTERNAL:
 	case LOC_VALUEPRINT:	/* print evalution result */
 		print_flag = 1;
 		args = value;
-		if (port_file(inport) == stdin) {
+		if (port_file(current_inport) == stdin) {
 			s_save(LOC_T0LVL, NIL, NIL);
 			s_goto(LOC_P0LIST);
 		} else {
@@ -6094,10 +6097,10 @@ LOC_VECTOR:
 			break;
 		}
 		if (is_pair(cdr(args))) {
-			if (cadr(args) != outport) {
-				outport = cons(outport, NIL);
-				s_save(LOC_CURR_OUTPORT, outport, NIL);
-				outport = cadr(args);
+			if (cadr(args) != current_outport) {
+				current_outport = cons(current_outport, NIL);
+				s_save(LOC_CURR_OUTPORT, current_outport, NIL);
+				current_outport = cadr(args);
 			}
 		}
 		args = car(args);
@@ -6107,10 +6110,10 @@ LOC_VECTOR:
 	case LOC_NEWLINE:	/* newline */
 		if (!validargs("newline", 0, 1, TST_OUTPORT)) Error_0(msg);
 		if (is_pair(args)) {
-			if (car(args) != outport) {
-				outport = cons(outport, NIL);
-				s_save(LOC_CURR_OUTPORT, outport, NIL);
-				outport = car(args);
+			if (car(args) != current_outport) {
+				current_outport = cons(current_outport, NIL);
+				s_save(LOC_CURR_OUTPORT, current_outport, NIL);
+				current_outport = car(args);
 			}
 		}
 		putstr("\n");
@@ -6118,9 +6121,9 @@ LOC_VECTOR:
 
 	case LOC_ERR0:	/* error */
 		if (!validargs("error", 1, 65535, TST_NONE)) Error_0(msg);
-		tmpfp = port_file(outport);
+		tmpfp = port_file(current_outport);
 		fflush(tmpfp);
-		port_file(outport) = stderr;
+		port_file(current_outport) = stderr;
 		fprintf(stderr, "\n\nError - ");
 		fprintf(stderr, "%s", strvalue(car(args)));
 		args = cdr(args);
@@ -6146,7 +6149,7 @@ LOC_ERR1:
 			    print_flag = 1;
 			    s_goto(LOC_P0HIST);
 			}
-			port_file(outport) = tmpfp;
+			port_file(current_outport) = tmpfp;
 			s_goto(LOC_T0LVL);
 		}
 
@@ -6224,13 +6227,18 @@ LOC_ERR1:
 
 	case LOC_CURR_INPORT:	/* current-input-port */
 		if (!validargs("current-input-port", 0, 1, TST_INPORT)) Error_0(msg);
-		if (is_pair(args)) inport = car(args);
-		s_return(inport);
+		if (is_pair(args)) current_inport = car(args);
+		s_return(current_inport);
 
 	case LOC_CURR_OUTPORT:	/* current-output-port */
 		if (!validargs("current-output-port", 0, 1, TST_OUTPORT)) Error_0(msg);
-		if (is_pair(args)) outport = car(args);
-		s_return(outport);
+		if (is_pair(args)) current_outport = car(args);
+		s_return(current_outport);
+
+	case LOC_CURR_SOURCE:	/* current-source */
+		if (!validargs("current-source", 0, 1, TST_STRING)) Error_0(msg);
+		if (is_pair(args)) current_source = car(args);
+		s_return(current_source);
 
 	case LOC_WITH_INFILE0:	/* with-input-from-file */
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
@@ -6240,15 +6248,15 @@ LOC_ERR1:
 		    /* s_return(F); */
 		}
 		code = cadr(args);
-		args = cons(x, inport);
-		inport = car(args);
+		args = cons(x, current_inport);
+		current_inport = car(args);
 		s_save(LOC_WITH_INFILE1, args, NIL);
 		args = NIL;
 		s_goto(LOC_APPLY);
 
 	case LOC_WITH_INFILE1:	/* with-input-from-file */
 		port_close(car(args));
-		inport = cdr(args);
+		current_inport = cdr(args);
 		s_return(value);
 
 	case LOC_WITH_OUTFILE0:	/* with-output-to-file */
@@ -6258,15 +6266,15 @@ LOC_ERR1:
 			s_return(F);
 		}
 		code = cadr(args);
-		args = cons(x, outport);
-		outport = car(args);
+		args = cons(x, current_outport);
+		current_outport = car(args);
 		s_save(LOC_WITH_OUTFILE1, args, NIL);
 		args = NIL;
 		s_goto(LOC_APPLY);
 
 	case LOC_WITH_OUTFILE1:	/* with-output-to-file */
 		port_close(car(args));
-		outport = cdr(args);
+		current_outport = cdr(args);
 		s_return(value);
 
 	case LOC_OPEN_INFILE:	/* open-input-file */
@@ -6355,10 +6363,10 @@ LOC_ERR1:
 			if (port_file(car(args)) == NULL) {
 				Error_0("input port was closed");
 			}
-			if (car(args) != inport) {
-				inport = cons(inport, NIL);
-				s_save(LOC_CURR_INPORT, inport, NIL);
-				inport = car(args);
+			if (car(args) != current_inport) {
+				current_inport = cons(current_inport, NIL);
+				s_save(LOC_CURR_INPORT, current_inport, NIL);
+				current_inport = car(args);
 			}
 		}
 		s_goto(LOC_READ_INTERNAL);
@@ -6379,10 +6387,10 @@ LOC_ERR1:
 			if (port_file(car(args)) == NULL) {
 				Error_0("input port was closed");
 			}
-			if (car(args) != inport) {
-				inport = cons(inport, NIL);
-				s_save(LOC_CURR_INPORT, inport, NIL);
-				inport = car(args);
+			if (car(args) != current_inport) {
+				current_inport = cons(current_inport, NIL);
+				s_save(LOC_CURR_INPORT, current_inport, NIL);
+				current_inport = car(args);
 			}
 		}
 		w = inchar();
@@ -6399,7 +6407,7 @@ LOC_ERR1:
 		if (is_pair(args)) {
 			x = car(args);
 		} else {
-			x = inport;
+			x = current_inport;
 		}
 		s_retbool(is_fileport(x) || is_strport(x));
 
@@ -6867,7 +6875,10 @@ static void init_vars_global(void)
 	load_stack[0] = mk_port(stdin, port_input);
 	load_files = 1;
 	/* init output file */
-	outport = mk_port(stdout, port_output);
+	current_outport = mk_port(stdout, port_output);
+
+	current_source = mk_string( "" );
+
 	strbuff = mk_memblock(256, &NIL, &NIL);
 }
 
@@ -6906,8 +6917,9 @@ void scheme_init(void)
 void scheme_deinit(void)
 {
 	symbol_list = NIL;
-	inport = NIL;
-	outport = NIL;
+	current_inport = NIL;
+	current_outport = NIL;
+	current_source = NIL;
 	global_env = NIL;
 	call_history = NIL;
 	winders = NIL;
@@ -6938,7 +6950,7 @@ int scheme_load_file(FILE *fin)
 	if (fin == stdin) {
 		interactive_repl = 1;
 	}
-	inport = mk_port(fin, port_input);
+	current_inport = mk_port(fin, port_input);
 	if (setjmp(error_jmp) == 0) {
 		op = LOC_T0LVL;
 	} else {
@@ -6952,7 +6964,7 @@ int scheme_load_string(const char *cmd)
 	int op;
 
 	interactive_repl = 0;
-	inport = port_from_string(cmd, port_input);
+	current_inport = port_from_string(cmd, port_input);
 	if (setjmp(error_jmp) == 0) {
 		op = LOC_T0LVL;
 	} else {

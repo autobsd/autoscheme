@@ -23,45 +23,45 @@
 ;; (write (get-environment-variables))(newline)
 ;; (write (get-environment-variable "HOME"))(newline)
 
-(newline)
-(display "+: ")(write +)(newline)
-(display "macro?: ")(write (macro? +))(newline)
-(display "closure?: ")(write (closure? +))(newline)
-(display "procedure?: ")(write (procedure? +))(newline)
+;; (newline)
+;; (display "+: ")(write +)(newline)
+;; (display "macro?: ")(write (macro? +))(newline)
+;; (display "closure?: ")(write (closure? +))(newline)
+;; (display "procedure?: ")(write (procedure? +))(newline)
 
 
-(define-macro (mymac x)
-  `(+ ,x 5)
-  )
-(newline)
-(display "mymac: ")(write mymac)(newline)
-(display "macro?: ")(write (macro? mymac))(newline)
-(display "closure?: ")(write (closure? mymac))(newline)
-(display "procedure?: ")(write (procedure? mymac))(newline)
+;; (define-macro (mymac x)
+;;   `(+ ,x 5)
+;;   )
+;; (newline)
+;; (display "mymac: ")(write mymac)(newline)
+;; (display "macro?: ")(write (macro? mymac))(newline)
+;; (display "closure?: ")(write (closure? mymac))(newline)
+;; (display "procedure?: ")(write (procedure? mymac))(newline)
 
 
 
 
-(define (add2 x)
-  (+ x 2))
+;; (define (add2 x)
+;;   (+ x 2))
 
-(newline)
-(display "add2: ")(write add2)(newline)
-(display "macro?: ")(write (macro? add2))(newline)
-(display "closure?: ")(write (closure? add2))(newline)
-(display "procedure?: ")(write (procedure? add2))(newline)
+;; (newline)
+;; (display "add2: ")(write add2)(newline)
+;; (display "macro?: ")(write (macro? add2))(newline)
+;; (display "closure?: ")(write (closure? add2))(newline)
+;; (display "procedure?: ")(write (procedure? add2))(newline)
 
-(newline)
-(display "environment-only: ")(write environment-only)(newline)
-(display "macro?: ")(write (macro? environment-only))(newline)
-(display "closure?: ")(write (closure? environment-only))(newline)
-(display "procedure?: ")(write (procedure? environment-only))(newline)
+;; (newline)
+;; (display "environment-only: ")(write environment-only)(newline)
+;; (display "macro?: ")(write (macro? environment-only))(newline)
+;; (display "closure?: ")(write (closure? environment-only))(newline)
+;; (display "procedure?: ")(write (procedure? environment-only))(newline)
 
 
-(newline)
-(define path "/some/path/to/file.scm")
-(display "path: ")(write path)(newline)
-(display "path-directory: ")(write (path-directory path))(newline)
+;; (newline)
+;; (define path "/some/path/to/file.scm")
+;; (display "path: ")(write path)(newline)
+;; (display "path-directory: ")(write (path-directory path))(newline)
 ;; (gc-verbose #t)
 ;; (collect-garbage)
 
@@ -94,7 +94,13 @@
 
 ;; (display "(my-param): ")(write (my-param))(newline)
 
-;; ;; (write
-;; ;; (include_ "file1.scm" 
-;; ;; 	  "file2.scm")
-;; ;; )(newline)
+
+;; (include "file2.scm")
+
+
+;; (display "x: ")(write x)(newline)
+
+
+(define x (quote (a b . c) 5 5))
+(display "x: ")(write x)(newline)
+(display "(list? x): ")(write (list? x))(newline)

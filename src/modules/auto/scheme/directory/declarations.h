@@ -4,7 +4,7 @@
  */
 #include <limits.h>
 #include <unistd.h>
-
+#include <string.h>
 
 pointer ff_current_directory( pointer args );
 

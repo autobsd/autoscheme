@@ -3,3 +3,8 @@
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment );
+
+foreign_function ff_current_directory;
+foreign_function ff_path_absolute_p;
+foreign_function ff_path_make_absolute;
+foreign_function ff_path_directory;

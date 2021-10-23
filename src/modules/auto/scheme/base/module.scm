@@ -54,7 +54,7 @@
 
 	(lambda ()
 	  (for-each (lambda (param value)
-		      (param value #f)
+		      (param value)
 		      )
 		    params prev-values)))))
 
@@ -82,3 +82,46 @@
 				     (apply r7-read-string args))))))
 
     auto-read-string))
+
+
+
+  
+
+
+
+((foreign-syntax LOC_DEF0 "define") write-simple (foreign-procedure LOC_WRITE))
+
+
+(define include_ 
+  (let* ((current-directory (foreign-function ff_current_directory))
+	 (current-source (foreign-procedure LOC_CURR_SOURCE))
+
+	 (macro (foreign-syntax LOC_MACRO "macro"))
+
+	 (path-make-absolute (foreign-function ff_path_make_absolute))
+	 (path-directory (foreign-function ff_path_directory))
+
+	 (with-input-from-file (foreign-procedure LOC_WITH_INFILE0))
+	 (eval (foreign-procedure LOC_PEVAL))
+	 (read (foreign-procedure LOC_READ))
+	 )
+
+    (macro filenames
+      (let ((result #f))
+	(for-each (lambda (filename)
+		    (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
+				  (with-input-from-file (current-source) 
+				    (lambda()
+				      (let eval-statement ((statement (read)))
+				        (cond ((not (eof-object? statement))
+				      	     (set! result (eval statement (expansion-environment)))
+				      	     (eval-statement (read)))))
+				      ))))
+		  filenames)
+	result))))
+
+
+	
+  
+
+

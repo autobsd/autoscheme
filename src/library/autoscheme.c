@@ -105,6 +105,7 @@ struct cell _ONE;		/* special cell representing integer 1 */
 
 pointer current_inport = &_NIL;	/* pointer to current-input-port */
 pointer current_outport = &_NIL;/* pointer to current-output-port */
+pointer current_errport = &_NIL;/* pointer to current-error-port */
 pointer current_source = &_NIL; /* pointer to current-source */
 
 pointer winders = &_NIL;	/* pointer to winders list */
@@ -1072,6 +1073,7 @@ void gc(pointer *a, pointer *b)
 	call_history = forward(call_history);
 	current_inport = forward(current_inport);
 	current_outport = forward(current_outport);
+	current_errport = forward(current_errport);
 	current_source = forward(current_source);
 	winders = forward(winders);
 	strbuff = forward(strbuff);
@@ -1285,6 +1287,7 @@ void gc(pointer *a, pointer *b)
 	mark(call_history);
 	mark(current_inport);
 	mark(current_outport);
+	mark(current_errport);
 	mark(current_source);
 	mark(winders);
 	mark(strbuff);
@@ -6235,6 +6238,11 @@ LOC_ERR1:
 		if (is_pair(args)) current_outport = car(args);
 		s_return(current_outport);
 
+	case LOC_CURR_ERRPORT:	/* current-error-port */
+		if (!validargs("current-error-port", 0, 1, TST_OUTPORT)) Error_0(msg);
+		if (is_pair(args)) current_errport = car(args);
+		s_return(current_errport);
+
 	case LOC_CURR_SOURCE:	/* current-source */
 		if (!validargs("current-source", 0, 1, TST_STRING)) Error_0(msg);
 		if (is_pair(args)) current_source = car(args);
@@ -6874,9 +6882,9 @@ static void init_vars_global(void)
 	bignum(&_ONE) = NIL;
 	load_stack[0] = mk_port(stdin, port_input);
 	load_files = 1;
-	/* init output file */
-	current_outport = mk_port(stdout, port_output);
 
+	current_outport = mk_port(stdout, port_output);
+	current_errport = mk_port(stderr, port_output);
 	current_source = mk_string( "" );
 
 	strbuff = mk_memblock(256, &NIL, &NIL);
@@ -6919,6 +6927,7 @@ void scheme_deinit(void)
 	symbol_list = NIL;
 	current_inport = NIL;
 	current_outport = NIL;
+	current_errport = NIL;
 	current_source = NIL;
 	global_env = NIL;
 	call_history = NIL;

@@ -11,7 +11,7 @@
 	  open-output-file 
 
 	  with-input-from-file
-	  with-input-to-file
+	  with-output-to-file
 	  )
 
   (begin
@@ -23,6 +23,6 @@
     ((foreign-syntax LOC_DEF0 "define") open-output-file (foreign-procedure LOC_OPEN_OUTFILE))
 
     ((foreign-syntax LOC_DEF0 "define") with-input-from-file (foreign-procedure LOC_WITH_INFILE0))
-    ((foreign-syntax LOC_DEF0 "define") with-input-to-file (foreign-procedure LOC_WITH_OUTFILE0))
+    ((foreign-syntax LOC_DEF0 "define") with-output-to-file (foreign-procedure LOC_WITH_OUTFILE0))
     )
   )

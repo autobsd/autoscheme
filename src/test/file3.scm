@@ -14,6 +14,7 @@
 	(auto scheme memory)
 	(auto scheme closure)
 	(auto scheme path)
+	(auto scheme file)
 	)
 
 (display "testing:\n")
@@ -107,6 +108,14 @@
 ;; (display "(list? x): ")(write (list? x))(newline)
 
 
-(write (current-directory))(newline)
-(write (current-directory "../../../platforms/darwin"))(newline)
-(write (current-directory))(newline)
+;; (write (current-directory))(newline)
+;; (write (current-directory "../../../platforms/darwin"))(newline)
+
+;; ;; (with-output-to-file "test.txt" (lambda () (display "test output2")(newline)))
+
+;; (define o-port (open-output-file "test.txt"))
+;; (display "test output 3" o-port)(newline o-port)
+;; (close-output-port o-port)
+(display "this is a normal message.\n" (current-output-port))
+(display "this is an error message!\n" (current-error-port))(newline (current-error-port))
+(display "this is a normal message.\n" (current-output-port))

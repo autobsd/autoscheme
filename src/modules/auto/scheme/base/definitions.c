@@ -73,9 +73,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 /* cond-expand */
 
     scheme_register_operation(LOC_CONS, "cons", environment);
-
-/* current-error-port */
-
+    scheme_register_operation(LOC_CURR_ERRPORT, "current-error-port", environment);
     scheme_register_operation(LOC_CURR_INPORT, "current-input-port", environment);
     scheme_register_operation(LOC_CURR_OUTPORT, "current-output-port", environment);
     scheme_register_syntax(LOC_DEF0, "define", environment);

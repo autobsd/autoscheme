@@ -124,6 +124,8 @@
 ;; (display "vector: ")(write (list->vector '(<error-object> "File error - message" irr1 irr2)))(newline)
 
 (newline)
-(raise (list->vector '(<error-object> "File error - message" (irr1 "irr2" irr3))))
+
+(error "File error - message" 'irr1 "irr2" 'irr3)
+;; (raise (list->vector '(<error-object> "File error - message" (irr1 "irr2" irr3))))
 ;; (raise (list->vector '(<error-object> "File error - message" ())))
 (display "After exception")(newline)

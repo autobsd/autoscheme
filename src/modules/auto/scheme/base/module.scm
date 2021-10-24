@@ -125,5 +125,6 @@
   
 
 (define raise (foreign-operation LOC_RAISE0))
+(define error (foreign-operation LOC_ERROR))
 
     

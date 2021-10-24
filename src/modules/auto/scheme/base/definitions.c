@@ -96,7 +96,6 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_EQ, "eq?", environment);
     scheme_register_operation(LOC_EQUAL, "equal?", environment);
     scheme_register_operation(LOC_EQV, "eqv?", environment);
-    scheme_register_operation(LOC_ERR0, "error", environment);
 
 /* error-object-irritants */
 /* error-object-message */

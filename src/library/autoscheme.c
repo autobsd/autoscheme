@@ -6225,6 +6225,7 @@ LOC_ERR1:
 	case LOC_DFLT_XHAND3:
 	    s_return( F );
 
+	LOC_RAISE0:
 	case LOC_RAISE0: /* raise */
 	    if (!validargs("raise", 1, 1, TST_ANY)) Error_0(msg);
 	    x = cons( current_xhands, NIL );
@@ -6251,7 +6252,14 @@ LOC_ERR1:
 	    s_goto( LOC_APPLY );
 
 
-
+	case LOC_ERROR:  /* error */
+	    if (!validargs("error", 1, 65535, TST_STRING TST_ANY)) Error_0(msg);
+	    x = mk_vector(3);
+	    set_vector_elem( x, 0, mk_symbol( "<error-object>" ));
+	    set_vector_elem( x, 1, car( args ));
+	    set_vector_elem( x, 2, cdr( args ));
+	    args = cons( x, NIL );
+	    s_goto( LOC_RAISE0 );
 
 
 	case LOC_REVERSE:	/* reverse */

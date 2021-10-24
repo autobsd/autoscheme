@@ -125,3 +125,9 @@
   
 
 
+(define raise
+  (let ((current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
+    (lambda (obj)
+      ((car (current-exception-handlers)) obj)
+      )))
+    

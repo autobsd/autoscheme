@@ -106,6 +106,7 @@ struct cell _ONE;		/* special cell representing integer 1 */
 pointer current_inport = &_NIL;	/* pointer to current-input-port */
 pointer current_outport = &_NIL;/* pointer to current-output-port */
 pointer current_errport = &_NIL;/* pointer to current-error-port */
+pointer current_xhands = &_NIL; /* pointer to current-exception-handlers */
 pointer current_source = &_NIL; /* pointer to current-source */
 
 pointer winders = &_NIL;	/* pointer to winders list */
@@ -1074,6 +1075,7 @@ void gc(pointer *a, pointer *b)
 	current_inport = forward(current_inport);
 	current_outport = forward(current_outport);
 	current_errport = forward(current_errport);
+	current_xhands = forward(current_xhands);
 	current_source = forward(current_source);
 	winders = forward(winders);
 	strbuff = forward(strbuff);
@@ -1288,6 +1290,7 @@ void gc(pointer *a, pointer *b)
 	mark(current_inport);
 	mark(current_outport);
 	mark(current_errport);
+	mark(current_xhands);
 	mark(current_source);
 	mark(winders);
 	mark(strbuff);
@@ -6156,6 +6159,75 @@ LOC_ERR1:
 			s_goto(LOC_T0LVL);
 		}
 
+	LOC_FLUSH_OUTPORT:
+	case LOC_FLUSH_OUTPORT:	/* flush-output-port */
+	    if (!validargs("flush-output-port", 0, 1, TST_OUTPORT)) Error_0(msg);
+	    if( is_pair( args )) 
+		args = car( args );
+	    else
+		args = current_outport;
+	    if( is_fileport( args ))
+		fflush( port_file( args ));
+	    s_return( T );
+
+	case LOC_DFLT_XHAND0:	/* defalt exception handler */
+	    if (!validargs("default-exception-handler", 1, 1, TST_ANY)) Error_0(msg);
+	    s_save( LOC_DFLT_XHAND1, args, NIL );
+	    args = cons( current_outport, NIL );
+	    s_goto(LOC_FLUSH_OUTPORT);
+
+	case LOC_DFLT_XHAND1:	
+	    x = cons( current_outport, NIL );
+	    s_save( LOC_CURR_OUTPORT, x, NIL );
+	    current_outport = current_errport;
+	    x = car( args );
+	    if( is_vector( x ) && 
+	    	ivalue( x ) == 3 &&
+		is_symbol( vector_elem( x, 0 )) &&
+	    	!strcmp( strvalue( vector_elem( x, 0 )), "<error-object>" ) &&
+		is_string( vector_elem( x, 1 )) &&
+		( is_null( vector_elem( x, 2 )) || is_pair( vector_elem( x, 2 ))))
+	    {
+		putstr( strvalue( vector_elem( car( args ), 1 )));
+		x = vector_elem( car( args ), 2);
+		if( x == NIL )
+		{
+		    putstr( "\n");
+		    args = cons( call_history, NIL);
+		    print_flag = 1;
+		    s_goto( LOC_P0HIST );
+		    /* s_return( T ); */
+		}
+		else
+		{
+		    putstr( ":");
+		    args = x;
+		}
+	    }
+	    else
+	    {
+		putstr( "Exception - raised with:" );
+		args = cons( cons( x, NIL ), NIL);
+	    }
+	    /* fall through */
+
+	case LOC_DFLT_XHAND2:
+	    if( is_null( args ))
+	    {
+		putstr( "\n" );
+
+		args = cons( call_history, NIL);
+		print_flag = 1;
+		s_goto( LOC_P0HIST );
+		/* s_return( T ); */
+	    }
+	    putstr( "\n" );
+	    x = cdr( args );
+	    s_save( LOC_DFLT_XHAND2, x, NIL );
+	    args = car( args );
+	    print_flag = 1;
+	    s_goto( LOC_P0LIST );
+
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
 		s_return(reverse(car(args)));
@@ -6242,6 +6314,11 @@ LOC_ERR1:
 		if (!validargs("current-error-port", 0, 1, TST_OUTPORT)) Error_0(msg);
 		if (is_pair(args)) current_errport = car(args);
 		s_return(current_errport);
+
+	case LOC_CURR_XHANDS:	/* current-exception-handlers */
+		if (!validargs("current-exception-handlers", 0, 1, TST_LIST)) Error_0(msg);
+		if (is_pair(args)) current_xhands = car(args);
+		s_return(current_xhands);
 
 	case LOC_CURR_SOURCE:	/* current-source */
 		if (!validargs("current-source", 0, 1, TST_STRING)) Error_0(msg);
@@ -6885,6 +6962,7 @@ static void init_vars_global(void)
 
 	current_outport = mk_port(stdout, port_output);
 	current_errport = mk_port(stderr, port_output);
+	current_xhands = cons( mk_operation( LOC_DFLT_XHAND0, &NIL), NIL );
 	current_source = mk_string( "" );
 
 	strbuff = mk_memblock(256, &NIL, &NIL);
@@ -6928,6 +7006,7 @@ void scheme_deinit(void)
 	current_inport = NIL;
 	current_outport = NIL;
 	current_errport = NIL;
+	current_xhands = NIL;
 	current_source = NIL;
 	global_env = NIL;
 	call_history = NIL;

@@ -117,8 +117,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 /* floor-quotient */
 /* floor-remainder */
 /* floor/ */
-/* flush-output-port */
 
+    scheme_register_operation(LOC_FLUSH_OUTPORT, "flush-output-port", environment);
     scheme_register_operation(LOC_FOREACH0, "for-each", environment);
     scheme_register_operation(LOC_GCD, "gcd", environment);
 

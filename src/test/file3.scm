@@ -116,6 +116,14 @@
 ;; (define o-port (open-output-file "test.txt"))
 ;; (display "test output 3" o-port)(newline o-port)
 ;; (close-output-port o-port)
-(display "this is a normal message.\n" (current-output-port))
-(display "this is an error message!\n" (current-error-port))(newline (current-error-port))
-(display "this is a normal message.\n" (current-output-port))
+;; (display "this is a normal message.\n" (current-output-port))
+;; (display "this is an error message!\n" (current-error-port))(newline (current-error-port))
+;; (display "this is a normal message.\n" (current-output-port))
+
+
+;; (display "vector: ")(write (list->vector '(<error-object> "File error - message" irr1 irr2)))(newline)
+
+(newline)
+(raise (list->vector '(<error-object> "File error - message" (irr1 "irr2" irr3))))
+;; (raise (list->vector '(<error-object> "File error - message" ())))
+(display "After exception")(newline)

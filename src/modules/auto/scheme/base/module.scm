@@ -124,10 +124,6 @@
 	
   
 
+(define raise (foreign-operation LOC_RAISE0))
 
-(define raise
-  (let ((current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
-    (lambda (obj)
-      ((car (current-exception-handlers)) obj)
-      )))
     

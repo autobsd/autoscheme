@@ -6170,7 +6170,7 @@ LOC_ERR1:
 		fflush( port_file( args ));
 	    s_return( T );
 
-	case LOC_DFLT_XHAND0:	/* defalt exception handler */
+	case LOC_DFLT_XHAND0:	/* default exception handler */
 	    if (!validargs("default-exception-handler", 1, 1, TST_ANY)) Error_0(msg);
 	    s_save( LOC_DFLT_XHAND1, args, NIL );
 	    args = cons( current_outport, NIL );
@@ -6178,6 +6178,7 @@ LOC_ERR1:
 
 	case LOC_DFLT_XHAND1:	
 	    x = cons( current_outport, NIL );
+	    s_save( LOC_DFLT_XHAND3, NIL, NIL );
 	    s_save( LOC_CURR_OUTPORT, x, NIL );
 	    current_outport = current_errport;
 	    x = car( args );
@@ -6193,10 +6194,7 @@ LOC_ERR1:
 		if( x == NIL )
 		{
 		    putstr( "\n");
-		    args = cons( call_history, NIL);
-		    print_flag = 1;
-		    s_goto( LOC_P0HIST );
-		    /* s_return( T ); */
+		    s_return( T );
 		}
 		else
 		{
@@ -6215,11 +6213,7 @@ LOC_ERR1:
 	    if( is_null( args ))
 	    {
 		putstr( "\n" );
-
-		args = cons( call_history, NIL);
-		print_flag = 1;
-		s_goto( LOC_P0HIST );
-		/* s_return( T ); */
+		s_return( T );
 	    }
 	    putstr( "\n" );
 	    x = cdr( args );
@@ -6227,6 +6221,38 @@ LOC_ERR1:
 	    args = car( args );
 	    print_flag = 1;
 	    s_goto( LOC_P0LIST );
+
+	case LOC_DFLT_XHAND3:
+	    s_return( F );
+
+	case LOC_RAISE0: /* raise */
+	    if (!validargs("raise", 1, 1, TST_ANY)) Error_0(msg);
+	    x = cons( current_xhands, NIL );
+	    s_save( LOC_CURR_XHANDS, x, NIL );
+	    x = cons( current_outport, NIL );
+	    s_save( LOC_CURR_OUTPORT, x, NIL );
+	    current_outport = current_errport;
+
+	    /* fall through */
+
+	case LOC_RAISE1:
+	    if( is_null( current_xhands ))
+	    {
+		x = cons( value, NIL);
+		s_save(LOC_EMERGENCY_EXIT, x, NIL);
+
+		args = cons( call_history, NIL);
+		print_flag = 1;
+		s_goto( LOC_P0HIST );
+	    }
+	    s_save( LOC_RAISE1, args, NIL );
+	    code = car( current_xhands );
+	    current_xhands = cdr( current_xhands );
+	    s_goto( LOC_APPLY );
+
+
+
+
 
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
@@ -6253,9 +6279,14 @@ LOC_ERR1:
 		return 0;
 
 	case LOC_EMERGENCY_EXIT:	/* emergency-exit */
-		if (!validargs("emergency-exit", 0, 1, TST_INTEGER)) Error_0(msg);
-		if (is_pair(args)) {
-		    exit( (int)ivalue(car(args)));
+		if (!validargs("emergency-exit", 0, 1, TST_ANY)) Error_0(msg);
+		if( is_pair( args )) 
+		{
+		    x = car( args );
+		    if( is_integer( x ))
+			exit( (int)ivalue(car(args)));
+		    else if( isfalse( x ))
+			exit( 1 );			
 		}
 		exit( 0 );
 

@@ -125,7 +125,41 @@
 
 (newline)
 
-(error "File error - message" 'irr1 "irr2" 'irr3)
-;; (raise (list->vector '(<error-object> "File error - message" (irr1 "irr2" irr3))))
+(call/cc (lambda (return)
+	   (define my-handler
+	     (lambda (obj)
+	       (display "doing something with: ")(write obj)(newline)
+	       (return)
+	       ))
+
+	   (with-exception-handler 
+	    my-handler
+	    (lambda ()
+
+	      (display "inside 'my-handler' scope")(newline)
+
+	      (error "File error - message" 'irr1 "irr2" 'irr3)
+
+	      ))
+	   ))
+
+;; (raise (list->vector '(<error-object> <file> "File error - message" (irr1 "irr2" irr3))))
 ;; (raise (list->vector '(<error-object> "File error - message" ())))
 (display "After exception")(newline)
+;; (write #((<file-error> <error-object>) "message" (irr1 "irr2" irr3)))(newline)
+;; (write #((<error-object>) "message" (irr1 "irr2" irr3)))(newline)
+;; (write #(<error-object> <file> "message" (irr1 "irr2" irr3)))(newline)
+
+
+;; #(<error-object> #f "File error - message" (irr1 "irr2" irr3))
+;; #((<file-error> <error-object>) "message" (irr1 "irr2" irr3))
+;; #((<error-object>) "message" (irr1 "irr2" irr3))
+
+;; #(<error-object> "File error - message" (irr1 "irr2" irr3))
+;; #(<error-object> <file> "message" (irr1 "irr2" irr3))
+
+;; #(<error-object> File "message" (irr1 "irr2" irr3))
+;; #(<error-object> #f "message" (irr1 "irr2" irr3))
+
+
+

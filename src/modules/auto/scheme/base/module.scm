@@ -26,37 +26,37 @@
 	      (else (set! value (car args))))))))
 
 
+(define parameterize 
+  ((foreign-syntax LOC_MACRO "macro") (associations . body)
+   (let* ((eval (foreign-operation LOC_PEVAL))
+	  (params (map (lambda (association)
+			 (eval (car association) (expansion-environment)))
+		       associations))
+	  (tmp-values (map (lambda (association)
+			     (eval (cadr association) (expansion-environment)))
+			   associations))
 
-((foreign-syntax LOC_DEFMACRO0 "define-macro") (parameterize associations . body)
-  (let* ((eval (foreign-operation LOC_PEVAL))
-	 (params (map (lambda (association)
-			(eval (car association) (expansion-environment)))
-		      associations))
-	 (tmp-values (map (lambda (association)
-			(eval (cadr association) (expansion-environment)))
-		      associations))
+	  (prev-values (map (lambda (param)
+			      (apply param '()))
+			    params)))
 
-	 (prev-values (map (lambda (param)
-			     (apply param '()))
-			   params)))
+     (dynamic-wind
+	 (lambda ()
+	   (for-each (lambda (param value)
+		       (param value)
+		       )
+		     params tmp-values))
 
-    (dynamic-wind
-	(lambda ()
-	  (for-each (lambda (param value)
-		      (param value)
-		      )
-		    params tmp-values))
+	 (lambda ()
+	   (for-each (lambda (statement)
+		       (eval statement (expansion-environment)))
+		     body))
 
-	(lambda ()
-	  (for-each (lambda (statement)
-		      (eval statement (expansion-environment)))
-		    body))
-
-	(lambda ()
-	  (for-each (lambda (param value)
-		      (param value)
-		      )
-		    params prev-values)))))
+	 (lambda ()
+	   (for-each (lambda (param value)
+		       (param value)
+		       )
+		     params prev-values))))))
 
 
 
@@ -89,7 +89,7 @@
 
 
 
-((foreign-syntax LOC_DEF0 "define") write-simple (foreign-operation LOC_WRITE))
+
 
 
 (define include
@@ -121,10 +121,20 @@
 	result))))
 
 
-	
-  
 
 (define raise (foreign-operation LOC_RAISE0))
 (define error (foreign-operation LOC_ERROR))
 
-    
+(define with-exception-handler 
+  ((foreign-syntax LOC_MACRO "macro") (handler-code thunk-code)
+   
+       (let* ((eval (foreign-operation LOC_PEVAL))
+	      (handler (eval handler-code (expansion-environment)))
+	      (thunk (eval thunk-code (expansion-environment)))
+	      (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
+
+	 (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
+		       (thunk)
+		       ))))
+
+ 

@@ -789,12 +789,12 @@ pointer mk_uninterned_symbol(const char *name)
 	return x;
 }
 
-pointer gensym(void)
+pointer gensym( const char *prefix )
 {
 	char name[40];
 	static unsigned long gensym_cnt;
 
-	snprintf(name, 40, "gensym-%lu", gensym_cnt++);
+	snprintf(name, 40, "%s%lu", prefix, gensym_cnt++);
 	return mk_uninterned_symbol(name);
 }
 
@@ -3334,8 +3334,11 @@ LOC_READ_INTERNAL:
 		s_goto(LOC_EVAL);
 
 	case LOC_GENSYM:
-		if (!validargs("gensym", 0, 0, TST_NONE)) Error_0(msg);
-		s_return(gensym());
+		if (!validargs("gensym", 0, 1, TST_STRING)) Error_0(msg);
+		if( is_null( car( args )))
+		    s_return(gensym("gensym-"));
+		else 
+		    s_return( gensym( strvalue( car( args ))));
 
 	case LOC_LAMBDA:	/* lambda */
 		s_return(mk_closure(code, envir));
@@ -4255,6 +4258,36 @@ LOC_EXPANDPATTERN:
 		args = NIL;
 		s_goto(LOC_BEGIN);
 
+	case LOC_DEFVALS0:	/* define-values */
+		s_save(LOC_DEFVALS1, NIL, code);
+		code = cadr(code);
+		s_goto(LOC_EVAL);
+
+	case LOC_DEFVALS1:	
+		if (type(value) & T_VALUES) {
+			type(value) &= ~T_VALUES;
+			args = value;
+		} else {
+			args = cons(value, NIL);
+		}
+		mark_y = args;
+		for (mark_x = car(code); is_pair(mark_x); mark_x = cdr(mark_x), args = cdr(args)) {
+			if (args == NIL) {
+				Error_0("too few arguments");
+			} else {
+				y = cons(car(mark_x), car(args));
+				y = cons(y, car(envir));
+				car(envir) = y;
+			}
+		}
+		if (is_symbol(mark_x)) {
+			mark_x = cons(mark_x, args);
+			mark_x = cons(mark_x, car(envir));
+			car(envir) = mark_x;
+		}
+		args = mark_y;
+		s_goto(LOC_VALUES);
+
 	case LOC_PAPPLY:	/* apply */
 		if (!validargs("apply", 2, 65535, TST_NONE)) Error_0(msg);
 		code = car(args);
@@ -4335,10 +4368,11 @@ LOC_EXPANDPATTERN:
 #endif
 		s_goto(LOC_APPLY);
 
+	LOC_VALUES:
 	case LOC_VALUES:			/* values */
 		if (!validargs("values", 0, 65535, TST_NONE)) Error_0(msg);
 		w = s_next_op();
-		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1) {
+		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1 || w == LOC_DEFVALS1) {
 			type(args) |= T_VALUES;
 			s_return(args);
 		} else {
@@ -6183,14 +6217,15 @@ LOC_ERR1:
 	    current_outport = current_errport;
 	    x = car( args );
 	    if( is_vector( x ) && 
-	    	ivalue( x ) == 3 &&
+	    	ivalue( x ) == 4 &&
 		is_symbol( vector_elem( x, 0 )) &&
-	    	!strcmp( strvalue( vector_elem( x, 0 )), "<error-object>" ) &&
-		is_string( vector_elem( x, 1 )) &&
-		( is_null( vector_elem( x, 2 )) || is_pair( vector_elem( x, 2 ))))
+	    	!strcmp( strvalue( vector_elem( x, 0 )), "<ERROR-OBJECT>" ) &&
+		is_symbol( vector_elem( x, 1 )) &&
+		is_string( vector_elem( x, 2 )) &&
+		( is_null( vector_elem( x, 3 )) || is_pair( vector_elem( x, 3 ))))
 	    {
-		putstr( strvalue( vector_elem( car( args ), 1 )));
-		x = vector_elem( car( args ), 2);
+		putstr( strvalue( vector_elem( car( args ), 2 )));
+		x = vector_elem( car( args ), 3);
 		if( x == NIL )
 		{
 		    putstr( "\n");
@@ -6254,10 +6289,11 @@ LOC_ERR1:
 
 	case LOC_ERROR:  /* error */
 	    if (!validargs("error", 1, 65535, TST_STRING TST_ANY)) Error_0(msg);
-	    x = mk_vector(3);
-	    set_vector_elem( x, 0, mk_symbol( "<error-object>" ));
-	    set_vector_elem( x, 1, car( args ));
-	    set_vector_elem( x, 2, cdr( args ));
+	    x = mk_vector(4);
+	    set_vector_elem( x, 0, mk_symbol( "<ERROR-OBJECT>" ));
+	    set_vector_elem( x, 1, mk_symbol( "record-type_0" ));
+	    set_vector_elem( x, 2, car( args ));
+	    set_vector_elem( x, 3, cdr( args ));
 	    args = cons( x, NIL );
 	    s_goto( LOC_RAISE0 );
 

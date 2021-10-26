@@ -3,8 +3,8 @@
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (import (auto scheme write)
-	(auto scheme base) 
 	(auto scheme environment)
+	(auto scheme base) 
 	;; (except (auto scheme base) lambda)
 	(auto scheme directory)
 	(scheme process-context)
@@ -15,6 +15,7 @@
 	(auto scheme closure)
 	(auto scheme path)
 	(auto scheme file)
+	(auto scheme macro)
 	)
 
 (display "testing:\n")
@@ -161,5 +162,23 @@
 ;; #(<error-object> File "message" (irr1 "irr2" irr3))
 ;; #(<error-object> #f "message" (irr1 "irr2" irr3))
 
+;; #(<ERROR-OBJECT> record-type_0 "File error - message" (irr1 "irr2" irr3))
 
 
+
+
+(write (gensym))(newline)
+(write (gensym))(newline)
+(write (gensym 'record-type_))(newline)
+
+
+;; (receive (a b) (values 3 5)
+;;   (display "a: ")(write a)(newline)
+;;   (display "b: ")(write b)(newline)
+;;   )
+
+
+(define-values (x y) (define-values (a b) (values 3 5)
+  ))
+(display "a: ")(write a)(newline)
+(display "y: ")(write y)(newline)

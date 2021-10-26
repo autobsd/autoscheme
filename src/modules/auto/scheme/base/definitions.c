@@ -81,8 +81,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 /* define-record-type */
 
     scheme_register_syntax(LOC_DEFSYNTAX0, "define-syntax", environment);
+    scheme_register_syntax(LOC_DEFVALS0, "define-values", environment);
 
-/* define-values */
 /* denominator */
 
     scheme_register_syntax(LOC_DO0, "do", environment);

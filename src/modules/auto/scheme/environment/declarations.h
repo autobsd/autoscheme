@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static pointer ff_environment_define_d( pointer args );
+pointer ff_environment_define_d( pointer args );
 static pointer ff_environment_undefine_d( pointer args );
 static pointer ff_environment_defined_symbols( pointer args );
 static pointer ff_environment_assoc( pointer args );

@@ -124,61 +124,78 @@
 
 ;; (display "vector: ")(write (list->vector '(<error-object> "File error - message" irr1 irr2)))(newline)
 
-(newline)
+;; (newline)
 
-(call/cc (lambda (return)
-	   (define my-handler
-	     (lambda (obj)
-	       (display "doing something with: ")(write obj)(newline)
-	       (return)
-	       ))
+;; (call/cc (lambda (return)
+;; 	   (define my-handler
+;; 	     (lambda (obj)
+;; 	       (display "doing something with: ")(write obj)(newline)
+;; 	       (return)
+;; 	       ))
 
-	   (with-exception-handler 
-	    my-handler
-	    (lambda ()
+;; 	   (with-exception-handler 
+;; 	    my-handler
+;; 	    (lambda ()
 
-	      (display "inside 'my-handler' scope")(newline)
+;; 	      (display "inside 'my-handler' scope")(newline)
 
-	      (error "File error - message" 'irr1 "irr2" 'irr3)
+;; 	      (error "File error - message" 'irr1 "irr2" 'irr3)
 
-	      ))
-	   ))
+;; 	      ))
+;; 	   ))
 
-;; (raise (list->vector '(<error-object> <file> "File error - message" (irr1 "irr2" irr3))))
-;; (raise (list->vector '(<error-object> "File error - message" ())))
-(display "After exception")(newline)
-;; (write #((<file-error> <error-object>) "message" (irr1 "irr2" irr3)))(newline)
-;; (write #((<error-object>) "message" (irr1 "irr2" irr3)))(newline)
-;; (write #(<error-object> <file> "message" (irr1 "irr2" irr3)))(newline)
-
-
-;; #(<error-object> #f "File error - message" (irr1 "irr2" irr3))
-;; #((<file-error> <error-object>) "message" (irr1 "irr2" irr3))
-;; #((<error-object>) "message" (irr1 "irr2" irr3))
-
-;; #(<error-object> "File error - message" (irr1 "irr2" irr3))
-;; #(<error-object> <file> "message" (irr1 "irr2" irr3))
-
-;; #(<error-object> File "message" (irr1 "irr2" irr3))
-;; #(<error-object> #f "message" (irr1 "irr2" irr3))
-
-;; #(<ERROR-OBJECT> record-type_0 "File error - message" (irr1 "irr2" irr3))
+;; ;; (raise (list->vector '(<error-object> <file> "File error - message" (irr1 "irr2" irr3))))
+;; ;; (raise (list->vector '(<error-object> "File error - message" ())))
+;; (display "After exception")(newline)
+;; ;; (write #((<file-error> <error-object>) "message" (irr1 "irr2" irr3)))(newline)
+;; ;; (write #((<error-object>) "message" (irr1 "irr2" irr3)))(newline)
+;; ;; (write #(<error-object> <file> "message" (irr1 "irr2" irr3)))(newline)
 
 
+;; ;; #(<error-object> #f "File error - message" (irr1 "irr2" irr3))
+;; ;; #((<file-error> <error-object>) "message" (irr1 "irr2" irr3))
+;; ;; #((<error-object>) "message" (irr1 "irr2" irr3))
+
+;; ;; #(<error-object> "File error - message" (irr1 "irr2" irr3))
+;; ;; #(<error-object> <file> "message" (irr1 "irr2" irr3))
+
+;; ;; #(<error-object> File "message" (irr1 "irr2" irr3))
+;; ;; #(<error-object> #f "message" (irr1 "irr2" irr3))
+
+;; ;; #(<ERROR-OBJECT> record-type_0 "File error - message" (irr1 "irr2" irr3))
 
 
-(write (gensym))(newline)
-(write (gensym))(newline)
-(write (gensym 'record-type_))(newline)
 
 
-;; (receive (a b) (values 3 5)
-;;   (display "a: ")(write a)(newline)
-;;   (display "b: ")(write b)(newline)
-;;   )
+;; (write (gensym))(newline)
+;; (write (gensym))(newline)
+;; (write (gensym 'record-type_))(newline)
 
 
-(define-values (x y) (define-values (a b) (values 3 5)
-  ))
-(display "a: ")(write a)(newline)
-(display "y: ")(write y)(newline)
+;; (define-record-type <PARE>
+;;   (kons x y)
+;;   pare?
+;;   (x kar set-kar!)
+;;   (y kdr))
+
+;; (define my-pare (kons 1 2))
+;; (write my-pare)(newline)
+;; (write (kar my-pare))(newline)
+;; (write (set-kar! my-pare 11))(newline)
+;; (write (kar my-pare))(newline)
+;; (write (kdr my-pare))(newline)
+;; (newline)
+;; (write (define my-var 7))(newline)
+;; (write my-var)(newline)
+;; (write (set! my-var 77))(newline)
+;; (write my-var)(newline)
+
+(raise-continuable 5)
+
+(display "after handlers")(newline)
+
+
+;; (guard (condition
+;;              ((assq ’a condition) => cdr)
+;;              ((assq ’b condition)))
+;;       (raise (list (cons ’a 42))))

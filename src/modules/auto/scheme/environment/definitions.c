@@ -43,7 +43,7 @@ static pointer environment_define_d( pointer environment, pointer symbol, pointe
     return environment;
 }
 
-static pointer ff_environment_define_d( pointer args )
+pointer ff_environment_define_d( pointer args )
 {
     pointer environment = car( args );
     pointer symbol = cadr( args );

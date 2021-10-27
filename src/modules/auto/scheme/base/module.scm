@@ -7,7 +7,118 @@
 (foreign-initialize (include-string "initialization.c"))
 
 
+(define error (foreign-operation LOC_ERROR))
 
+(define define-record-type
+  (let ((environment-define! (foreign-function ff_environment_define_d))
+	(gensym (foreign-operation LOC_GENSYM))
+	(eval (foreign-operation LOC_PEVAL))
+	(verify-type (lambda (record type) (>= (vector-length record) 2)(equal? (vector-ref record 1) type))))
+    
+    ((foreign-syntax LOC_MACRO "macro") (name constructor predicate . fields)
+
+     (let* ((record-type (gensym "record-type_"))
+	    (constructor-name (car constructor))
+	    (field-tags (cdr constructor))
+	    (counter 2)
+	    (ref-fields '())
+	    (constructor-statements `((vector-set! v 1 ',record-type)
+				      (vector-set! v 0 ',name))))
+
+       (for-each (lambda (field)
+		   (if (not (pair? field)) (error "Record definition error - improper field" field))
+		   (set! ref-fields (cons (cons (car field) (cons counter (cdr field)))
+					  ref-fields))
+		   (set! counter (+ counter 1)))
+		 fields)
+
+       (for-each (lambda (tag)
+		   (let ((field (assoc tag ref-fields)))
+		     (if (not field) (error "Record definition error - unspecified field in constructor" tag))
+		     (set! constructor-statements (cons `(vector-set! v ,(cadr field) ,tag)
+							constructor-statements))
+		     ))
+		 field-tags)
+
+       (let ((constructor (eval `(lambda ,field-tags
+				   (let ((v (make-vector ,counter #f)))
+				     ,@(reverse constructor-statements))))))
+	 (environment-define! (expansion-environment) constructor-name constructor))
+
+       (for-each (lambda (ref-field)
+		   (if (pair? (cddr ref-field))
+		       (let ((accessor-name (car (cddr ref-field)))
+			     (accessor (eval `(lambda (v)
+						(if (verify-type v ',record-type)
+						    (vector-ref v ,(cadr ref-field))
+						    (error "Record access error - inappropriate type" v))))))
+			 (environment-define! (expansion-environment) accessor-name accessor)))
+
+		   (if (pair? (cdr (cddr ref-field)))
+		       (let ((mutator-name (cadr (cddr ref-field)))
+			     (mutator (eval `(lambda (v o)
+					       (if (verify-type v ',record-type)
+						   (vector-set! v ,(cadr ref-field) o)
+						   (error "Record access error - inappropriate type" v))
+					       o))))
+			 (environment-define! (expansion-environment) mutator-name mutator))))
+
+		 ref-fields)))))
+
+
+
+;; ((foreign-syntax LOC_DEF0 "define") display (foreign-operation LOC_DISPLAY))
+;; ((foreign-syntax LOC_DEF0 "define") write (foreign-operation LOC_WRITE))
+
+;; (define guard 
+;;   ((foreign-syntax LOC_MACRO "macro") (test . body)
+   
+;;    (let* (;; (eval (foreign-operation LOC_PEVAL))
+;; 	  ;; (handler (eval handler-code (expansion-environment)))
+;; 	  ;; (thunk (eval thunk-code (expansion-environment)))
+;; 	  ;; (current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
+;; 	  )
+
+;;      (display "test: ")(write test)(newline)
+;;      (display "body: ")(write body)(newline)
+
+;;      ;; (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
+;;      ;; 		   (thunk)
+     
+;;      )))
+
+
+
+
+
+
+(define include
+  (let* ((current-directory (foreign-function ff_current_directory))
+	 (current-source (foreign-operation LOC_CURR_SOURCE))
+
+	 (macro (foreign-syntax LOC_MACRO "macro"))
+
+	 (path-make-absolute (foreign-function ff_path_make_absolute))
+	 (path-directory (foreign-function ff_path_directory))
+
+	 (with-input-from-file (foreign-operation LOC_WITH_INFILE0))
+	 (eval (foreign-operation LOC_PEVAL))
+	 (read (foreign-operation LOC_READ))
+	 )
+
+    (macro filenames
+      (let ((result #f))
+	(for-each (lambda (filename)
+		    (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
+				  (with-input-from-file (current-source) 
+				    (lambda()
+				      (let eval-statement ((statement (read)))
+				        (cond ((not (eof-object? statement))
+					       (set! result (eval statement (expansion-environment)))
+					       (eval-statement (read)))))
+				      ))))
+		  filenames)
+	result))))
 
 
 ;; (make-parameter init converter) MULTI THREADED
@@ -60,6 +171,22 @@
 
 
 
+
+
+(define raise (foreign-operation LOC_RAISE0))
+
+(define raise-continuable 
+  (lambda (obj)
+    (let* ((current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
+	   (handler-list (current-exception-handlers))
+	   (current-handler (car handler-list)))
+      
+    (parameterize ((current-exception-handlers (cdr handler-list)))
+		 (current-handler obj)))))
+
+
+
+
 (define read-string 
   (letrec ((r7-read-string (lambda (k . rest)
 			     (if (= k 0) ""
@@ -85,56 +212,17 @@
 
 
 
-  
-
-
-
-
-
-
-(define include
-  (let* ((current-directory (foreign-function ff_current_directory))
-	 (current-source (foreign-operation LOC_CURR_SOURCE))
-
-	 (macro (foreign-syntax LOC_MACRO "macro"))
-
-	 (path-make-absolute (foreign-function ff_path_make_absolute))
-	 (path-directory (foreign-function ff_path_directory))
-
-	 (with-input-from-file (foreign-operation LOC_WITH_INFILE0))
-	 (eval (foreign-operation LOC_PEVAL))
-	 (read (foreign-operation LOC_READ))
-	 )
-
-    (macro filenames
-      (let ((result #f))
-	(for-each (lambda (filename)
-		    (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
-				  (with-input-from-file (current-source) 
-				    (lambda()
-				      (let eval-statement ((statement (read)))
-				        (cond ((not (eof-object? statement))
-				      	     (set! result (eval statement (expansion-environment)))
-				      	     (eval-statement (read)))))
-				      ))))
-		  filenames)
-	result))))
-
-
-
-(define raise (foreign-operation LOC_RAISE0))
-(define error (foreign-operation LOC_ERROR))
 
 (define with-exception-handler 
   ((foreign-syntax LOC_MACRO "macro") (handler-code thunk-code)
    
-       (let* ((eval (foreign-operation LOC_PEVAL))
-	      (handler (eval handler-code (expansion-environment)))
-	      (thunk (eval thunk-code (expansion-environment)))
-	      (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
+   (let* ((eval (foreign-operation LOC_PEVAL))
+	  (handler (eval handler-code (expansion-environment)))
+	  (thunk (eval thunk-code (expansion-environment)))
+	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
 
-	 (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
-		       (thunk)
-		       ))))
+     (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
+		   (thunk)
+		   ))))
 
- 
+

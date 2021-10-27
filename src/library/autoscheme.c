@@ -792,7 +792,7 @@ pointer mk_uninterned_symbol(const char *name)
 pointer gensym( const char *prefix )
 {
 	char name[40];
-	static unsigned long gensym_cnt;
+	static unsigned long gensym_cnt = 1;
 
 	snprintf(name, 40, "%s%lu", prefix, gensym_cnt++);
 	return mk_uninterned_symbol(name);
@@ -3336,7 +3336,7 @@ LOC_READ_INTERNAL:
 	case LOC_GENSYM:
 		if (!validargs("gensym", 0, 1, TST_STRING)) Error_0(msg);
 		if( is_null( car( args )))
-		    s_return(gensym("gensym-"));
+		    s_return(gensym("gensym_"));
 		else 
 		    s_return( gensym( strvalue( car( args ))));
 
@@ -6240,7 +6240,7 @@ LOC_ERR1:
 	    else
 	    {
 		putstr( "Exception - raised with:" );
-		args = cons( cons( x, NIL ), NIL);
+		args = cons( x, NIL);
 	    }
 	    /* fall through */
 

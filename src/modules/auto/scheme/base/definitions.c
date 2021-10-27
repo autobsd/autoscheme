@@ -77,9 +77,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_CURR_INPORT, "current-input-port", environment);
     scheme_register_operation(LOC_CURR_OUTPORT, "current-output-port", environment);
     scheme_register_syntax(LOC_DEF0, "define", environment);
-
-/* define-record-type */
-
+/* define-record-type - defined in module */
     scheme_register_syntax(LOC_DEFSYNTAX0, "define-syntax", environment);
     scheme_register_syntax(LOC_DEFVALS0, "define-values", environment);
 
@@ -96,6 +94,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_EQ, "eq?", environment);
     scheme_register_operation(LOC_EQUAL, "equal?", environment);
     scheme_register_operation(LOC_EQV, "eqv?", environment);
+/* error - defined in module */
 
 /* error-object-irritants */
 /* error-object-message */
@@ -128,8 +127,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 /* guard */
 
     scheme_register_syntax(LOC_IF0, "if", environment);
+/* include - defined in module */
 
-/* include */
 /* include-ci */
 /* inexact */     scheme_register_operation(LOC_EX2INEX, "exact->inexact", environment);
 
@@ -170,8 +169,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
 /* make-bytevector */
 /* make-list */
-/* make-parameter */
 
+/* make-parameter - defined in module */
     scheme_register_operation(LOC_MKSTRING, "make-string", environment);
     scheme_register_operation(LOC_MKVECTOR, "make-vector", environment);
     scheme_register_operation(LOC_MAP0, "map", environment);
@@ -205,9 +204,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
     scheme_register_operation(LOC_OUTPORTP, "output-port?", environment);
     scheme_register_operation(LOC_PAIR, "pair?", environment);
-
-/* parameterize */
-
+/* parameterize - defined in module */
     scheme_register_operation(LOC_PEEK_CHAR, "peek-char", environment);
 
 /* peek-u8 */
@@ -218,10 +215,9 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_syntax(LOC_QQUOTE0, "quasiquote", environment);
     scheme_register_syntax(LOC_QUOTE, "quote", environment);
     scheme_register_operation(LOC_QUO, "quotient", environment);
+/* raise - defined in module */
+/* raise-continuable - defined in module */
 
-
-/* raise */
-/* raise-continuable */
 /* rational? */
 /* rationalize */
 /* read-bytevector */
@@ -231,7 +227,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
 /* read-error? */
 /* read-line */
-/* read-string */
+/* read-string - defined in module */
 /* read-u8 */
 
     scheme_register_operation(LOC_REAL, "real?", environment);
@@ -321,7 +317,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_VECTORP, "vector?", environment);
     scheme_register_syntax(LOC_WHEN0, "when", environment);
 
-/* with-exception-handler */
+/* with-exception-handler - defined in module */
 /* write-bytevector */
 
     scheme_register_operation(LOC_WRITE_CHAR, "write-char", environment);

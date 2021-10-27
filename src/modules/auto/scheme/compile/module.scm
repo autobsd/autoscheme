@@ -147,7 +147,7 @@
 		 (let* ((included-source (path-make-absolute (cadr expression) (path-directory source)))
 			(included-expressions (with-input-from-file included-source read-list))
 			)
-		   (compile-expression (cons 'begin included-expressions) included-source quote-level)))
+		   (compile-expression (cons '(foreign-syntax LOC_BEGIN "begin") included-expressions) included-source quote-level)))
 
 
 		((and (zero? quote-level) (compile-time-macro? expression))
@@ -201,11 +201,13 @@
 			  source
 			(lambda ()
 			  (let process-expression ((expression (read)))
-
-			    (cond ((not (eof-object? expression))
-				   (set! statements (string-append statements 
-								   "return_value = autoscheme_eval(" (compile-expression expression source 0) ", environment);\n"))
-				   (process-expression (read))))))
+			    (if (not (eof-object? expression))
+				(let ((next-expression (read)))
+				   
+				  (set! statements (string-append statements 
+								  (if (eof-object? next-expression) "return_value = " "")
+								  "autoscheme_eval(" (compile-expression expression source 0) ", environment);\n"))
+				   (process-expression next-expression)))))
 
 			))
 		    sources)

@@ -92,8 +92,8 @@ pointer ff_path_directory( pointer args )
  pointer LOAD_MODULE__auto_scheme_path(pointer environment)
 {
 pointer return_value = T;
-return_value = autoscheme_eval(T, environment);
-return_value = autoscheme_eval(T, environment);
+autoscheme_eval(T, environment);
+autoscheme_eval(T, environment);
 return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("path"),NIL))),cons(cons(mk_symbol("export"),cons(mk_symbol("path-directory"),cons(mk_symbol("path-absolute?"),cons(mk_symbol("path-make-absolute"),NIL)))),cons(cons(mk_symbol("begin"),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("path-absolute?"),cons(mk_function(ff_path_absolute_p,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("path-make-absolute"),cons(mk_function(ff_path_make_absolute,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("path-directory"),cons(mk_function(ff_path_directory,&NIL),NIL))),NIL)))),NIL)))), environment);
 return return_value;
 }

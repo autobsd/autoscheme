@@ -190,12 +190,17 @@
 ;; (write (set! my-var 77))(newline)
 ;; (write my-var)(newline)
 
-(raise-continuable 5)
+;; (raise-continuable 5)
 
-(display "after handlers")(newline)
+;; (display "after handlers")(newline)
 
 
-;; (guard (condition
-;;              ((assq ’a condition) => cdr)
-;;              ((assq ’b condition)))
-;;       (raise (list (cons ’a 42))))
+(write (guard (condition
+	       ((assq 'a condition) => cdr)
+	       ((assq 'b condition)))
+	      (raise-continuable (list (cons 'a 42)))
+	      (display "...after guard process")(newline)
+	      )
+       )(newline)
+(display "after guard expression")(newline)
+

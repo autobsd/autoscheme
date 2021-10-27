@@ -12,7 +12,7 @@ pointer LOAD_MODULE__auto_scheme_environment(pointer environment);
 #include <stdlib.h>
 #include <string.h>
 
-static pointer ff_environment_define_d( pointer args );
+pointer ff_environment_define_d( pointer args );
 static pointer ff_environment_undefine_d( pointer args );
 static pointer ff_environment_defined_symbols( pointer args );
 static pointer ff_environment_assoc( pointer args );
@@ -72,7 +72,7 @@ static pointer environment_define_d( pointer environment, pointer symbol, pointe
     return environment;
 }
 
-static pointer ff_environment_define_d( pointer args )
+pointer ff_environment_define_d( pointer args )
 {
     pointer environment = car( args );
     pointer symbol = cadr( args );
@@ -391,8 +391,8 @@ environment_define_d( environment, name, library );
 
 INITIALIZE_LIBRARY__auto_scheme_environment( library );
 
- return_value = autoscheme_eval(T, environment);
-return_value = autoscheme_eval(T, environment);
+ autoscheme_eval(T, environment);
+autoscheme_eval(T, environment);
 return_value = autoscheme_eval(T, environment);
 return return_value;
 }

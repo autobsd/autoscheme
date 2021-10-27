@@ -6,8 +6,13 @@
 (foreign-define (include-string "definitions.c"))
 (foreign-initialize (include-string "initialization.c"))
 
+;; ((foreign-syntax LOC_DEF0 "define") display (foreign-operation LOC_DISPLAY))
+;; ((foreign-syntax LOC_DEF0 "define") write (foreign-operation LOC_WRITE))
+
+
 
 (define error (foreign-operation LOC_ERROR))
+
 
 (define define-record-type
   (let ((environment-define! (foreign-function ff_environment_define_d))
@@ -66,30 +71,46 @@
 		 ref-fields)))))
 
 
-
-;; ((foreign-syntax LOC_DEF0 "define") display (foreign-operation LOC_DISPLAY))
-;; ((foreign-syntax LOC_DEF0 "define") write (foreign-operation LOC_WRITE))
-
-;; (define guard 
-;;   ((foreign-syntax LOC_MACRO "macro") (test . body)
+(define guard 
+  ((foreign-syntax LOC_MACRO "macro") (test . body)
    
-;;    (let* (;; (eval (foreign-operation LOC_PEVAL))
-;; 	  ;; (handler (eval handler-code (expansion-environment)))
-;; 	  ;; (thunk (eval thunk-code (expansion-environment)))
-;; 	  ;; (current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
-;; 	  )
+   (let* ((eval (foreign-operation LOC_PEVAL))
+	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
+	  (saved-handlers (current-exception-handlers))
+	  (variable (car test))
+	  (clauses (cdr test))
 
-;;      (display "test: ")(write test)(newline)
-;;      (display "body: ")(write body)(newline)
-
-;;      ;; (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
-;;      ;; 		   (thunk)
+	  (gensym (foreign-operation LOC_GENSYM))
+	  (generated-symbol (gensym "guard_"))
+      	  )
      
-;;      )))
+     `',(call/cc (lambda (normal-return)
 
+		   (define-values (obj back-to-thunk) (call/cc (lambda (goto-cond)
+								    (let ((handler (lambda (obj)
+										     (call/cc (lambda (back-to-thunk)
+												(goto-cond obj back-to-thunk)))
+										     (raise-continuable obj)
+										     )))
 
+								      (dynamic-wind 
+									  (lambda ()
+									    (current-exception-handlers (cons handler saved-handlers)))
 
-
+									  (lambda ()
+									    (normal-return (for-each (lambda (statement)
+												       (eval statement (expansion-environment)))
+												     body)))
+									  
+									  (lambda ()
+									    (current-exception-handlers saved-handlers)))))))
+	
+		   ((eval `(lambda (,variable ,generated-symbol)
+			     ,(cons 'cond (append clauses `((else (,generated-symbol)))))
+			    )
+			 (expansion-environment)) obj back-to-thunk
+			 )
+		   )))))
 
 
 (define include
@@ -170,10 +191,8 @@
 		     params prev-values))))))
 
 
-
-
-
 (define raise (foreign-operation LOC_RAISE0))
+
 
 (define raise-continuable 
   (lambda (obj)
@@ -181,10 +200,9 @@
 	   (handler-list (current-exception-handlers))
 	   (current-handler (car handler-list)))
       
-    (parameterize ((current-exception-handlers (cdr handler-list)))
-		 (current-handler obj)))))
-
-
+      (parameterize ((current-exception-handlers (cdr handler-list)))
+		    (current-handler obj)
+		    ))))
 
 
 (define read-string 
@@ -211,8 +229,6 @@
     auto-read-string))
 
 
-
-
 (define with-exception-handler 
   ((foreign-syntax LOC_MACRO "macro") (handler-code thunk-code)
    
@@ -222,7 +238,6 @@
 	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
 
      (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
-		   (thunk)
-		   ))))
+		   (thunk)))))
 
 

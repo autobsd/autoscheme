@@ -3270,7 +3270,7 @@ LOC_APPLYCONT:
 		dump = cdr(code);
 #endif
 		w = s_next_op();
-		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1) {
+		if (w == LOC_WITHVALUES1 || w == LOC_RECEIVE1 || w == LOC_DEFVALS1) {
 			type(args) |= T_VALUES;
 			s_return(args);
 		} else {
@@ -4349,7 +4349,7 @@ LOC_EXPANDPATTERN:
 		mark_y = NIL;
 		for (mark_x = args; mark_x != NIL; mark_x = cdr(mark_x)) {
 			if (car(mark_x) == NIL) {
-				s_return(T);
+				s_return(value);
 			}
 			mark_y = cons(caar(mark_x), mark_y);
 			car(mark_x) = cdar(mark_x);

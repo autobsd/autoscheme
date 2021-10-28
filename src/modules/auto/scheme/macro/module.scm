@@ -20,4 +20,8 @@
     ((foreign-syntax LOC_DEF0 "define") macro? (foreign-operation LOC_MACROP))
 
     ((foreign-syntax LOC_DEF0 "define") gensym (foreign-operation LOC_GENSYM))
+
+    ((foreign-syntax LOC_DEF0 "define") define-syntax-lambda (foreign-syntax LOC_DEFSYNLAM0 "define-syntax-lambda"))
+    ((foreign-syntax LOC_DEF0 "define") syntax-lambda (foreign-syntax LOC_SYNLAM "syntax-lambda"))
+
     ))

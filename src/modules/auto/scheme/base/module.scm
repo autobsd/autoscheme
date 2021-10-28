@@ -8,6 +8,7 @@
 
 ;; ((foreign-syntax LOC_DEF0 "define") display (foreign-operation LOC_DISPLAY))
 ;; ((foreign-syntax LOC_DEF0 "define") write (foreign-operation LOC_WRITE))
+(define syntax-lambda (foreign-syntax LOC_SYNLAM "syntax-lambda"))
 
 
 
@@ -72,8 +73,7 @@
 
 
 (define guard 
-  ((foreign-syntax LOC_MACRO "macro") (test . body)
-   
+  (syntax-lambda exp-env (test . body)
    (let* ((eval (foreign-operation LOC_PEVAL))
 	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
 	  (saved-handlers (current-exception-handlers))
@@ -99,7 +99,7 @@
 
 									  (lambda ()
 									    (normal-return (for-each (lambda (statement)
-												       (eval statement (expansion-environment)))
+												       (eval statement exp-env))
 												     body)))
 									  
 									  (lambda ()
@@ -108,7 +108,7 @@
 		   ((eval `(lambda (,variable ,generated-symbol)
 			     ,(cons 'cond (append clauses `((else (,generated-symbol)))))
 			    )
-			 (expansion-environment)) obj back-to-thunk
+			 exp-env) obj back-to-thunk
 			 )
 		   )))))
 

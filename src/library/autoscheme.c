@@ -3198,17 +3198,22 @@ LOOP:
 	case LOC_APPLY:		/* apply 'code' to 'args' */
 LOC_APPLY:
 
-		if (is_operation(code)) {	/* PROCEDURE */
+		if (is_operation(code)) {	/* OPERATION */
 			location = op_loc(code);
 			goto LOOP;
-		} else if (is_function(code)) {	/* FOREIGN */
+		} else if (is_function(code)) {	/* FUNCTION */
 			push_recent_alloc(args);
 			x = (foreignfnc(code))(args);
 			s_return(x);
 		} else if (is_closure(code)) {	/* CLOSURE */
 			/* make environment */
 
-		    if( is_macro(code) )
+		    if( is_synlam( code ))
+		    {
+			args = cons( envir, args );
+			envir = cons(NIL, closure_env(code));
+		    }
+		    else if( is_macro( code ))
 		    {
 			x = cons( cons( cons( mk_symbol( "_expansion-environment" ), envir ), NIL ), NIL );
 			setenvironment( x );
@@ -3996,6 +4001,34 @@ LOC_DO2:
 		setpromise(x);
 		s_return(cons(args, x));
 
+	case LOC_DEFSYNLAM0:	/* define-syntax-lambda */
+
+	    if ( !is_symbol( caar( code ))) {
+		Error_0("variable is not a symbol");
+	    }
+	    s_save( LOC_DEFSYNLAM1, NIL, caar( code ));
+	    code = cons( cadr( car( code )), cons( cadr( cdar( code )), cdr( code )));
+	    /* fall through */
+		
+	case LOC_SYNLAM:	/* syntax-lambda */
+	    code = cons( cons( car( code ), cadr( code )), cddr( code ));
+	    x = mk_closure( code, envir );
+	    exttype( x ) |= ( T_SYNLAM | T_DEFSYNLAM | T_MACRO | T_DEFMACRO );
+	    s_return( x );
+
+	case LOC_DEFSYNLAM1:	
+	    for( x = car( envir ); x != NIL; x = cdr( x ))
+		if( caar( x ) == code)
+		    break;
+	    if( x != NIL )
+		cdar( x ) = value;
+	    else {
+		x = cons( code, value );
+		x = cons( x, car( envir ));
+		car( envir ) = x;
+	    }
+	    s_return( code );
+
 	case LOC_DEFMACRO0:	/* define-macro */
 
 	    if ( !is_symbol( caar( code ))) {
@@ -4010,7 +4043,7 @@ LOC_DO2:
 	    exttype( x ) |= ( T_MACRO | T_DEFMACRO );
 	    s_return( x );
 
-	case LOC_DEFMACRO1:	/* define-macro */
+	case LOC_DEFMACRO1:	
 	    for( x = car( envir ); x != NIL; x = cdr( x ))
 		if( caar( x ) == code)
 		    break;

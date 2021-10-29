@@ -12,9 +12,6 @@
 
 
 
-(define error (foreign-operation LOC_ERROR))
-
-
 (define define-record-type
   (let ((environment-define! (foreign-function ff_environment_define_d))
 	(gensym (foreign-operation LOC_GENSYM))
@@ -70,6 +67,10 @@
 			 (environment-define! (expansion-environment) mutator-name mutator))))
 
 		 ref-fields)))))
+
+
+(define error (foreign-operation LOC_ERROR))
+(define error-object? (foreign-operation LOC_ERROBJP))
 
 
 (define guard 

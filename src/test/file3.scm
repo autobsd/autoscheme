@@ -204,3 +204,5 @@
        )(newline)
 (display "after guard expression")(newline)
 
+
+(display "error-object?: ")(write (error-object? (list->vector '("<ERROR-OBJECT>" 'record-type_13))))(newline)

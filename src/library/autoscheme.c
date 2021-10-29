@@ -6330,6 +6330,12 @@ LOC_ERR1:
 	    args = cons( x, NIL );
 	    s_goto( LOC_RAISE0 );
 
+	case LOC_ERROBJP:  /* error-object? */
+	    if (!validargs("error", 1, 1, TST_ANY)) Error_0(msg);
+	    x = car( args );
+	    if( is_vector( x ) && ivalue( x ) >= 1 && !strcmp( strvalue( vector_elem( x, 0 )), "<ERROR-OBJECT>" ))
+		s_return( T );
+	    s_return( F );
 
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);

@@ -2840,20 +2840,20 @@ static pointer mappend(pointer f, pointer l, pointer r)
 
 #define Error_0(s) BEGIN                       \
 	args = cons(mk_string((s)), NIL);          \
-	location = LOC_ERR0;                        \
+	location = LOC_ERROR;                        \
 	goto LOOP; END
 
 #define Error_1(s, a) BEGIN                    \
 	args = cons((a), NIL);                     \
 	code = mk_string(s);                       \
 	args = cons(code, args);                   \
-	location = LOC_ERR0;                        \
+	location = LOC_ERROR;                        \
 	goto LOOP; END
 
 /* control macros for Eval_Cycle */
 #define s_goto(a) BEGIN                        \
 	location = (int)(a);                       \
-	goto a; END
+	goto LOOP; END
 
 #ifndef USE_SCHEME_STACK
 
@@ -2963,11 +2963,11 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 	}
 
 	if (n < min_arity) {
-		snprintf(msg, sizeof(msg), "%s: needs%s %d argument(s)",
+		snprintf(msg, sizeof(msg), "Call error - '%s' requires%s %d argument(s)",
 			name, min_arity == max_arity ? "" : " at least", min_arity);
 		return 0;
 	} else if (n > max_arity) {
-		snprintf(msg, sizeof(msg), "%s: needs%s %d argument(s)",
+		snprintf(msg, sizeof(msg), "Call error - '%s' requires%s %d argument(s)",
 			name, min_arity == max_arity ? "" : " at most", max_arity);
 		return 0;
 	} else if (arg_tests) {
@@ -2977,79 +2977,79 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 				break;
 			case '\002': /* TST_STRING */
 				if (!is_string(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: string", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a string", i, name);
 					return 0;
 				}
 				break;
 			case '\003': /* TST_SYMBOL */
 				if (!is_symbol(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: symbol", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a symbol", i, name);
 					return 0;
 				}
 				break;
 			case '\004': /* TST_PORT */
 				if (!is_port(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: port", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a port", i, name);
 					return 0;
 				}
 				break;
 			case '\005': /* TST_INPORT */
 				if (!is_inport(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: input port", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a port", i, name);
 					return 0;
 				}
 				break;
 			case '\006': /* TST_OUTPORT */
 				if (!is_outport(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: output port", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a port", i, name);
 					return 0;
 				}
 				break;
 			case '\007': /* TST_ENVIRONMENT */
 				if (!is_environment(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: environment", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not an environment", i, name);
 					return 0;
 				}
 				break;
 			case '\010': /* TST_PAIR */
 				if (!is_pair(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: pair", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a pair", i, name);
 					return 0;
 				}
 				break;
 			case '\011': /* TST_LIST */
 				if (!is_pair(car(x)) && car(x) != NIL) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: pair or '()", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a pair or '()", i, name);
 					return 0;
 				}
 				break;
 			case '\012': /* TST_CHAR */
 				if (!is_character(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: character", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a character", i, name);
 					return 0;
 				}
 				break;
 			case '\013': /* TST_VECTOR */
 				if (!is_vector(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: vector", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a vector", i, name);
 					return 0;
 				}
 				break;
 			case '\014': /* TST_NUMBER */
 				if (!is_number(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: number", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a number", i, name);
 					return 0;
 				}
 				break;
 			case '\015': /* TST_INTEGER */
 				if (!is_integer(car(x))) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: integer", name, i);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not an integer", i, name);
 					return 0;
 				}
 				break;
 			case '\016': /* TST_NATURAL */
 				if (!is_integer(car(x)) || ivalue(car(x)) < 0) {
-					snprintf(msg, sizeof(msg), "%s: argument %d must be: non-negative integer", name, i);
+					snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not an integer", i, name);
 					return 0;
 				}
 				break;
@@ -3069,7 +3069,6 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 /* kernel of this intepreter */
 static int Eval_Cycle(enum eval_location location)
 {
-	FILE *tmpfp = NULL;
 	int tok = 0;
 	int print_flag = 0;
 	pointer x, y;
@@ -3081,7 +3080,6 @@ LOOP:
 
 	switch (location) {
 	case LOC_EVAL:		/* main part of evalution */
-	LOC_EVAL:
 	    if (is_syntax(code)) {	/* syntax */
 		
 		if (syntaxnum(code) & T_DEFSYNTAX) {
@@ -3155,8 +3153,7 @@ LOOP:
 				value = cdr(value);
 			}
 			code = cdr(code);
-			location = syntaxnum(value) & T_SYNTAXNUM;
-			goto LOOP;
+			s_goto( syntaxnum(value) & T_SYNTAXNUM );
 		}
 		if (is_closure(value) && is_macro(value)) {	/* macro expansion */
 			if (syntaxnum(value) & T_DEFSYNTAX) {
@@ -3196,11 +3193,9 @@ LOOP:
 		/* fall through */
 
 	case LOC_APPLY:		/* apply 'code' to 'args' */
-LOC_APPLY:
 
 		if (is_operation(code)) {	/* OPERATION */
-			location = op_loc(code);
-			goto LOOP;
+		    s_goto( op_loc(code) );
 		} else if (is_function(code)) {	/* FUNCTION */
 			push_recent_alloc(args);
 			x = (foreignfnc(code))(args);
@@ -3268,7 +3263,7 @@ LOC_APPLY:
 		}
 
 	case LOC_APPLYCONT:
-LOC_APPLYCONT:
+
 #ifndef USE_SCHEME_STACK
 		dump = s_clone(cdr(code));
 #else
@@ -3288,7 +3283,7 @@ LOC_APPLYCONT:
 	switch (location) {
 
 	case LOC_T0LVL:	/* top level */
-LOC_T0LVL:
+
 		if (port_file(current_inport) == NULL || is_eofport(current_inport)) {
 			if (is_fileport(current_inport) && port_file(current_inport) != stdin && port_file(current_inport) != NULL) {
 				fclose(port_file(current_inport));
@@ -3320,7 +3315,7 @@ LOC_T0LVL:
 		s_goto(LOC_EVAL);
 
 	case LOC_READ_INTERNAL:		/* read internal */
-LOC_READ_INTERNAL:
+
 		tok = token();
 		s_goto(LOC_RDSEXPR);
 
@@ -3371,7 +3366,7 @@ LOC_READ_INTERNAL:
 		/* fall through */
 
 	case LOC_QQUOTE1:	/* quasiquote -- expand */
-LOC_QQUOTE1:
+
 		if (is_vector(code)) {
 			s_save(LOC_QQUOTE2, NIL, NIL);
 			x = NIL;
@@ -3619,7 +3614,7 @@ LOC_QQUOTE1:
 		Error_1("unbound variable", code);
 
 	case LOC_BEGIN:		/* begin */
-LOC_BEGIN:
+
 		if (!is_pair(code)) {
 			s_return(code);
 		}
@@ -3844,7 +3839,7 @@ LOC_BEGIN:
 		/* fall through */
 
 	case LOC_DO2:		/* do -- test */
-LOC_DO2:
+
 		for (mark_x = car(code); args != NIL; mark_x = cdr(mark_x), args = cdr(args)) {
 			y = cons(caar(mark_x), car(args));
 			y = cons(y, car(envir));
@@ -4064,7 +4059,7 @@ LOC_DO2:
 		s_return(mk_closure(code, envir));
 
 	case LOC_EXPANDPATTERN:	/* expand pattern */
-LOC_EXPANDPATTERN:
+
 		if (!is_pair(code)) {
 			Error_0("bad syntax in syntax-rules");
 		}
@@ -4401,7 +4396,7 @@ LOC_EXPANDPATTERN:
 #endif
 		s_goto(LOC_APPLY);
 
-	LOC_VALUES:
+
 	case LOC_VALUES:			/* values */
 		if (!validargs("values", 0, 65535, TST_NONE)) Error_0(msg);
 		w = s_next_op();
@@ -4456,7 +4451,7 @@ LOC_EXPANDPATTERN:
 		s_return(car(args));
 
 	case LOC_DOWINDS0:		/* winding -- after, before */
-LOC_DOWINDS0:
+
 		args = shared_tail(args, code);
 		if (winders != args && winders != NIL) {
 			s_save(LOC_DOWINDS2, args, code);
@@ -4470,7 +4465,7 @@ LOC_DOWINDS0:
 		s_return(T);
 
 	case LOC_DOWINDS1:		/* winding -- after */
-LOC_DOWINDS1:
+
 		winders = args;
 		if (args != code && args != NIL) {
 			s_save(LOC_DOWINDS1, cdr(args), code);
@@ -4481,7 +4476,7 @@ LOC_DOWINDS1:
 		s_return(T);
 
 	case LOC_DOWINDS2:		/* winding -- before */
-LOC_DOWINDS2:
+
 		if (args != code && code != NIL) {
 			s_save(LOC_DOWINDS3, args, code);
 			code = cdr(code);
@@ -5591,7 +5586,7 @@ LOC_DOWINDS2:
 		s_return(x);
 
 	case LOC_VECTOR:		/* vector */
-LOC_VECTOR:
+
 		if (!validargs("vector", 0, 65535, TST_NONE)) Error_0(msg);
 		w = list_length(args);
 		if (w < 0) {
@@ -6008,7 +6003,7 @@ LOC_VECTOR:
 		s_retbool(is_number(car(args)));
 	case LOC_STRINGP:	/* string? */
 		if (!validargs("string?", 1, 1, TST_ANY)) Error_0(msg);
-		s_retbool(is_string(car(args)));
+		s_retbool(is_string(car(args)) && !is_symbol(car(args)));
 	case LOC_INTEGER:	/* integer? */
 		if (!validargs("integer?", 1, 1, TST_ANY)) Error_0(msg);
 		s_retbool(is_integer(car(args)));
@@ -6120,7 +6115,7 @@ LOC_VECTOR:
 	case LOC_FORCE:		/* force */
 		if (!validargs("force", 1, 1, TST_ANY)) Error_0(msg);
 		code = car(args);
-	LOC_FORCE:
+
 		if (is_promise(code)) {
 			if (is_resultready(code)) {
 				s_return(cdar(code));
@@ -6192,41 +6187,6 @@ LOC_VECTOR:
 		putstr("\n");
 		s_return(T);
 
-	case LOC_ERR0:	/* error */
-		if (!validargs("error", 1, 65535, TST_NONE)) Error_0(msg);
-		tmpfp = port_file(current_outport);
-		fflush(tmpfp);
-		port_file(current_outport) = stderr;
-		fprintf(stderr, "\n\nError - ");
-		fprintf(stderr, "%s", strvalue(car(args)));
-		args = cdr(args);
-		s_goto(LOC_ERR1);
-
-	case LOC_ERR1:	/* error */
-LOC_ERR1:
-		
-		if (args != NIL) {
-		    putstr(": ");
-			s_save(LOC_ERR1, cdr(args), NIL);
-			args = car(args);
-			print_flag = 1;
-			s_goto(LOC_P0LIST);
-		} else {
-			putstr("\n");
-			flushinput();
-			if (!interactive_repl) {
-				/* return -1; */
-			    /* exit( 1 ); */
-			    s_save(LOC_EMERGENCY_EXIT, cons( mk_integer( 1 ), NIL), NIL);
-			    args = cons( call_history, NIL);
-			    print_flag = 1;
-			    s_goto(LOC_P0HIST);
-			}
-			port_file(current_outport) = tmpfp;
-			s_goto(LOC_T0LVL);
-		}
-
-	LOC_FLUSH_OUTPORT:
 	case LOC_FLUSH_OUTPORT:	/* flush-output-port */
 	    if (!validargs("flush-output-port", 0, 1, TST_OUTPORT)) Error_0(msg);
 	    if( is_pair( args )) 
@@ -6240,22 +6200,17 @@ LOC_ERR1:
 	case LOC_DFLT_XHAND0:	/* default exception handler */
 	    if (!validargs("default-exception-handler", 1, 1, TST_ANY)) Error_0(msg);
 	    s_save( LOC_DFLT_XHAND1, args, NIL );
+	    s_save( LOC_ERROBJP, args, NIL );
 	    args = cons( current_outport, NIL );
 	    s_goto(LOC_FLUSH_OUTPORT);
 
-	case LOC_DFLT_XHAND1:	
+	case LOC_DFLT_XHAND1:
 	    x = cons( current_outport, NIL );
 	    s_save( LOC_DFLT_XHAND3, NIL, NIL );
 	    s_save( LOC_CURR_OUTPORT, x, NIL );
 	    current_outport = current_errport;
 	    x = car( args );
-	    if( is_vector( x ) && 
-	    	ivalue( x ) == 4 &&
-		is_symbol( vector_elem( x, 0 )) &&
-	    	!strcmp( strvalue( vector_elem( x, 0 )), "<ERROR-OBJECT>" ) &&
-		is_symbol( vector_elem( x, 1 )) &&
-		is_string( vector_elem( x, 2 )) &&
-		( is_null( vector_elem( x, 3 )) || is_pair( vector_elem( x, 3 ))))
+	    if( istrue( value ))
 	    {
 		putstr( strvalue( vector_elem( car( args ), 2 )));
 		x = vector_elem( car( args ), 3);
@@ -6293,7 +6248,7 @@ LOC_ERR1:
 	case LOC_DFLT_XHAND3:
 	    s_return( F );
 
-	LOC_RAISE0:
+
 	case LOC_RAISE0: /* raise */
 	    if (!validargs("raise", 1, 1, TST_ANY)) Error_0(msg);
 	    x = cons( current_xhands, NIL );
@@ -6319,7 +6274,6 @@ LOC_ERR1:
 	    current_xhands = cdr( current_xhands );
 	    s_goto( LOC_APPLY );
 
-
 	case LOC_ERROR:  /* error */
 	    if (!validargs("error", 1, 65535, TST_STRING TST_ANY)) Error_0(msg);
 	    x = mk_vector(4);
@@ -6330,12 +6284,35 @@ LOC_ERR1:
 	    args = cons( x, NIL );
 	    s_goto( LOC_RAISE0 );
 
+
 	case LOC_ERROBJP:  /* error-object? */
-	    if (!validargs("error", 1, 1, TST_ANY)) Error_0(msg);
+	    if (!validargs("error-object?", 1, 1, TST_ANY)) Error_0(msg);
 	    x = car( args );
-	    if( is_vector( x ) && ivalue( x ) >= 1 && !strcmp( strvalue( vector_elem( x, 0 )), "<ERROR-OBJECT>" ))
+	    if( is_vector( x ) && 
+	    	ivalue( x ) >= 4 &&
+		is_symbol( vector_elem( x, 0 )) &&
+	    	!strcmp( strvalue( vector_elem( x, 0 )), "<ERROR-OBJECT>" ) &&
+		is_symbol( vector_elem( x, 1 )) &&
+		is_string( vector_elem( x, 2 )) &&
+		( is_null( vector_elem( x, 3 )) || is_pair( vector_elem( x, 3 ))))
+	    {
 		s_return( T );
+	    }
 	    s_return( F );
+
+	case LOC_ERRMSG0:  /* error-object-message */
+	    if (!validargs("error-object-message", 1, 1, TST_ANY)) Error_0(msg);
+	    s_save( LOC_ERRMSG1, args, NIL );
+	    s_goto( LOC_ERROBJP );
+
+	case LOC_ERRMSG1:
+	    x = car( args );
+	    if( isfalse( value ))
+	    {
+		args = cons( mk_string( "Type error - argument 1 in call to 'error-object-message' is not an error-object" ), cons( x, NIL ));
+		s_goto( LOC_ERROR );
+	    }
+	    s_return( vector_elem( car( args ), 2 ));
 
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
@@ -6611,7 +6588,7 @@ LOC_ERR1:
 		s_retbool(is_fileport(x) || is_strport(x));
 
 	case LOC_RDSEXPR:
-LOC_RDSEXPR:
+
 		if (tok == TOK_EOF) {
 			s_return(EOF_OBJ);
 		}
@@ -6731,7 +6708,7 @@ LOC_RDSEXPR:
 
 	/* ========== printing part ========== */
 	case LOC_P0LIST:
-LOC_P0LIST:
+
 		if (is_vector(args)) {
 			putstr("#(");
 			x = mk_integer(0);
@@ -6786,7 +6763,7 @@ LOC_P0LIST:
 		}
 
 	case LOC_PVECFROM:
-LOC_PVECFROM:
+
 		w = ivalue(cdr(args));
 		if (w == ivalue(car(args))) {
 			putstr(")");
@@ -6803,20 +6780,13 @@ LOC_PVECFROM:
 	    /* ========== printing call history ========== */
 
 	case LOC_P0HIST:
-	LOC_P0HIST:
-
 	    putstr( "\nCall history:\n" );
-
 	    x = mk_integer( call_history_pos - 1 );
 	    args = cons( car( args ), x );
 	    s_goto( LOC_P1HIST );
 
-
 	case LOC_P1HIST:
-	LOC_P1HIST:
-
 	    w = ivalue( cdr( args ));
-
 	    if( w == -1 ) 
 	    {
 		ivalue( cdr( args )) = (int32_t)CALL_HISTORY_LENGTH - 1;
@@ -6825,20 +6795,15 @@ LOC_PVECFROM:
 	    else 
 	    {
 		putstr( "\n     " );
-
 		ivalue( cdr( args )) = (int32_t)w - 1;
 		s_save( LOC_P1HIST, args, NIL );
-
 		args = vector_elem( car( args ), (int)w );
 		s_goto( LOC_P0LIST );
 	    }
 
 	case LOC_P2HIST:
-	LOC_P2HIST:
-
 	    w = ivalue( cdr( args ));
 	    x = vector_elem( car( args ), (int)w );
-
 	    if( w < call_history_pos ||  x == NIL )
 	    {
 		putstr( "\n" );
@@ -6847,10 +6812,8 @@ LOC_PVECFROM:
 	    else
 	    {
 	    	putstr( "\n     " );
-
 	    	ivalue( cdr( args )) = (int32_t)w - 1;
 	    	s_save( LOC_P2HIST, args, NIL );
-
 	    	args = x;
 	    	s_goto( LOC_P0LIST );
 	    }

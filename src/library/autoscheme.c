@@ -6328,6 +6328,28 @@ LOOP:
 	    }
 	    s_return( vector_elem( car( args ), 3 ));
 
+	case LOC_FILERRP0:  /* file-error? */
+	    if (!validargs("file-error?", 1, 1, TST_ANY)) Error_0(msg);
+	    s_save( LOC_FILERRP1, args, NIL );
+	    s_goto( LOC_ERROBJP );
+
+	case LOC_FILERRP1:
+	    if( isfalse( value ))
+		s_return( F );
+	    s_save( LOC_FILERRP2, args, NIL );
+	    s_goto( LOC_ERRMSG1 );
+
+	case LOC_FILERRP2:
+	    x = car( args );
+	    if( strlength( value ) < 4 )
+		s_return( F );
+	    if( tolower( strvalue( value )[0] ) == 'f' &&
+		tolower( strvalue( value )[1] ) == 'i' &&
+		tolower( strvalue( value )[2] ) == 'l' &&
+		tolower( strvalue( value )[3] ) == 'e')
+		s_return( T );
+	    s_return( F );
+
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
 		s_return(reverse(car(args)));

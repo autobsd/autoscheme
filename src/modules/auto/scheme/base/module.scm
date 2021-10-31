@@ -74,6 +74,7 @@
 (define error-object-irritants (foreign-operation LOC_ERRIRR0))
 (define error-object? (foreign-operation LOC_ERROBJP))
 
+(define file-error? (foreign-operation LOC_FILERRP0))
 
 (define guard 
   (syntax-lambda exp-env (test . body)

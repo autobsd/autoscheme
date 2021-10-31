@@ -71,6 +71,7 @@
 
 (define error (foreign-operation LOC_ERROR))
 (define error-object-message (foreign-operation LOC_ERRMSG0))
+(define error-object-irritants (foreign-operation LOC_ERRIRR0))
 (define error-object? (foreign-operation LOC_ERROBJP))
 
 

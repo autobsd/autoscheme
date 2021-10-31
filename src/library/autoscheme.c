@@ -6309,10 +6309,24 @@ LOOP:
 	    x = car( args );
 	    if( isfalse( value ))
 	    {
-		args = cons( mk_string( "Type error - argument 1 in call to 'error-object-message' is not an error-object" ), cons( x, NIL ));
+		args = cons( mk_string( "Type error - argument 1 in call to 'error-object-message' is not a proper error-object" ), cons( x, NIL ));
 		s_goto( LOC_ERROR );
 	    }
 	    s_return( vector_elem( car( args ), 2 ));
+
+	case LOC_ERRIRR0:  /* error-object-irritants */
+	    if (!validargs("error-object-irritants", 1, 1, TST_ANY)) Error_0(msg);
+	    s_save( LOC_ERRIRR1, args, NIL );
+	    s_goto( LOC_ERROBJP );
+
+	case LOC_ERRIRR1:
+	    x = car( args );
+	    if( isfalse( value ))
+	    {
+		args = cons( mk_string( "Type error - argument 1 in call to 'error-object-irritants' is not a proper error-object" ), cons( x, NIL ));
+		s_goto( LOC_ERROR );
+	    }
+	    s_return( vector_elem( car( args ), 3 ));
 
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);

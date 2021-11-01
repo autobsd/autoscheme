@@ -6350,6 +6350,28 @@ LOOP:
 		s_return( T );
 	    s_return( F );
 
+	case LOC_REDERRP0:  /* read-error? */
+	    if (!validargs("read-error?", 1, 1, TST_ANY)) Error_0(msg);
+	    s_save( LOC_REDERRP1, args, NIL );
+	    s_goto( LOC_ERROBJP );
+
+	case LOC_REDERRP1:
+	    if( isfalse( value ))
+		s_return( F );
+	    s_save( LOC_REDERRP2, args, NIL );
+	    s_goto( LOC_ERRMSG1 );
+
+	case LOC_REDERRP2:
+	    x = car( args );
+	    if( strlength( value ) < 4 )
+		s_return( F );
+	    if( tolower( strvalue( value )[0] ) == 'r' &&
+		tolower( strvalue( value )[1] ) == 'e' &&
+		tolower( strvalue( value )[2] ) == 'a' &&
+		tolower( strvalue( value )[3] ) == 'd')
+		s_return( T );
+	    s_return( F );
+
 	case LOC_REVERSE:	/* reverse */
 		if (!validargs("reverse", 1, 1, TST_LIST)) Error_0(msg);
 		s_return(reverse(car(args)));

@@ -209,6 +209,8 @@
 		    ))))
 
 
+(define read-error? (foreign-operation LOC_REDERRP0))
+
 (define read-string 
   (letrec ((r7-read-string (lambda (k . rest)
 			     (if (= k 0) ""

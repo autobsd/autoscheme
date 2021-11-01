@@ -214,6 +214,17 @@
 (display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
 
 (display "file-error?: ")(write (file-error? err-obj))(newline)
+(display "read-error?: ")(write (read-error? err-obj))(newline)
+
+(newline)
+(define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "Read error - message" (14))))
+(display "error-object?: ")(write (error-object? err-obj))(newline)
+(display "error-message: ")(write (error-object-message err-obj))(newline)
+(display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
+
+(display "file-error?: ")(write (file-error? err-obj))(newline)
+(display "read-error?: ")(write (read-error? err-obj))(newline)
+
 
 ;; (define err-obj 14)
 ;; (display "error-object?: ")(write (error-object? err-obj))(newline)

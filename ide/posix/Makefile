@@ -228,7 +228,7 @@ build: $(bin_dir)/autoscheme
 
 $(bin_dir)/autoscheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_dir)/autoscheme.c
 	mkdir -p $(bin_dir)
-	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lautoscheme -L$(lib_dir) -I$(include_dir)
+	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(include_dir)
 
 $(gen_dir)/autoscheme.c: $(bin_dir)/autoscheme-prime $(src_dir)/application/autoscheme.scm $(scheme_deps)
 	mkdir -p $(gen_dir)
@@ -453,7 +453,7 @@ $(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
 
 $(bin_dir)/autoscheme-prime:
 	mkdir -p $(bin_dir)
-	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
+	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 		$(prime_dir)/scheme.c \
 		$(prime_dir)/auto_scheme_file.c \
 		$(prime_dir)/auto_scheme_port.c \

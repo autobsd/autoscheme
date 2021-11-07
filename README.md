@@ -11,4 +11,4 @@ It comprises a command-line application and an embeddable C library that provide
 - an S2S compiler (Scheme to C/C++)
 - an interactive REPL
 - a command-line shell
-- a set of modules that implement and extend the R7RS standard
+- a set of modules that extend a subset of the R7RS standard

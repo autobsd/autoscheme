@@ -9,6 +9,8 @@ It comprises a command-line application and an embeddable C library that provide
 
 - a Scheme interpreter
 - an S2S compiler (Scheme to C/C++)
-- an interactive REPL
-- a command-line shell
 - a set of modules that extend a subset of the R7RS standard
+<!-- 
+- an interactive REPL
+- a command-line shell 
+-->

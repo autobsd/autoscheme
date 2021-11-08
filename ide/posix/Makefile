@@ -487,11 +487,11 @@ $(bin_dir)/autoscheme-prime:
 
 
 
-install: $(bin_dir)/scheme
-	cp $(bin_dir)/scheme $(install_dir)/
+install: $(bin_dir)/autoscheme
+	cp $(bin_dir)/autoscheme $(install_dir)/
 
 uninstall: 
-	rm $(install_dir)/scheme
+	rm $(install_dir)/autoscheme
 
 clean:
 	rm -rf $(gen_dir)

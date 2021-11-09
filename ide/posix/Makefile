@@ -14,6 +14,11 @@ lib_dir = lib
 include_dir = include
 
 install_dir = /usr/local/bin
+ext_mod_dir = /var/local/lib/autoscheme.modules
+
+
+
+
 
 compile_options = -fbracket-depth=10000   
 strict_options = -Wall -Wextra -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition $(compile_options)
@@ -489,9 +494,15 @@ $(bin_dir)/autoscheme-prime:
 
 install: $(bin_dir)/autoscheme
 	cp $(bin_dir)/autoscheme $(install_dir)/
+	mkdir -p $(ext_mod_dir)
+	cp -r .$(ext_mod_dir)/ $(ext_mod_dir)/ 
+
+
+
 
 uninstall: 
 	rm -f $(install_dir)/autoscheme
+	rm -rf $(ext_mod_dir)
 
 clean:
 	rm -rf $(gen_dir)

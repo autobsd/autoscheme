@@ -4,34 +4,42 @@
 
 (import (auto scheme base)
 	(auto scheme write)
+	(auto scheme directory)
 	)
 
 (display "configuring build...")(newline)
 
+(define modules '())
+(define module-dependencies "")
+
+(define update-dependencies
+  (lambda (module)
+    (parameterize ((current-directory module))
+		  (set! module-dependencies (string-append module-dependencies "\n" module "_dep = \\\n"))
+		  (for-each (lambda (file)
+			      (set! module-dependencies (string-append module-dependencies "\t$(modules_dir)/" 
+								       module "/" file 
+								       " \\\n"))
+			      )
+			    (directory-files))
+		  )))
+
+(parameterize ((current-directory "../../src/modules"))
+
+	      (for-each (lambda (module)
+			  (update-dependencies module)
+			  (set! modules (cons module modules))
+			  )
+			(directory-files))
 
 
-;; (display "current-directory: ")(write (current-directory))(newline)
+	      )
 
-;; (define modules '())
-
-;; (current-directory "../../src/modules")
-
-;; (let get-modules ((prefix '())
-;; 		  )
-;;   (let ((files (directory-files)))
-;;     (for-each (lambda (file)
-;; 		(cond ((directory? file)
-;; 		       (display "prefix: ")(write prefix)(newline)
-;; 		       (display "found-dir: ")(write file)(newline)
-;; 		       (parameterize ((current-directory file))
-;; 				     (get-modules (cons file prefix))
-;; 				     ))
-;; 		      ((string=? file "module.scm")
-;; 		       (display "prefix: ")(write prefix)(newline)
-;; 		       (display "found-module: ")(write file)(newline)
-;; 		       )
-;; 		       ))
-;; 	      files))
+(define module-objects "")
 
 
-;;   )
+
+
+(display module-dependencies)(newline)
+
+(display modules)(newline)

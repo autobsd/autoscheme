@@ -4372,12 +4372,13 @@ LOOP:
 		if (!validargs("for-each", 2, 65535, TST_ANY TST_LIST)) Error_0(msg);
 		code = car(args);
 		args = cdr(args);
+		value = T;
 
 	case LOC_FOREACH1:	/* for-each */
 		mark_y = NIL;
 		for (mark_x = args; mark_x != NIL; mark_x = cdr(mark_x)) {
 			if (car(mark_x) == NIL) {
-				s_return(value);
+			    s_return( value );
 			}
 			mark_y = cons(caar(mark_x), mark_y);
 			car(mark_x) = cdar(mark_x);

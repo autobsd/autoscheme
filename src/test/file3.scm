@@ -195,41 +195,45 @@
 ;; (display "after handlers")(newline)
 
 
-(write (guard (condition
-	       ((assq 'a condition) => cdr)
-	       ((assq 'b condition)))
-	      (raise-continuable (list (cons 'a 42)))
-	      (display "...after guard process")(newline)
-	      )
-       )(newline)
-(display "after guard expression")(newline)
+;; (write (guard (condition
+;; 	       ((assq 'a condition) => cdr)
+;; 	       ((assq 'b condition)))
+;; 	      (raise-continuable (list (cons 'a 42)))
+;; 	      (display "...after guard process")(newline)
+;; 	      )
+;;        )(newline)
+;; (display "after guard expression")(newline)
 
-(define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "message" (14))))
-(display "error-object?: ")(write (error-object? err-obj))(newline)
-(display "error-message: ")(write (error-object-message err-obj))(newline)
-
-(define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "File error - message" (14))))
-(display "error-object?: ")(write (error-object? err-obj))(newline)
-(display "error-message: ")(write (error-object-message err-obj))(newline)
-(display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
-
-(display "file-error?: ")(write (file-error? err-obj))(newline)
-(display "read-error?: ")(write (read-error? err-obj))(newline)
-
-(newline)
-(define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "Read error - message" (14))))
-(display "error-object?: ")(write (error-object? err-obj))(newline)
-(display "error-message: ")(write (error-object-message err-obj))(newline)
-(display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
-
-(display "file-error?: ")(write (file-error? err-obj))(newline)
-(display "read-error?: ")(write (read-error? err-obj))(newline)
-
-
-;; (define err-obj 14)
+;; (define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "message" (14))))
 ;; (display "error-object?: ")(write (error-object? err-obj))(newline)
 ;; (display "error-message: ")(write (error-object-message err-obj))(newline)
 
-;; (cons)
+;; (define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "File error - message" (14))))
+;; (display "error-object?: ")(write (error-object? err-obj))(newline)
+;; (display "error-message: ")(write (error-object-message err-obj))(newline)
+;; (display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
+
+;; (display "file-error?: ")(write (file-error? err-obj))(newline)
+;; (display "read-error?: ")(write (read-error? err-obj))(newline)
+
+;; (newline)
+;; (define err-obj (list->vector '(<ERROR-OBJECT> record-type_13 "Read error - message" (14))))
+;; (display "error-object?: ")(write (error-object? err-obj))(newline)
+;; (display "error-message: ")(write (error-object-message err-obj))(newline)
+;; (display "error-irritants: ")(write (error-object-irritants err-obj))(newline)
+
+;; (display "file-error?: ")(write (file-error? err-obj))(newline)
+;; (display "read-error?: ")(write (read-error? err-obj))(newline)
+
+
+;; ;; (define err-obj 14)
+;; ;; (display "error-object?: ")(write (error-object? err-obj))(newline)
+;; ;; (display "error-message: ")(write (error-object-message err-obj))(newline)
+
+;; ;; (cons)
+
+
+;; (write (directory-files))(newline)
+
 
 

@@ -7,11 +7,15 @@
 #include <string.h>
 
 #include <dirent.h> 
-#include <stdio.h> 
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 
 pointer ff_current_directory( pointer args );
 pointer ff_directory_files( pointer args );
+pointer ff_directory_p( pointer args );
 
 
 

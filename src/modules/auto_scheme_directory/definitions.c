@@ -63,3 +63,17 @@ pointer ff_directory_files( pointer args )
     }
     return result;
 }
+
+pointer ff_directory_p( pointer args )
+{
+    char *path = strvalue( car( args ));
+
+   struct stat statbuf;
+   if( stat( path, &statbuf ) != 0 )
+       return F;
+   
+   if( S_ISDIR( statbuf.st_mode ))
+       return T;
+
+   return F;
+}

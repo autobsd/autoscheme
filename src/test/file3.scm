@@ -232,4 +232,4 @@
 
 ;; (cons)
 
-(display "dir: ")(write (directory-files))(newline)
+

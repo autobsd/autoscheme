@@ -44,123 +44,123 @@ scheme_dep = \
 
 
 
-auto_scheme_environment_module_scm = $(modules_dir)/auto/scheme/environment/module.scm 
+auto_scheme_environment_module_scm = $(modules_dir)/auto_scheme_environment/module.scm 
 auto_scheme_environment_dep = \
 	$(auto_scheme_environment_module_scm) \
-	$(modules_dir)/auto/scheme/environment/declarations.h \
-	$(modules_dir)/auto/scheme/environment/definitions.c \
-	$(modules_dir)/auto/scheme/environment/initialization.c \
+	$(modules_dir)/auto_scheme_environment/declarations.h \
+	$(modules_dir)/auto_scheme_environment/definitions.c \
+	$(modules_dir)/auto_scheme_environment/initialization.c \
 
 
-auto_scheme_macro_module_scm = $(modules_dir)/auto/scheme/macro/module.scm 
+auto_scheme_macro_module_scm = $(modules_dir)/auto_scheme_macro/module.scm 
 auto_scheme_macro_dep = \
 	$(auto_scheme_macro_module_scm) \
 
-auto_scheme_base_module_scm = $(modules_dir)/auto/scheme/base/module.scm 
+auto_scheme_base_module_scm = $(modules_dir)/auto_scheme_base/module.scm 
 auto_scheme_base_dep = \
 	$(auto_scheme_base_module_scm) \
-	$(modules_dir)/auto/scheme/base/declarations.h \
-	$(modules_dir)/auto/scheme/base/definitions.c \
-	$(modules_dir)/auto/scheme/base/initialization.c \
+	$(modules_dir)/auto_scheme_base/declarations.h \
+	$(modules_dir)/auto_scheme_base/definitions.c \
+	$(modules_dir)/auto_scheme_base/initialization.c \
 
 
 
 
-scheme_eval_module_scm = $(modules_dir)/scheme/eval/module.scm 
+scheme_eval_module_scm = $(modules_dir)/scheme_eval/module.scm 
 scheme_eval_dep = \
 	$(scheme_eval_module_scm) \
-	$(modules_dir)/scheme/eval/declarations.h \
-	$(modules_dir)/scheme/eval/definitions.c \
+	$(modules_dir)/scheme_eval/declarations.h \
+	$(modules_dir)/scheme_eval/definitions.c \
 
-scheme_repl_module_scm = $(modules_dir)/scheme/repl/module.scm 
+scheme_repl_module_scm = $(modules_dir)/scheme_repl/module.scm 
 scheme_repl_dep = \
 	$(scheme_repl_module_scm) \
 
-scheme_load_module_scm = $(modules_dir)/scheme/load/module.scm 
+scheme_load_module_scm = $(modules_dir)/scheme_load/module.scm 
 scheme_load_dep = \
 	$(scheme_load_module_scm) \
 
 
-auto_scheme_list_module_scm = $(modules_dir)/auto/scheme/list/module.scm 
+auto_scheme_list_module_scm = $(modules_dir)/auto_scheme_list/module.scm 
 auto_scheme_list_dep = \
 	$(auto_scheme_list_module_scm) \
 
 
-auto_scheme_write_module_scm = $(modules_dir)/auto/scheme/write/module.scm 
+auto_scheme_write_module_scm = $(modules_dir)/auto_scheme_write/module.scm 
 auto_scheme_write_dep = \
 	$(auto_scheme_write_module_scm) \
 
-auto_scheme_args_fold_module_scm = $(modules_dir)/auto/scheme/args/fold/module.scm 
+auto_scheme_args_fold_module_scm = $(modules_dir)/auto_scheme_args_fold/module.scm 
 auto_scheme_args_fold_dep = \
 	$(auto_scheme_args_fold_module_scm) \
 
-auto_scheme_args_module_scm = $(modules_dir)/auto/scheme/args/module.scm 
+auto_scheme_args_module_scm = $(modules_dir)/auto_scheme_args/module.scm 
 auto_scheme_args_dep = \
 	$(auto_scheme_args_module_scm) \
 
-auto_scheme_string_module_scm = $(modules_dir)/auto/scheme/string/module.scm 
+auto_scheme_string_module_scm = $(modules_dir)/auto_scheme_string/module.scm 
 auto_scheme_string_dep = \
 	$(auto_scheme_string_module_scm) \
 
-scheme_cxr_module_scm = $(modules_dir)/scheme/cxr/module.scm 
+scheme_cxr_module_scm = $(modules_dir)/scheme_cxr/module.scm 
 scheme_cxr_dep = \
 	$(scheme_cxr_module_scm) \
 
-scheme_process_context_module_scm = $(modules_dir)/scheme/process/context/module.scm 
+scheme_process_context_module_scm = $(modules_dir)/scheme_process_context/module.scm 
 scheme_process_context_dep = \
 	$(scheme_process_context_module_scm) \
-	$(modules_dir)/scheme/process/context/declarations.h \
-	$(modules_dir)/scheme/process/context/definitions.c \
+	$(modules_dir)/scheme_process_context/declarations.h \
+	$(modules_dir)/scheme_process_context/definitions.c \
 
-auto_scheme_directory_module_scm = $(modules_dir)/auto/scheme/directory/module.scm 
+auto_scheme_directory_module_scm = $(modules_dir)/auto_scheme_directory/module.scm 
 auto_scheme_directory_dep = \
 	$(auto_scheme_directory_module_scm) \
-	$(modules_dir)/auto/scheme/directory/declarations.h \
-	$(modules_dir)/auto/scheme/directory/definitions.c \
+	$(modules_dir)/auto_scheme_directory/declarations.h \
+	$(modules_dir)/auto_scheme_directory/definitions.c \
 
-auto_scheme_path_module_scm = $(modules_dir)/auto/scheme/path/module.scm 
+auto_scheme_path_module_scm = $(modules_dir)/auto_scheme_path/module.scm 
 auto_scheme_path_dep = \
 	$(auto_scheme_path_module_scm) \
-	$(modules_dir)/auto/scheme/path/declarations.h \
-	$(modules_dir)/auto/scheme/path/definitions.c \
+	$(modules_dir)/auto_scheme_path/declarations.h \
+	$(modules_dir)/auto_scheme_path/definitions.c \
 
-scheme_read_module_scm = $(modules_dir)/scheme/read/module.scm 
+scheme_read_module_scm = $(modules_dir)/scheme_read/module.scm 
 scheme_read_dep = \
 	$(scheme_read_module_scm) \
 
-auto_scheme_file_module_scm = $(modules_dir)/auto/scheme/file/module.scm 
+auto_scheme_file_module_scm = $(modules_dir)/auto_scheme_file/module.scm 
 auto_scheme_file_dep = \
 	$(auto_scheme_file_module_scm) \
 
-auto_scheme_port_module_scm = $(modules_dir)/auto/scheme/port/module.scm 
+auto_scheme_port_module_scm = $(modules_dir)/auto_scheme_port/module.scm 
 auto_scheme_port_dep = \
 	$(auto_scheme_port_module_scm) \
 
-auto_scheme_char_module_scm = $(modules_dir)/auto/scheme/char/module.scm 
+auto_scheme_char_module_scm = $(modules_dir)/auto_scheme_char/module.scm 
 auto_scheme_char_dep = \
 	$(auto_scheme_char_module_scm) \
 
-auto_scheme_inexact_module_scm = $(modules_dir)/auto/scheme/inexact/module.scm 
+auto_scheme_inexact_module_scm = $(modules_dir)/auto_scheme_inexact/module.scm 
 auto_scheme_inexact_dep = \
 	$(auto_scheme_inexact_module_scm) \
 
-auto_scheme_lazy_module_scm = $(modules_dir)/auto/scheme/lazy/module.scm 
+auto_scheme_lazy_module_scm = $(modules_dir)/auto_scheme_lazy/module.scm 
 auto_scheme_lazy_dep = \
 	$(auto_scheme_lazy_module_scm) \
 
-auto_scheme_memory_module_scm = $(modules_dir)/auto/scheme/memory/module.scm 
+auto_scheme_memory_module_scm = $(modules_dir)/auto_scheme_memory/module.scm 
 auto_scheme_memory_dep = \
 	$(auto_scheme_memory_module_scm) \
 
-auto_scheme_closure_module_scm = $(modules_dir)/auto/scheme/closure/module.scm 
+auto_scheme_closure_module_scm = $(modules_dir)/auto_scheme_closure/module.scm 
 auto_scheme_closure_dep = \
 	$(auto_scheme_closure_module_scm) \
 
-auto_scheme_compile_module_scm = $(modules_dir)/auto/scheme/compile/module.scm 
+auto_scheme_compile_module_scm = $(modules_dir)/auto_scheme_compile/module.scm 
 auto_scheme_compile_dep = \
 	$(auto_scheme_compile_module_scm) \
 
-auto_scheme_interpret_module_scm = $(modules_dir)/auto/scheme/interpret/module.scm 
+auto_scheme_interpret_module_scm = $(modules_dir)/auto_scheme_interpret/module.scm 
 auto_scheme_interpret_dep = \
 	$(auto_scheme_interpret_module_scm) \
 

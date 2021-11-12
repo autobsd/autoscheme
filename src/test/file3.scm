@@ -231,3 +231,5 @@
 ;; (display "error-message: ")(write (error-object-message err-obj))(newline)
 
 ;; (cons)
+
+(display "dir: ")(write (directory-files))(newline)

@@ -7,7 +7,8 @@ src_dir = $(project_dir)/src
 prime_dir = $(src_dir)/prime
 
 modules_dir = $(src_dir)/modules
-gen_dir = $(project_dir)/gen
+# gen_dir = $(project_dir)/gen
+gen_dir = gen
 bin_dir = bin
 obj_dir = _obj
 lib_dir = lib
@@ -228,8 +229,8 @@ scheme_modules = scheme \
 all: build
 
 
-build: $(bin_dir)/autoscheme 
-
+build: $(bin_dir)/autoscheme  
+	$(bin_dir)/autoscheme-prime -i configure.scm
 
 $(bin_dir)/autoscheme: $(include_dir)/autoscheme.h $(lib_dir)/libautoscheme.a $(gen_dir)/autoscheme.c
 	mkdir -p $(bin_dir)

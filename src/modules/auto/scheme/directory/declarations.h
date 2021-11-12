@@ -6,7 +6,12 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <dirent.h> 
+#include <stdio.h> 
+
+
 pointer ff_current_directory( pointer args );
+pointer ff_directory_files( pointer args );
 
 
 

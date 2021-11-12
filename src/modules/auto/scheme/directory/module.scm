@@ -8,11 +8,15 @@
 
 (define-library (auto scheme directory)
 
-  (export current-directory)
+  (export current-directory directory-files)
 
 
   (begin 
     
     ((foreign-syntax LOC_DEF0 "define") current-directory (foreign-function ff_current_directory))
+    ((foreign-syntax LOC_DEF0 "define") directory-files (foreign-function ff_directory_files))
+
+
+
 
   ))

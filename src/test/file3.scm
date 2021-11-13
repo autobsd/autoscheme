@@ -97,7 +97,7 @@
 ;; (display "(my-param): ")(write (my-param))(newline)
 
 
-;; (include "file2.scm")
+(include "file2.scm")
 
 
 ;; (display "x: ")(write x)(newline)
@@ -126,23 +126,23 @@
 
 ;; (newline)
 
-;; (call/cc (lambda (return)
-;; 	   (define my-handler
-;; 	     (lambda (obj)
-;; 	       (display "doing something with: ")(write obj)(newline)
-;; 	       (return)
-;; 	       ))
+(call/cc (lambda (return)
+	   (define my-handler
+	     (lambda (obj)
+	       (display "doing something with: ")(write obj)(newline)
+	       (return)
+	       ))
 
-;; 	   (with-exception-handler 
-;; 	    my-handler
-;; 	    (lambda ()
+	   (with-exception-handler 
+	    my-handler
+	    (lambda ()
 
-;; 	      (display "inside 'my-handler' scope")(newline)
+	      (display "inside 'my-handler' scope")(newline)
 
-;; 	      (error "File error - message" 'irr1 "irr2" 'irr3)
+	      (error "File error - message" 'irr1 "irr2" 'irr3)
 
-;; 	      ))
-;; 	   ))
+	      ))
+	   ))
 
 ;; ;; (raise (list->vector '(<error-object> <file> "File error - message" (irr1 "irr2" irr3))))
 ;; ;; (raise (list->vector '(<error-object> "File error - message" ())))
@@ -172,23 +172,23 @@
 ;; (write (gensym 'record-type_))(newline)
 
 
-;; (define-record-type <PARE>
-;;   (kons x y)
-;;   pare?
-;;   (x kar set-kar!)
-;;   (y kdr))
+(define-record-type <PARE>
+  (kons x y)
+  pare?
+  (x kar set-kar!)
+  (y kdr))
 
-;; (define my-pare (kons 1 2))
-;; (write my-pare)(newline)
-;; (write (kar my-pare))(newline)
-;; (write (set-kar! my-pare 11))(newline)
-;; (write (kar my-pare))(newline)
-;; (write (kdr my-pare))(newline)
-;; (newline)
-;; (write (define my-var 7))(newline)
-;; (write my-var)(newline)
-;; (write (set! my-var 77))(newline)
-;; (write my-var)(newline)
+(define my-pare (kons 1 2))
+(write my-pare)(newline)
+(write (kar my-pare))(newline)
+(write (set-kar! my-pare 11))(newline)
+(write (kar my-pare))(newline)
+(write (kdr my-pare))(newline)
+(newline)
+(write (define my-var 7))(newline)
+(write my-var)(newline)
+(write (set! my-var 77))(newline)
+(write my-var)(newline)
 
 ;; (raise-continuable 5)
 
@@ -226,14 +226,8 @@
 ;; (display "read-error?: ")(write (read-error? err-obj))(newline)
 
 
-;; ;; (define err-obj 14)
-;; ;; (display "error-object?: ")(write (error-object? err-obj))(newline)
-;; ;; (display "error-message: ")(write (error-object-message err-obj))(newline)
+;; (define err-obj 14)
+;; (display "error-object?: ")(write (error-object? err-obj))(newline)
+;; (display "error-message: ")(write (error-object-message err-obj))(newline)
 
-;; ;; (cons)
-
-
-;; (write (directory-files))(newline)
-
-
-
+;; (cons)

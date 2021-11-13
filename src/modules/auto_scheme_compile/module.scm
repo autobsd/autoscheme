@@ -122,10 +122,10 @@
 		 (string-append "cons(mk_symbol(\"quasiquote\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'unquote) (positive? quote-level))
-		 (string-append "cons(mk_symbol(\"unquote\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
+		 (string-append "cons(mk_symbol(\"unquote\")," (compile-remainder (cdr expression) source (- quote-level 1)) ")"))
 
 		((and (pair? expression) (equal? (car expression) 'unquote-splicing) (positive? quote-level))
-		 (string-append "cons(mk_symbol(\"unquote-splicing\")," (compile-remainder (cdr expression) source (+ quote-level 1)) ")"))
+		 (string-append "cons(mk_symbol(\"unquote-splicing\")," (compile-remainder (cdr expression) source (- quote-level 1)) ")"))
 
 
 

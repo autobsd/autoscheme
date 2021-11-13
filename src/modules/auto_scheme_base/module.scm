@@ -18,55 +18,55 @@
 	(eval (foreign-operation LOC_PEVAL))
 	(verify-type (lambda (record type) (>= (vector-length record) 2)(equal? (vector-ref record 1) type))))
     
-    ((foreign-syntax LOC_MACRO "macro") (name constructor predicate . fields)
+    (syntax-lambda exp-env (name constructor predicate . fields)
 
-     (let* ((record-type (gensym "record-type_"))
-	    (constructor-name (car constructor))
-	    (field-tags (cdr constructor))
-	    (counter 2)
-	    (ref-fields '())
-	    (constructor-statements `((vector-set! v 1 ',record-type)
-				      (vector-set! v 0 ',name))))
+		   (let* ((record-type (gensym "record-type_"))
+			  (constructor-name (car constructor))
+			  (field-tags (cdr constructor))
+			  (counter 2)
+			  (ref-fields '())
+			  (constructor-statements `((vector-set! v 1 ',record-type)
+						    (vector-set! v 0 ',name))))
 
-       (for-each (lambda (field)
-		   (if (not (pair? field)) (error "Record definition error - improper field" field))
-		   (set! ref-fields (cons (cons (car field) (cons counter (cdr field)))
-					  ref-fields))
-		   (set! counter (+ counter 1)))
-		 fields)
+		     (for-each (lambda (field)
+				 (if (not (pair? field)) (error "Record definition error - improper field" field))
+				 (set! ref-fields (cons (cons (car field) (cons counter (cdr field)))
+							ref-fields))
+				 (set! counter (+ counter 1)))
+			       fields)
 
-       (for-each (lambda (tag)
-		   (let ((field (assoc tag ref-fields)))
-		     (if (not field) (error "Record definition error - unspecified field in constructor" tag))
-		     (set! constructor-statements (cons `(vector-set! v ,(cadr field) ,tag)
-							constructor-statements))
-		     ))
-		 field-tags)
+		     (for-each (lambda (tag)
+				 (let ((field (assoc tag ref-fields)))
+				   (if (not field) (error "Record definition error - unspecified field in constructor" tag))
+				   (set! constructor-statements (cons `(vector-set! v ,(cadr field) ,tag)
+								      constructor-statements))
+				   ))
+			       field-tags)
 
-       (let ((constructor (eval `(lambda ,field-tags
-				   (let ((v (make-vector ,counter #f)))
-				     ,@(reverse constructor-statements))))))
-	 (environment-define! (expansion-environment) constructor-name constructor))
+		     (let ((constructor (eval `(lambda ,field-tags
+						 (let ((v (make-vector ,counter #f)))
+						   ,@(reverse constructor-statements))))))
+		       (environment-define! exp-env constructor-name constructor))
 
-       (for-each (lambda (ref-field)
-		   (if (pair? (cddr ref-field))
-		       (let ((accessor-name (car (cddr ref-field)))
-			     (accessor (eval `(lambda (v)
-						(if (verify-type v ',record-type)
-						    (vector-ref v ,(cadr ref-field))
-						    (error "Record access error - inappropriate type" v))))))
-			 (environment-define! (expansion-environment) accessor-name accessor)))
+		     (for-each (lambda (ref-field)
+				 (if (pair? (cddr ref-field))
+				     (let ((accessor-name (car (cddr ref-field)))
+					   (accessor (eval `(lambda (v)
+							      (if (verify-type v ',record-type)
+								  (vector-ref v ,(cadr ref-field))
+								  (error "Record access error - inappropriate type" v))))))
+				       (environment-define! exp-env accessor-name accessor)))
 
-		   (if (pair? (cdr (cddr ref-field)))
-		       (let ((mutator-name (cadr (cddr ref-field)))
-			     (mutator (eval `(lambda (v o)
-					       (if (verify-type v ',record-type)
-						   (vector-set! v ,(cadr ref-field) o)
-						   (error "Record access error - inappropriate type" v))
-					       o))))
-			 (environment-define! (expansion-environment) mutator-name mutator))))
+				 (if (pair? (cdr (cddr ref-field)))
+				     (let ((mutator-name (cadr (cddr ref-field)))
+					   (mutator (eval `(lambda (v o)
+							     (if (verify-type v ',record-type)
+								 (vector-set! v ,(cadr ref-field) o)
+								 (error "Record access error - inappropriate type" v))
+							     o))))
+				       (environment-define! exp-env mutator-name mutator))))
 
-		 ref-fields)))))
+			       ref-fields)))))
 
 
 (define error (foreign-operation LOC_ERROR))
@@ -120,18 +120,14 @@
 (define include
   (let* ((current-directory (foreign-function ff_current_directory))
 	 (current-source (foreign-operation LOC_CURR_SOURCE))
-
-	 (macro (foreign-syntax LOC_MACRO "macro"))
-
 	 (path-make-absolute (foreign-function ff_path_make_absolute))
 	 (path-directory (foreign-function ff_path_directory))
-
 	 (with-input-from-file (foreign-operation LOC_WITH_INFILE0))
 	 (eval (foreign-operation LOC_PEVAL))
 	 (read (foreign-operation LOC_READ))
 	 )
 
-    (macro filenames
+    (syntax-lambda exp-env filenames
       (let ((result #f))
 	(for-each (lambda (filename)
 		    (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
@@ -139,11 +135,11 @@
 				    (lambda()
 				      (let eval-statement ((statement (read)))
 				        (cond ((not (eof-object? statement))
-					       (set! result (eval statement (expansion-environment)))
+					       (set! result (eval statement exp-env))
 					       (eval-statement (read)))))
 				      ))))
 		  filenames)
-	result))))
+	`',result))))
 
 
 ;; (make-parameter init converter) MULTI THREADED
@@ -231,14 +227,14 @@
 
 
 (define with-exception-handler 
-  ((foreign-syntax LOC_MACRO "macro") (handler-code thunk-code)
+  (syntax-lambda exp-env (handler-code thunk-code)
    
-   (let* ((eval (foreign-operation LOC_PEVAL))
-	  (handler (eval handler-code (expansion-environment)))
-	  (thunk (eval thunk-code (expansion-environment)))
+		 `',(let* ((eval (foreign-operation LOC_PEVAL))
+	  (handler (eval handler-code exp-env))
+	  (thunk (eval thunk-code exp-env))
 	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
 
      (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
-		   (thunk)))))
+		      (thunk)))))
 
 

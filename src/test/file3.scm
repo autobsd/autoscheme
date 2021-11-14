@@ -10,6 +10,7 @@
 	(scheme process-context)
 	(auto scheme macro)
 	(auto scheme list)
+	(auto scheme sort)
 	(auto scheme lazy)
 	(auto scheme memory)
 	(auto scheme closure)
@@ -231,3 +232,5 @@
 ;; (display "error-message: ")(write (error-object-message err-obj))(newline)
 
 ;; (cons)
+
+(write (list-sort string<? '("z" "aaa" "ccc" "bbb")))(newline)

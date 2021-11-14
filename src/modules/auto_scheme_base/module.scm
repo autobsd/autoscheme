@@ -78,43 +78,43 @@
 
 (define guard 
   (syntax-lambda exp-env (test . body)
-   (let* ((eval (foreign-operation LOC_PEVAL))
-	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
-	  (saved-handlers (current-exception-handlers))
-	  (variable (car test))
-	  (clauses (cdr test))
+		 (let* ((eval (foreign-operation LOC_PEVAL))
+			(current-exception-handlers (foreign-operation LOC_CURR_XHANDS))
+			(saved-handlers (current-exception-handlers))
+			(variable (car test))
+			(clauses (cdr test))
 
-	  (gensym (foreign-operation LOC_GENSYM))
-	  (generated-symbol (gensym "guard_"))
-      	  )
-     
-     `',(call/cc (lambda (normal-return)
+			(gensym (foreign-operation LOC_GENSYM))
+			(generated-symbol (gensym "guard_"))
+			)
+		   
+		   `',(call/cc (lambda (normal-return)
 
-		   (define-values (obj back-to-thunk) (call/cc (lambda (goto-cond)
-								    (let ((handler (lambda (obj)
-										     (call/cc (lambda (back-to-thunk)
-												(goto-cond obj back-to-thunk)))
-										     (raise-continuable obj)
-										     )))
+				 (define-values (obj back-to-thunk) (call/cc (lambda (goto-cond)
+									       (let ((handler (lambda (obj)
+												(call/cc (lambda (back-to-thunk)
+													   (goto-cond obj back-to-thunk)))
+												(raise-continuable obj)
+												)))
 
-								      (dynamic-wind 
-									  (lambda ()
-									    (current-exception-handlers (cons handler saved-handlers)))
+										 (dynamic-wind 
+										     (lambda ()
+										       (current-exception-handlers (cons handler saved-handlers)))
 
-									  (lambda ()
-									    (normal-return (for-each (lambda (statement)
-												       (eval statement exp-env))
-												     body)))
-									  
-									  (lambda ()
-									    (current-exception-handlers saved-handlers)))))))
-	
-		   ((eval `(lambda (,variable ,generated-symbol)
-			     ,(cons 'cond (append clauses `((else (,generated-symbol)))))
-			    )
-			 exp-env) obj back-to-thunk
-			 )
-		   )))))
+										     (lambda ()
+										       (normal-return (for-each (lambda (statement)
+														  (eval statement exp-env))
+														body)))
+										     
+										     (lambda ()
+										       (current-exception-handlers saved-handlers)))))))
+				 
+				 ((eval `(lambda (,variable ,generated-symbol)
+					   ,(cons 'cond (append clauses `((else (,generated-symbol)))))
+					   )
+					exp-env) obj back-to-thunk
+					)
+				 )))))
 
 
 (define include
@@ -128,18 +128,18 @@
 	 )
 
     (syntax-lambda exp-env filenames
-      (let ((result #f))
-	(for-each (lambda (filename)
-		    (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
-				  (with-input-from-file (current-source) 
-				    (lambda()
-				      (let eval-statement ((statement (read)))
-				        (cond ((not (eof-object? statement))
-					       (set! result (eval statement exp-env))
-					       (eval-statement (read)))))
-				      ))))
-		  filenames)
-	`',result))))
+		   (let ((result #f))
+		     (for-each (lambda (filename)
+				 (parameterize ((current-source (path-make-absolute filename (path-directory (current-source)))))
+					       (with-input-from-file (current-source) 
+						 (lambda()
+						   (let eval-statement ((statement (read)))
+						     (cond ((not (eof-object? statement))
+							    (set! result (eval statement exp-env))
+							    (eval-statement (read)))))
+						   ))))
+			       filenames)
+		     `',result))))
 
 
 ;; (make-parameter init converter) MULTI THREADED
@@ -228,13 +228,13 @@
 
 (define with-exception-handler 
   (syntax-lambda exp-env (handler-code thunk-code)
-   
-		 `',(let* ((eval (foreign-operation LOC_PEVAL))
-	  (handler (eval handler-code exp-env))
-	  (thunk (eval thunk-code exp-env))
-	  (current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
+		 
+		 (let* ((eval (foreign-operation LOC_PEVAL))
+			(handler (eval handler-code exp-env))
+			(thunk (eval thunk-code exp-env))
+			(current-exception-handlers (foreign-operation LOC_CURR_XHANDS)))
 
-     (parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
-		      (thunk)))))
+		   `',(parameterize ((current-exception-handlers (cons handler (current-exception-handlers))))
+				    (thunk)))))
 
 

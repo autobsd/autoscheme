@@ -6479,7 +6479,7 @@ LOOP:
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
 		if (x == NIL) {
-		    Error_1("unable to open file", car(args));
+		    Error_1("Read error - unable to open file", car(args));
 		    /* s_return(F); */
 		}
 		code = cadr(args);
@@ -6917,7 +6917,7 @@ LOOP:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("unable to handle non pair element");
+				Error_1("Syntax error - improper alist in call to 'assq'", y);
 			}
 			if (x == caar(y)) s_return(car(y));
 		}
@@ -6928,7 +6928,7 @@ LOOP:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("unable to handle non pair element");
+				Error_1("Syntax error - improper alist in call to 'assv'", y);
 			}
 			if (eqv(x, caar(y))) s_return(car(y));
 		}
@@ -6939,7 +6939,7 @@ LOOP:
 		x = car(args);
 		for (y = cadr(args); is_pair(y); y = cdr(y)) {
 			if (!is_pair(car(y))) {
-				Error_0("unable to handle non pair element");
+			    Error_1("Syntax error - improper alist in call to 'assoc'", y);
 			}
 			if (equal(x, caar(y))) s_return(car(y));
 		}

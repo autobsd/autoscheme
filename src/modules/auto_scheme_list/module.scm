@@ -6,13 +6,21 @@
 
   (import (auto scheme base))
 
-  (export alist-delete 
+  (export alist?
+	  alist-delete 
 	  alist-delete!
 
 	  last-pair
 	  )
 
   (begin 
+
+    (define alist?
+      (lambda (obj)
+	(cond ((null? obj) #t)
+	      ((and (pair? obj) (pair? (car obj))) (alist? (cdr obj)))
+	      (else #f))))
+
     
     (define alist-delete
       (lambda (alist key)

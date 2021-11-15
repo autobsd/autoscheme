@@ -16,7 +16,7 @@
 (display "configuring build...")(newline)
 
 (define modules-directory "../../src/modules")
-(define manifest-file "manifest.s")
+(define manifest-file "MANIFEST.s")
 
 (define modules (list-sort string<? (directory-files modules-directory)))
 

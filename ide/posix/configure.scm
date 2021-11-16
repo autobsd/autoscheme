@@ -10,78 +10,96 @@
 	(auto scheme list)
 	(auto scheme sort)
 	(auto scheme string)
+	(scheme process-context)
 	(scheme read)
 	)
 
 (display "configuring build...")(newline)
 
+(define application-directory "../../src/application/autoscheme")
 (define modules-directory "../../src/modules")
 (define manifest-file "MANIFEST.s")
 
 (define modules (list-sort string<? (directory-files modules-directory)))
 
-(define mod-alist
+(define get-configuration
+  (lambda ()
+    (let* ((alist (guard (condition ((read-error? condition) '())
+				    (else (raise condition))
+				    )
+			 (with-input-from-file manifest-file (lambda ()
+							       (let ((alist (read)))
+								 (cond ((eof-object? alist) '())
+								       ((alist? alist) alist)
+								       (else (error "Configuration error - manifest is not a proper alist" 
+										    (path-make-absolute manifest-file)))))))))
+	   (requirements (cond ((assoc 'require: alist) => cdr)
+			       (else '())))
+	   (dependencies (map (lambda (file)
+				(string-append (current-directory) file))
+			      (directory-files))))
+
+      `((requirements: . ,requirements)
+	(dependencies: . ,dependencies)))))
+
+
+
+(define module-configurations
   (parameterize ((current-directory modules-directory))
 		(map (lambda (module)
 		       (parameterize ((current-directory module)
 				      )
-				     (let* ((alist (guard (condition ((read-error? condition) '())
-								     (else (raise condition))
-								     )
-							  (with-input-from-file manifest-file (lambda ()
-												(let ((alist (read)))
-												  (cond ((eof-object? alist) '())
-													((alist? alist) alist)
-													(else (error "Configuration error - manifest is not a proper alist" 
-														     (path-make-absolute manifest-file)))))))))
-					    (requirements (cond ((assoc 'require: alist) => cdr)
-								(else '())))
-					    (dependencies (map (lambda (file)
-								 (string-append "$(modules_dir)/" module "/" file))
-							       (directory-files)))
-					    (alist `((requirements: . ,requirements)
-						     (dependencies: . ,dependencies))))
-				       (cons module
-					     alist))))
+				     
+				     (cons module
+					   (get-configuration)))
+		       )
 		     modules)))
 
-(define dep-order 
-  (letrec ((_dep-order '("scheme"))
-	   (add-module (lambda (module)
-			 (cond ((not (member module _dep-order))
-				(display "checking requirements...\n")(write (assoc module mod-alist))(newline)(newline)
-				(for-each (lambda (dep)
-					    (add-module dep))
-					  (cdr (assoc 'requirements: (cdr (assoc module mod-alist)))))
-				(set! _dep-order (cons module _dep-order)))))))
-    (for-each (lambda (module-dep)
-		(add-module (car module-dep)))
-	      mod-alist)
-    _dep-order))
 
-(define load-order (reverse dep-order))
 
-(define dependencies 
-  (let* ((_dependencies "")
-	 (update-dependencies (lambda (module)
-				(parameterize ((current-directory module))
-					      (set! _dependencies (string-append _dependencies "\n" 
-										 module "_dep = \\\n"))
-					      (for-each (lambda (file)
-							  (set! _dependencies (string-append _dependencies "\t$(modules_dir)/" 
-											     module "/" file 
-											     " \\\n")))
-							(directory-files))))))
-    (parameterize ((current-directory modules-directory))
-		  (for-each (lambda (module)
-			      (update-dependencies module))
-			    modules))
-    _dependencies))
+(define link-modules 
+  (lambda (configuration-list)
+    (letrec ((_linked-modules '("scheme"))
+	     (add-module (lambda (configuration)
+			   (let ((module (car configuration)))
+			     (cond ((not (member module _linked-modules))
+				    (for-each (lambda (dep)
+						(add-module (assoc dep module-configurations)))
+					      (cdr (assoc 'requirements: (cdr configuration))))
+				    (set! _linked-modules (cons module _linked-modules))))))))
 
-(define mod-objs (string-append "module_objects = \\\n"
-				(apply string-append (map (lambda (module)
-							    (string-append "\t$(obj_dir)/" module ".o \\\n"))
-							  dep-order))))
+      (for-each add-module configuration-list)
+      _linked-modules)))
+
+
+(define linked-modules (link-modules module-configurations))
+
+(define lib-loaded-modules (reverse linked-modules))
+
+
+(define application-configuration
+  (parameterize ((current-directory application-directory)
+		 )
+		(cons "application" (get-configuration))))
+
+(define app-loaded-modules (reverse (cdr (link-modules (list application-configuration)))))
+
+
+(define variables (string-append "autoscheme_sources =  \\\n"
+				 "	$(src_dir)/application/autoscheme/main.scm \\\n"
+				 "\n"
+				 "autoscheme_dependencies = $(autoscheme_sources)\n"
+				 "\n"
+				 "autoscheme_requirements = \\\n"				
+				 (apply string-append (map (lambda (module)
+							     (string-append "\t" module " \\\n"))
+							   app-loaded-modules))
+				 "\n"
+				 "module_objects = \\\n"
+				 (apply string-append (map (lambda (module)
+							     (string-append "\t$(obj_dir)/" module ".o \\\n"))
+							   linked-modules))
+				 ))
 
 (define targets
   (string-append "\n"
@@ -103,16 +121,16 @@
 		 "\n"
 		 (apply string-append (map (lambda (module)
 					     (string-append "$(obj_dir)/" module ".o:  \\\n\t" 
-							    (string-join (cdr (assoc 'dependencies: (cdr (assoc module mod-alist)))) " \\\n\t") "\n"
+							    (string-join (cdr (assoc 'dependencies: (cdr (assoc module module-configurations)))) " \\\n\t") "\n"
 							    "\n"
 							    "	$(bin_dir)/autoscheme-prime --compile-module $(modules_dir)/" module "/module.scm -n " module " -o $(gen_dir)/" module ".c\n"
 							    "	$(CC) $(strict_options_89) -c $(gen_dir)/" module ".c -o $(obj_dir)/" module ".o -I$(include_dir)\n"
 							    "\n"))
-					   load-order))))
+					   modules))))
 
 (define output-file-port (open-output-file "gen/Makefile"))
 
-(display mod-objs output-file-port)(newline output-file-port)
+(display variables output-file-port)(newline output-file-port)
 (display targets output-file-port)(newline output-file-port)
 
 (close-output-port output-file-port)
@@ -127,11 +145,11 @@
 					"\n"
 					(apply string-append (map (lambda (module)
 								    (string-append "    foreign_function LOAD_MODULE__" module ";\n"))
-								  load-order))
+								  lib-loaded-modules))
 					"\n"
 					(apply string-append (map (lambda (module)
 								    (string-append "    LOAD_MODULE__" module "( environment );\n"))
-								  load-order))
+								  lib-loaded-modules))
 					"\n"
 					"    return environment;\n"
 					"}\n"

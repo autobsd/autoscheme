@@ -2,6 +2,9 @@
 #  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 #  SPDX-License-Identifier: BSD-2-Clause
 
+prefix = /usr/local
+state_prefix = /var/local/lib
+
 project_dir = ../..
 src_dir = $(project_dir)/src
 prime_dir = $(src_dir)/prime
@@ -12,8 +15,7 @@ bin_dir = bin
 obj_dir = _obj
 lib_dir = lib
 include_dir = include
-install_dir = /usr/local/bin
-application_dir = /var/local/lib/autoscheme
+
 
 
 compile_options = -fbracket-depth=10000   
@@ -22,45 +24,13 @@ strict_options_89 = $(strict_options) -std=c89
 strict_options_99 = $(strict_options) -std=c99 
 
 
-autoscheme_sources =  \
-	$(src_dir)/application/autoscheme.scm \
 
-autoscheme_dependencies = $(autoscheme_sources)
-
-autoscheme_requirements =  \
-                 scheme \
-                 auto_scheme_base \
-                 auto_scheme_write \
-                 auto_scheme_environment \
-                 auto_scheme_args_fold \
-                 auto_scheme_string \
-                 scheme_cxr \
-                 auto_scheme_args \
-                 auto_scheme_char \
-                 auto_scheme_closure \
-                 auto_scheme_path \
-                 auto_scheme_file \
-                 scheme_read \
-                 auto_scheme_compile \
-                 auto_scheme_directory \
-                 auto_scheme_inexact \
-                 scheme_eval \
-                 scheme_load \
-                 auto_scheme_interpret \
-                 auto_scheme_lazy \
-                 auto_scheme_list \
-                 auto_scheme_macro \
-                 auto_scheme_memory \
-                 auto_scheme_port \
-                 auto_scheme_sort \
-                 scheme_process_context \
-                 scheme_repl \
 
 export
 
 all: build
 
-build: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(include_dir)/autoscheme.h $(gen_dir)/Makefile 
+build: $(include_dir)/autoscheme.h $(gen_dir)/Makefile 
 	mkdir -p $(lib_dir)
 	mkdir -p $(bin_dir)
 	$(MAKE) -f $(gen_dir)/Makefile
@@ -84,9 +54,9 @@ $(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
 
 #####################
 
-$(bin_dir)/autoscheme-prime:
+$(bin_dir)/autoscheme-prime: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o
 	mkdir -p $(bin_dir)
-	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
+	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library -lm $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o \
 		$(prime_dir)/load_modules.c \
 		$(prime_dir)/scheme.c \
 		$(prime_dir)/auto_scheme_file.c \
@@ -119,14 +89,14 @@ $(bin_dir)/autoscheme-prime:
 
 #####################
 
-install: $(bin_dir)/autoscheme
-	cp $(bin_dir)/autoscheme $(install_dir)/
-	mkdir -p $(application_dir)
-	cp -r .$(application_dir)/ $(application_dir)/ 
+install: 
+	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/bin/
+	mkdir -p $(DESTDIR)$(state_prefix)/autoscheme.state
+
 
 uninstall: 
-	rm -f $(install_dir)/autoscheme
-	rm -rf $(application_dir)
+	rm -f $(DESTDIR)$(prefix)/bin/autoscheme
+	rm -rf $(DESTDIR)$(state_prefix)/autoscheme.state
 
 clean:
 	rm -rf $(gen_dir)

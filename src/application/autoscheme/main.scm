@@ -17,7 +17,7 @@
 	)
 
 
-(define program-version (include "../../version.txt"))
+(define program-version (include "../../../version.txt"))
 
 (define display-version
   (lambda ()

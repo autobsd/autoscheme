@@ -12,10 +12,11 @@ prime_dir = $(src_dir)/prime
 modules_dir = $(src_dir)/modules
 gen_dir = gen
 bin_dir = bin
+libexec_dir = libexec
 obj_dir = _obj
 lib_dir = lib
 include_dir = include
-
+state_dir = autoscheme.state
 
 
 compile_options = -fbracket-depth=10000   
@@ -30,33 +31,23 @@ export
 
 all: build
 
-build: $(include_dir)/autoscheme.h $(gen_dir)/Makefile 
-	mkdir -p $(lib_dir)
-	mkdir -p $(bin_dir)
+build: $(include_dir)/autoscheme.h $(gen_dir)/Makefile
 	$(MAKE) -f $(gen_dir)/Makefile
 
-$(gen_dir)/Makefile: $(bin_dir)/autoscheme-prime
-	echo "generating Makefile..."
+
+$(gen_dir)/Makefile: $(libexec_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(bin_dir)/autoscheme-prime -i configure.scm
+	$(libexec_dir)/autoscheme-prime -i configure.scm
 
 $(include_dir)/autoscheme.h: $(src_dir)/library/autoscheme.h
 	mkdir -p $(include_dir)	
 	cp $(src_dir)/library/autoscheme.h $(include_dir)/autoscheme.h
 
-$(obj_dir)/libautoscheme.o: $(src_dir)/library/autoscheme.c $(src_dir)/library/autoscheme.h
-	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_89) -c $(src_dir)/library/autoscheme.c -o $(obj_dir)/libautoscheme.o
-
-$(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
-	mkdir -p $(obj_dir)
-	$(CC) $(strict_options_99) -c $(src_dir)/library/bignum.c -o $(obj_dir)/bignum.o
-
 #####################
 
-$(bin_dir)/autoscheme-prime: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o
-	mkdir -p $(bin_dir)
-	$(CC) $(strict_options_99) -o $(bin_dir)/autoscheme-prime -I$(src_dir)/library -lm $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o \
+$(libexec_dir)/autoscheme-prime: 
+	mkdir -p $(libexec_dir)
+	$(CC) $(strict_options_99) -o $(libexec_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 		$(prime_dir)/load_modules.c \
 		$(prime_dir)/scheme.c \
 		$(prime_dir)/auto_scheme_file.c \
@@ -90,13 +81,20 @@ $(bin_dir)/autoscheme-prime: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o
 #####################
 
 install: 
-	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/bin/
-	mkdir -p $(DESTDIR)$(state_prefix)/autoscheme.state
+	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)
+	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/$(bin_dir)/
+	mkdir -p $(DESTDIR)$(prefix)/$(libexec_dir)
+	cp $(libexec_dir)/autoscheme-prime $(DESTDIR)$(prefix)/$(libexec_dir)/
+	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
+	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)
 
 
 uninstall: 
-	rm -f $(DESTDIR)$(prefix)/bin/autoscheme
-	rm -rf $(DESTDIR)$(state_prefix)/autoscheme.state
+	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
+	rm -f $(DESTDIR)$(prefix)/$(libexec_dir)/autoscheme-prime
+	rm -f $(DESTDIR)$(prefix)/$(lib_dir)/libautoscheme.a
+	rm -rf $(DESTDIR)$(state_prefix)/$(state_dir)
 
 clean:
 	rm -rf $(gen_dir)
@@ -104,5 +102,6 @@ clean:
 	rm -rf $(bin_dir)
 	rm -rf $(include_dir)
 	rm -rf $(lib_dir)
+	rm -rf $(libexec_dir)
 
 	rm -rf tmp

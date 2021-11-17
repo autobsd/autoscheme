@@ -3,5 +3,6 @@ _obj/
 bin/
 include/
 lib/
+libexec/
 tmp/
 src/prime/Makefile

@@ -87,7 +87,15 @@ install:
 	cp $(libexec_dir)/autoscheme-prime $(DESTDIR)$(prefix)/$(libexec_dir)/
 	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
 	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
+
 	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/src
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+
+	cp -R . $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+	cp -R $(src_dir)/application $(DESTDIR)$(state_prefix)/$(state_dir)/src/
+
 
 
 uninstall: 

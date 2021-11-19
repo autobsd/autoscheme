@@ -17,6 +17,7 @@
 	(auto scheme path)
 	(auto scheme file)
 	(auto scheme macro)
+	(auto scheme process)
 	)
 
 (display "testing:\n")
@@ -234,3 +235,6 @@
 ;; (cons)
 
 (write (list-sort string<? '("z" "aaa" "ccc" "bbb")))(newline)
+
+(process-command "pwd")
+(process-command "ls")

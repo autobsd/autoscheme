@@ -18,7 +18,7 @@
 	(eval (foreign-operation LOC_PEVAL))
 	(verify-type (lambda (record type) (>= (vector-length record) 2)(equal? (vector-ref record 1) type))))
     
-    (syntax-lambda exp-env (name constructor predicate . fields)
+    (syntax-lambda exp-env (name constructor predicate-name . fields)
 
 		   (let* ((record-type (gensym "record-type_"))
 			  (constructor-name (car constructor))
@@ -47,6 +47,12 @@
 						 (let ((v (make-vector ,counter #f)))
 						   ,@(reverse constructor-statements))))))
 		       (environment-define! exp-env constructor-name constructor))
+
+		     (let ((predicate (lambda (v)
+					(and (vector? v)
+					     (>= (vector-length v) 2)
+					     (equal? (vector-ref v 1) record-type)))))
+		       (environment-define! exp-env predicate-name predicate))
 
 		     (for-each (lambda (ref-field)
 				 (if (pair? (cddr ref-field))

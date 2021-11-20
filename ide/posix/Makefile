@@ -9,6 +9,7 @@ project_dir = ../..
 src_dir = $(project_dir)/src
 prime_dir = $(src_dir)/prime
 
+applications_dir = $(src_dir)/applications
 modules_dir = $(src_dir)/modules
 gen_dir = gen
 bin_dir = bin
@@ -48,13 +49,13 @@ $(include_dir)/autoscheme.h: $(src_dir)/library/autoscheme.h
 $(libexec_dir)/autoscheme-prime: 
 	mkdir -p $(libexec_dir)
 	$(CC) $(strict_options_99) -o $(libexec_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
-		$(prime_dir)/load_modules.c \
 		$(prime_dir)/scheme.c \
 		$(prime_dir)/auto_scheme_file.c \
 		$(prime_dir)/auto_scheme_port.c \
 		$(prime_dir)/auto_scheme_macro.c \
 		$(prime_dir)/auto_scheme_base.c \
 		$(prime_dir)/auto_scheme_write.c \
+		$(prime_dir)/auto_scheme_char_set.c \
 		$(prime_dir)/auto_scheme_string.c \
 		$(prime_dir)/scheme_read.c \
 		$(prime_dir)/scheme_process_context.c \
@@ -67,6 +68,8 @@ $(libexec_dir)/autoscheme-prime:
 		$(prime_dir)/auto_scheme_closure.c \
 		$(prime_dir)/auto_scheme_list.c \
 		$(prime_dir)/auto_scheme_sort.c \
+		$(prime_dir)/auto_scheme_process.c \
+		$(prime_dir)/load_modules.c \
 		$(prime_dir)/scheme_eval.c \
 		$(prime_dir)/scheme_repl.c \
 		$(prime_dir)/scheme_load.c \

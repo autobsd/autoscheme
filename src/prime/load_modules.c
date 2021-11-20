@@ -14,6 +14,7 @@ pointer ff_load_modules( pointer args )
     foreign_function LOAD_MODULE__auto_scheme_write;
     foreign_function LOAD_MODULE__auto_scheme_environment;
     foreign_function LOAD_MODULE__auto_scheme_args_fold;
+    foreign_function LOAD_MODULE__auto_scheme_char_set;
     foreign_function LOAD_MODULE__auto_scheme_string;
     foreign_function LOAD_MODULE__scheme_cxr;
     foreign_function LOAD_MODULE__auto_scheme_args;
@@ -33,6 +34,7 @@ pointer ff_load_modules( pointer args )
     foreign_function LOAD_MODULE__auto_scheme_macro;
     foreign_function LOAD_MODULE__auto_scheme_memory;
     foreign_function LOAD_MODULE__auto_scheme_port;
+    foreign_function LOAD_MODULE__auto_scheme_process;
     foreign_function LOAD_MODULE__auto_scheme_sort;
     foreign_function LOAD_MODULE__scheme_process_context;
     foreign_function LOAD_MODULE__scheme_repl;
@@ -42,6 +44,7 @@ pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_write( environment );
     LOAD_MODULE__auto_scheme_environment( environment );
     LOAD_MODULE__auto_scheme_args_fold( environment );
+    LOAD_MODULE__auto_scheme_char_set( environment );
     LOAD_MODULE__auto_scheme_string( environment );
     LOAD_MODULE__scheme_cxr( environment );
     LOAD_MODULE__auto_scheme_args( environment );
@@ -61,6 +64,7 @@ pointer ff_load_modules( pointer args )
     LOAD_MODULE__auto_scheme_macro( environment );
     LOAD_MODULE__auto_scheme_memory( environment );
     LOAD_MODULE__auto_scheme_port( environment );
+    LOAD_MODULE__auto_scheme_process( environment );
     LOAD_MODULE__auto_scheme_sort( environment );
     LOAD_MODULE__scheme_process_context( environment );
     LOAD_MODULE__scheme_repl( environment );

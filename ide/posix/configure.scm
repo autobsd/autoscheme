@@ -16,11 +16,12 @@
 
 (display "configuring build...")(newline)
 
-(define application-directory "../../src/application/autoscheme")
+(define applications-directory "../../src/applications")
 (define modules-directory "../../src/modules")
 (define manifest-file "MANIFEST.s")
 
 (define modules (list-sort string<? (directory-files modules-directory)))
+(define applications (list-sort string<? (directory-files applications-directory)))
 
 (define get-configuration
   (lambda ()
@@ -77,23 +78,35 @@
 (define lib-loaded-modules (reverse linked-modules))
 
 
-(define application-configuration
-  (parameterize ((current-directory application-directory)
-		 )
-		(cons "application" (get-configuration))))
+(define application-configurations
+  (parameterize ((current-directory applications-directory))
+		(map (lambda (application)
+		       (parameterize ((current-directory application)
+				      )
+				     
+				     (cons application
+					   (get-configuration)))
+		       )
+		     applications)))
 
-(define app-loaded-modules (reverse (cdr (link-modules (list application-configuration)))))
 
 
-(define variables (string-append "autoscheme_sources =  \\\n"
-				 "	$(src_dir)/application/autoscheme/main.scm \\\n"
-				 "\n"
-				 "autoscheme_dependencies = $(autoscheme_sources)\n"
-				 "\n"
+
+;; (display "application-configuration: ")(newline)
+;; (write application-configuration)(newline)(exit 1)
+
+(define autoscheme-imported-modules (reverse (cdr (link-modules (list (assoc "autoscheme" application-configurations))))))
+
+
+(define variables (string-append ;; "autoscheme_sources =  \\\n"
+				 ;; "	$(src_dir)/application/autoscheme/main.scm \\\n"
+				 ;; "\n"
+				 ;; "autoscheme_dependencies = $(autoscheme_sources)\n"
+				 ;; "\n"
 				 "autoscheme_requirements = \\\n"				
 				 (apply string-append (map (lambda (module)
-							     (string-append "\t" module " \\\n"))
-							   app-loaded-modules))
+				 			     (string-append "\t" module " \\\n"))
+				 			   autoscheme-imported-modules))
 				 "\n"
 				 "module_objects = \\\n"
 				 (apply string-append (map (lambda (module)
@@ -107,11 +120,28 @@
 		 "\n"
 		 "build: $(lib_dir)/libautoscheme.a $(bin_dir)/autoscheme  \n"
 		 "\n"
-		 "$(bin_dir)/autoscheme: $(autoscheme_dependencies)\n"
-		 "	mkdir -p $(bin_dir)\n"
-		 "	$(libexec_dir)/autoscheme-prime --compile $(autoscheme_sources) -o $(gen_dir)/autoscheme.c --load-modules=\"$(autoscheme_requirements)\"\n"
-		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(include_dir)\n"
-		 "\n"
+		 (apply string-append (map (lambda (application)
+					     (string-append "$(bin_dir)/" application ":  \\\n\t" 
+							    (string-join (cdr (assoc 'dependencies: (cdr (assoc application application-configurations)))) " \\\n\t") "\n"
+							    "\n"
+							    "	mkdir -p $(bin_dir)\n"
+							    "	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/" application "/main.scm -o $(gen_dir)/autoscheme.c --load-modules=\"$(autoscheme_requirements)\"\n"
+
+							    ;; "	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/" application "/main.scm -o $(gen_dir)/autoscheme.c --load-modules= \\\n\t"
+							    ;; (apply string-append (map (lambda (module)
+							    ;; 				(string-append "\t" module " \\\n"))
+							    ;; 			      autoscheme-imported-modules))
+
+
+
+
+
+							    "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(include_dir)\n"
+							    "\n"))
+					   applications))
+
+
+
 		 "$(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)\n"
 		 "	mkdir -p $(lib_dir)\n"
 		 "	ar cr $(lib_dir)/libautoscheme.a $(obj_dir)/libautoscheme.o $(obj_dir)/bignum.o $(obj_dir)/load_modules.o $(module_objects)\n"

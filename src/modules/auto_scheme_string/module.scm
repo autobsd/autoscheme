@@ -5,6 +5,7 @@
 (define-library (auto scheme string)
 
   (import (auto scheme base) 
+	  (auto scheme char-set)
 	  )
 
   (export string-join
@@ -101,7 +102,7 @@
 
 	  (cond ((null? remainder) (list (list->string (reverse current))))
 
-		((equal? (car remainder) #\space) (cons (list->string (reverse current)) (get-tokens '() (cdr remainder))))
+		((char-set-contains? char-set:whitespace (car remainder)) (cons (list->string (reverse current)) (get-tokens '() (cdr remainder))))
 
 		(else (get-tokens (cons (car remainder) current) (cdr remainder) ))))
 	))

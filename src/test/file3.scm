@@ -18,6 +18,7 @@
 	(auto scheme file)
 	(auto scheme macro)
 	(auto scheme process)
+	(auto scheme char-set)
 	)
 
 (display "testing:\n")
@@ -238,3 +239,15 @@
 
 (process-command "pwd")
 (process-command "ls")
+
+
+
+
+(newline)
+
+
+(display "char-set:whitespace: ")(write char-set:whitespace)(newline)
+(display "char-set-contains?: ")(write (char-set-contains? char-set:whitespace #\tab))(newline)
+(display "char-set?: ")(write (char-set? char-set:whitespace #\return))(newline)
+
+(newline)

@@ -1,0 +1,12 @@
+/*  This file is part of the 'AutoScheme' project.
+ *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  SPDX-License-Identifier: BSD-2-Clause
+ */
+#include "autoscheme.h"
+pointer LOAD_MODULE__auto_scheme_char_set(pointer environment);
+pointer LOAD_MODULE__auto_scheme_char_set(pointer environment)
+{
+pointer return_value = T;
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("char-set"),NIL))),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),NIL)),cons(cons(mk_symbol("export"),cons(mk_symbol("char-set"),cons(mk_symbol("char-set?"),cons(mk_symbol("char-set-contains?"),cons(mk_symbol("char-set:blank"),cons(mk_symbol("char-set:whitespace"),NIL)))))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("define-record-type"),cons(mk_symbol("<char-set>"),cons(cons(mk_symbol("make-char-set"),cons(mk_symbol("chars"),cons(mk_symbol("contains?"),NIL))),cons(mk_symbol("char-set?"),cons(cons(mk_symbol("chars"),cons(mk_symbol("get-chars"),NIL)),cons(cons(mk_symbol("contains?"),cons(mk_symbol("get-contains"),NIL)),NIL)))))),cons(cons(mk_symbol("define"),cons(mk_symbol("char-set:contains?"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("cs"),cons(mk_symbol("c"),NIL)),cons(cons(mk_symbol("if"),cons(cons(mk_symbol("member"),cons(mk_symbol("c"),cons(cons(mk_symbol("get-chars"),cons(mk_symbol("cs"),NIL)),NIL))),cons(T,cons(F,NIL)))),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("char-set"),cons(cons(mk_symbol("lambda"),cons(mk_symbol("chars"),cons(cons(mk_symbol("make-char-set"),cons(mk_symbol("chars"),cons(mk_symbol("char-set:contains?"),NIL))),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("char-set-contains?"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("cs"),cons(mk_symbol("c"),NIL)),cons(cons(cons(mk_symbol("get-contains"),cons(mk_symbol("cs"),NIL)),cons(mk_symbol("cs"),cons(mk_symbol("c"),NIL))),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("char-set:blank"),cons(cons(mk_symbol("char-set"),cons(mk_character(32),cons(mk_character(9),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("char-set:whitespace"),cons(cons(mk_symbol("char-set"),cons(mk_character(32),cons(mk_character(10),cons(mk_character(9),cons(mk_character(12),cons(mk_character(11),cons(mk_character(13),NIL))))))),NIL))),NIL))))))),NIL))))), environment);
+return return_value;
+}

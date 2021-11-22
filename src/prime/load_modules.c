@@ -12,7 +12,6 @@ pointer ff_load_modules( pointer args )
     foreign_function LOAD_MODULE__scheme;
     foreign_function LOAD_MODULE__auto_scheme_base;
     foreign_function LOAD_MODULE__auto_scheme_write;
-    foreign_function LOAD_MODULE__auto_scheme_environment;
     foreign_function LOAD_MODULE__auto_scheme_args_fold;
     foreign_function LOAD_MODULE__auto_scheme_char_set;
     foreign_function LOAD_MODULE__auto_scheme_string;
@@ -25,6 +24,7 @@ pointer ff_load_modules( pointer args )
     foreign_function LOAD_MODULE__scheme_read;
     foreign_function LOAD_MODULE__auto_scheme_compile;
     foreign_function LOAD_MODULE__auto_scheme_directory;
+    foreign_function LOAD_MODULE__auto_scheme_environment;
     foreign_function LOAD_MODULE__auto_scheme_inexact;
     foreign_function LOAD_MODULE__scheme_eval;
     foreign_function LOAD_MODULE__scheme_load;
@@ -42,7 +42,6 @@ pointer ff_load_modules( pointer args )
     LOAD_MODULE__scheme( environment );
     LOAD_MODULE__auto_scheme_base( environment );
     LOAD_MODULE__auto_scheme_write( environment );
-    LOAD_MODULE__auto_scheme_environment( environment );
     LOAD_MODULE__auto_scheme_args_fold( environment );
     LOAD_MODULE__auto_scheme_char_set( environment );
     LOAD_MODULE__auto_scheme_string( environment );
@@ -55,6 +54,7 @@ pointer ff_load_modules( pointer args )
     LOAD_MODULE__scheme_read( environment );
     LOAD_MODULE__auto_scheme_compile( environment );
     LOAD_MODULE__auto_scheme_directory( environment );
+    LOAD_MODULE__auto_scheme_environment( environment );
     LOAD_MODULE__auto_scheme_inexact( environment );
     LOAD_MODULE__scheme_eval( environment );
     LOAD_MODULE__scheme_load( environment );

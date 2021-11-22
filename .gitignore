@@ -6,3 +6,4 @@ lib/
 libexec/
 tmp/
 src/prime/Makefile
+src/prime/autoscheme-mod.c

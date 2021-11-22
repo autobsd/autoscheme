@@ -21,8 +21,13 @@
 
 (define display-version
   (lambda ()
-    (display (string-append "AutoScheme version " program-version))(newline)
-    ))
+    (display (string-append "AutoScheme version " program-version))(newline)))
+
+(define display-usage
+  (lambda ()
+    (display "Usage: autoscheme options... [sources...]")(newline)
+    (args-usage option-table)))    
+
 
 (define recognized-processor 
   (lambda (option name arg . seeds)
@@ -44,7 +49,7 @@
 (define help-processor
   (lambda args
     (display-version)
-    (args-usage option-table)
+    (display-usage)
     (exit) ))
 
 (define unrecognized-processor 
@@ -55,7 +60,7 @@
 	  )
 
       (display (string-append "autoscheme: unrecognized option " name-string))(newline)
-      (args-usage option-table)
+      (display-usage)
       (exit 1) )))
 
 (define operand-processor 

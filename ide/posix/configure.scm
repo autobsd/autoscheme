@@ -83,6 +83,7 @@
 
 
 (define autoscheme-imported-modules (reverse (cdr (link-modules (list (assoc "autoscheme" application-configurations))))))
+(define autoscheme-mod-imported-modules (reverse (cdr (link-modules (list (assoc "autoscheme-mod" application-configurations))))))
 
 
 (define variables (string-append "prefix = /usr/local\n"
@@ -111,6 +112,9 @@
 				 "autoscheme_requirements = \\\n\t"				
 				 (string-join autoscheme-imported-modules " \\\n\t") "\n"
 				 "\n"
+				 "autoscheme_mod_requirements = \\\n\t"				
+				 (string-join autoscheme-mod-imported-modules " \\\n\t") "\n"
+				 "\n"
 				 "module_objects = \\\n\t"
 				 (string-join (map (lambda (module)
 						     (string-append "$(obj_dir)/" module ".o"))
@@ -128,6 +132,7 @@
 		 "build: $(gen_dir)/Makefile\n"
 		 "	$(MAKE) -f $(gen_dir)/Makefile $(lib_dir)/libautoscheme.a \n"
 		 "	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme\n"
+		 "	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme-mod\n"
 		 "\n"
 		 "install: \n"
 		 "	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)\n"
@@ -177,16 +182,20 @@
 		 "\n"
 		 "#####################\n"
 		 "\n"		 
-		 (apply string-append (map (lambda (application)
-					     (string-append "$(bin_dir)/" application ": $(libexec_dir)/autoscheme-prime $(lib_dir)/libautoscheme.a \\\n\t" 
-							    (string-join (cdr (assoc 'dependencies: (cdr (assoc application application-configurations)))) " \\\n\t") "\n"
-							    "\n"
-							    "	mkdir -p $(bin_dir)\n"
-							    "	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/" application "/main.scm -o $(gen_dir)/autoscheme.c --load-modules=\"$(autoscheme_requirements)\"\n"
-							    "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)\n"
-							    "\n"))
-					   applications))
-
+		 "$(bin_dir)/autoscheme: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautoscheme.a \\\n\t"
+		 (string-join (cdr (assoc 'dependencies: (cdr (assoc "autoscheme" application-configurations)))) " \\\n\t") "\n"
+		 "\n"
+		 "	mkdir -p $(bin_dir)\n"
+		 "	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/autoscheme/main.scm -o $(gen_dir)/autoscheme.c --load-modules=\"$(autoscheme_requirements)\"\n"
+		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)\n"
+		 "\n"
+		 "$(bin_dir)/autoscheme-mod: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautoscheme.a \\\n\t"
+		 (string-join (cdr (assoc 'dependencies: (cdr (assoc "autoscheme-mod" application-configurations)))) " \\\n\t") "\n"
+		 "\n"
+		 "	mkdir -p $(bin_dir)\n"
+		 "	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules=\"$(autoscheme_mod_requirements)\"\n"
+		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir)\n"
+		 "\n"
 		 "$(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)\n"
 		 "	mkdir -p $(lib_dir)\n"
 		 "	ar cr $(lib_dir)/libautoscheme.a $(obj_dir)/libautoscheme.o $(obj_dir)/bignum.o $(obj_dir)/load_modules.o $(module_objects)\n"

@@ -17,7 +17,6 @@
 
     (define args-usage
       (lambda (opt-tab)
-	(display "Usage: autoscheme options... [sources...]")(newline)
 
 	(let* ((max-short 0)
 	       (max-long 0)

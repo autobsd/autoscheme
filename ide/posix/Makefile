@@ -29,7 +29,6 @@ autoscheme_requirements = \
 	scheme \
 	auto_scheme_base \
 	auto_scheme_write \
-	auto_scheme_environment \
 	auto_scheme_args_fold \
 	auto_scheme_char_set \
 	auto_scheme_string \
@@ -40,9 +39,21 @@ autoscheme_requirements = \
 	auto_scheme_file \
 	scheme_read \
 	auto_scheme_compile \
+	auto_scheme_environment \
 	scheme_eval \
 	scheme_load \
 	auto_scheme_interpret \
+	scheme_process_context
+
+autoscheme_mod_requirements = \
+	scheme \
+	auto_scheme_base \
+	auto_scheme_write \
+	auto_scheme_args_fold \
+	auto_scheme_char_set \
+	auto_scheme_string \
+	scheme_cxr \
+	auto_scheme_args \
 	scheme_process_context
 
 module_objects = \
@@ -59,6 +70,7 @@ module_objects = \
 	$(obj_dir)/scheme_load.o \
 	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/auto_scheme_inexact.o \
+	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_directory.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/scheme_read.o \
@@ -71,7 +83,6 @@ module_objects = \
 	$(obj_dir)/auto_scheme_string.o \
 	$(obj_dir)/auto_scheme_char_set.o \
 	$(obj_dir)/auto_scheme_args_fold.o \
-	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_write.o \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/scheme.o
@@ -84,6 +95,7 @@ all: build
 build: $(gen_dir)/Makefile
 	$(MAKE) -f $(gen_dir)/Makefile $(lib_dir)/libautoscheme.a 
 	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme
+	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme-mod
 
 install: 
 	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)
@@ -138,6 +150,7 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/scheme_load.c \
 	$(prime_dir)/scheme_eval.c \
 	$(prime_dir)/auto_scheme_inexact.c \
+	$(prime_dir)/auto_scheme_environment.c \
 	$(prime_dir)/auto_scheme_directory.c \
 	$(prime_dir)/auto_scheme_compile.c \
 	$(prime_dir)/scheme_read.c \
@@ -150,7 +163,6 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/auto_scheme_string.c \
 	$(prime_dir)/auto_scheme_char_set.c \
 	$(prime_dir)/auto_scheme_args_fold.c \
-	$(prime_dir)/auto_scheme_environment.c \
 	$(prime_dir)/auto_scheme_write.c \
 	$(prime_dir)/auto_scheme_base.c \
 	$(prime_dir)/scheme.c
@@ -170,8 +182,8 @@ $(bin_dir)/autoscheme-mod: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautosch
 	../../src/applications/autoscheme-mod/MANIFEST.s
 
 	mkdir -p $(bin_dir)
-	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme.c --load-modules="$(autoscheme_requirements)"
-	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)
+	$(libexec_dir)/autoscheme-prime --compile $(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules="$(autoscheme_mod_requirements)"
+	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir)
 
 $(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)
 	mkdir -p $(lib_dir)

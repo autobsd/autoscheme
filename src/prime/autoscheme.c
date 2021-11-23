@@ -18,16 +18,13 @@ pointer LOAD_MODULE__scheme_read(pointer environment);
 pointer LOAD_MODULE__auto_scheme_compile(pointer environment);
 pointer LOAD_MODULE__scheme_eval(pointer environment);
 pointer LOAD_MODULE__scheme_load(pointer environment);
-pointer LOAD_MODULE__auto_scheme_interpret(pointer environment);
 pointer LOAD_MODULE__scheme_process_context(pointer environment);
+pointer LOAD_MODULE__auto_scheme_interpret(pointer environment);
 pointer LOAD_MODULE__program(pointer environment);
-int auto_argc;
-char **auto_argv;
+
 int main( int argc, char **argv )
 {
-    auto_argc = argc;
-    auto_argv = argv;
-    scheme_init();
+    scheme_init( argc, argv );
     LOAD_MODULE__scheme(global_env);
     LOAD_MODULE__auto_scheme_base(global_env);
     LOAD_MODULE__auto_scheme_write(global_env);
@@ -43,8 +40,8 @@ int main( int argc, char **argv )
     LOAD_MODULE__auto_scheme_compile(global_env);
     LOAD_MODULE__scheme_eval(global_env);
     LOAD_MODULE__scheme_load(global_env);
-    LOAD_MODULE__auto_scheme_interpret(global_env);
     LOAD_MODULE__scheme_process_context(global_env);
+    LOAD_MODULE__auto_scheme_interpret(global_env);
     LOAD_MODULE__program(global_env);
     scheme_deinit();
     return 0;
@@ -53,7 +50,7 @@ pointer LOAD_MODULE__program(pointer environment)
 {
 pointer return_value = T;
 autoscheme_eval(cons(mk_symbol("import"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("write"),NIL))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("args"),cons(mk_symbol("fold"),NIL)))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("args"),NIL))),cons(cons(mk_symbol("scheme"),cons(mk_symbol("cxr"),NIL)),cons(cons(mk_symbol("scheme"),cons(mk_symbol("process-context"),NIL)),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("string"),NIL))),cons(cons(mk_symbol("scheme"),cons(mk_symbol("read"),NIL)),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("file"),NIL))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("compile"),NIL))),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("interpret"),NIL))),NIL)))))))))))), environment);
-autoscheme_eval(cons(mk_symbol("define"),cons(mk_symbol("program-version"),cons(cons(mk_syntax(LOC_BEGIN,"begin"),cons(mk_string("0.209.0 (rev 1637633128)"),NIL)),NIL))), environment);
+autoscheme_eval(cons(mk_symbol("define"),cons(mk_symbol("program-version"),cons(cons(mk_syntax(LOC_BEGIN,"begin"),cons(mk_string("0.210.0 (rev 1637640779)"),NIL)),NIL))), environment);
 autoscheme_eval(cons(mk_symbol("define"),cons(mk_symbol("display-version"),cons(cons(mk_symbol("lambda"),cons(NIL,cons(cons(mk_symbol("display"),cons(cons(mk_symbol("string-append"),cons(mk_string("AutoScheme version "),cons(mk_symbol("program-version"),NIL))),NIL)),cons(cons(mk_symbol("newline"),NIL),NIL)))),NIL))), environment);
 autoscheme_eval(cons(mk_symbol("define"),cons(mk_symbol("display-usage"),cons(cons(mk_symbol("lambda"),cons(mk_symbol("args"),cons(cons(mk_symbol("apply"),cons(mk_symbol("display"),cons(cons(mk_symbol("cons"),cons(mk_string("Usage: autoscheme option ... [argument ...]"),cons(mk_symbol("args"),NIL))),NIL))),cons(cons(mk_symbol("apply"),cons(mk_symbol("newline"),cons(mk_symbol("args"),NIL))),cons(cons(mk_symbol("apply"),cons(mk_symbol("args-usage"),cons(cons(mk_symbol("cons"),cons(mk_symbol("option-table"),cons(mk_symbol("args"),NIL))),NIL))),NIL))))),NIL))), environment);
 autoscheme_eval(cons(mk_symbol("define"),cons(mk_symbol("recognized-processor"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("option"),cons(mk_symbol("name"),cons(mk_symbol("arg"),mk_symbol("seeds")))),cons(cons(mk_symbol("let"),cons(cons(cons(mk_symbol("options"),cons(cons(mk_symbol("car"),cons(mk_symbol("seeds"),NIL)),NIL)),cons(cons(mk_symbol("arguments"),cons(cons(mk_symbol("cadr"),cons(mk_symbol("seeds"),NIL)),NIL)),NIL)),cons(cons(mk_symbol("values"),cons(cons(mk_symbol("cons"),cons(cons(mk_symbol("list"),cons(mk_symbol("option"),cons(mk_symbol("name"),cons(mk_symbol("arg"),NIL)))),cons(mk_symbol("options"),NIL))),cons(mk_symbol("arguments"),NIL))),NIL))),NIL))),NIL))), environment);

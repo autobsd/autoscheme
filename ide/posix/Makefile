@@ -41,8 +41,8 @@ autoscheme_requirements = \
 	auto_scheme_compile \
 	scheme_eval \
 	scheme_load \
-	auto_scheme_interpret \
-	scheme_process_context
+	scheme_process_context \
+	auto_scheme_interpret
 
 autoscheme_mod_requirements = \
 	scheme \
@@ -57,7 +57,6 @@ autoscheme_mod_requirements = \
 
 module_objects = \
 	$(obj_dir)/scheme_repl.o \
-	$(obj_dir)/scheme_process_context.o \
 	$(obj_dir)/auto_scheme_sort.o \
 	$(obj_dir)/auto_scheme_process.o \
 	$(obj_dir)/auto_scheme_port.o \
@@ -66,6 +65,7 @@ module_objects = \
 	$(obj_dir)/auto_scheme_list.o \
 	$(obj_dir)/auto_scheme_lazy.o \
 	$(obj_dir)/auto_scheme_interpret.o \
+	$(obj_dir)/scheme_process_context.o \
 	$(obj_dir)/scheme_load.o \
 	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/auto_scheme_inexact.o \
@@ -137,7 +137,6 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/autoscheme.c \
 	$(prime_dir)/load_modules.c \
 	$(prime_dir)/scheme_repl.c \
-	$(prime_dir)/scheme_process_context.c \
 	$(prime_dir)/auto_scheme_sort.c \
 	$(prime_dir)/auto_scheme_process.c \
 	$(prime_dir)/auto_scheme_port.c \
@@ -146,6 +145,7 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/auto_scheme_list.c \
 	$(prime_dir)/auto_scheme_lazy.c \
 	$(prime_dir)/auto_scheme_interpret.c \
+	$(prime_dir)/scheme_process_context.c \
 	$(prime_dir)/scheme_load.c \
 	$(prime_dir)/scheme_eval.c \
 	$(prime_dir)/auto_scheme_inexact.c \

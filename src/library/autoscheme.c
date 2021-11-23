@@ -109,6 +109,9 @@ pointer current_errport = &_NIL;/* pointer to current-error-port */
 pointer current_xhands = &_NIL; /* pointer to current-exception-handlers */
 pointer current_source = &_NIL; /* pointer to current-source */
 
+pointer command_line = &_NIL;   /* pointer to command-line */
+
+
 pointer winders = &_NIL;	/* pointer to winders list */
 
 pointer strbuff = &_NIL;	/* pointer to string buffer */
@@ -1077,6 +1080,9 @@ void gc(pointer *a, pointer *b)
 	current_errport = forward(current_errport);
 	current_xhands = forward(current_xhands);
 	current_source = forward(current_source);
+
+	command_line = forward(command_line);
+
 	winders = forward(winders);
 	strbuff = forward(strbuff);
 
@@ -1292,6 +1298,7 @@ void gc(pointer *a, pointer *b)
 	mark(current_errport);
 	mark(current_xhands);
 	mark(current_source);
+	mark(command_line);
 	mark(winders);
 	mark(strbuff);
 
@@ -6475,6 +6482,11 @@ LOOP:
 		if (is_pair(args)) current_source = car(args);
 		s_return(current_source);
 
+	case LOC_CMD_LINE:	/* command-line */
+		if (!validargs("command-line", 0, 1, TST_LIST)) Error_0(msg);
+		if (is_pair(args)) command_line = car(args);
+		s_return(command_line);
+
 	case LOC_WITH_INFILE0:	/* with-input-from-file */
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), port_input);
@@ -7055,7 +7067,7 @@ void scheme_register_operation( enum eval_location location, char *name, pointer
     car( environment ) = x;
 }
 
-static void init_vars_global(void)
+static void init_vars_global( int argc, char **argv )
 {
 	symbol_list = NIL;
 	winders = NIL;
@@ -7101,18 +7113,21 @@ static void init_vars_global(void)
 	current_xhands = cons( mk_operation( LOC_DFLT_XHAND0, &NIL), NIL );
 	current_source = mk_string( "" );
 
+	command_line = NIL;
+	{ int i; for( i = argc - 1; i >= 0; i-- ) command_line = cons( mk_string( argv[i] ), command_line ); }
+
 	strbuff = mk_memblock(256, &NIL, &NIL);
 }
 
 
 /* initialization of AutoScheme */
-void scheme_init(void)
+void scheme_init( int argc, char **argv )
 {
 	alloc_cellseg();
 	gc_verbose = 0;
 
 	/* initialize several globals */
-	init_vars_global();
+	init_vars_global( argc, argv );
 
 	/* intialization of global pointers to special symbols */
 	LAMBDA = mk_symbol("lambda");
@@ -7144,6 +7159,7 @@ void scheme_deinit(void)
 	current_errport = NIL;
 	current_xhands = NIL;
 	current_source = NIL;
+	command_line = NIL;
 	global_env = NIL;
 	call_history = NIL;
 	winders = NIL;

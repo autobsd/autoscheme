@@ -14,34 +14,11 @@ pointer LOAD_MODULE__scheme_process_context(pointer environment);
 
 extern char **environ;
 
-extern int auto_argc;
-extern char **auto_argv;
-
-static pointer ff_command_line( pointer args );
 static pointer ff_get_environment_variables( pointer args );
  /*  This file is part of the 'AutoScheme' project.
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-static pointer ff_command_line( pointer args )
-{
-    static pointer arguments = NULL;
-    if( arguments == NULL )
-    {
-	int i;
-	arguments = NIL;
-
-	for( i = auto_argc - 1; i >= 0; i-- )
-	{
-	    arguments = cons( mk_string( auto_argv[i] ), arguments );
-	}
-    }
-    return arguments;
-    (void)args;
-}
-
-
-
 static pointer ff_get_environment_variables( pointer args )
 {
     static pointer variables = NULL;
@@ -74,6 +51,6 @@ static pointer ff_get_environment_variables( pointer args )
 pointer return_value = T;
 autoscheme_eval(T, environment);
 autoscheme_eval(T, environment);
-return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("scheme"),cons(mk_symbol("process-context"),NIL)),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),NIL)),cons(cons(mk_symbol("export"),cons(mk_symbol("command-line"),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),cons(mk_symbol("get-environment-variables"),cons(mk_symbol("get-environment-variable"),NIL)))))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("define"),cons(mk_symbol("command-line"),cons(mk_function(ff_command_line,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("get-environment-variables"),cons(mk_function(ff_get_environment_variables,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("get-environment-variable"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("name"),NIL),cons(cons(mk_symbol("let"),cons(cons(cons(mk_symbol("variable"),cons(cons(mk_symbol("assoc"),cons(mk_symbol("name"),cons(cons(mk_symbol("get-environment-variables"),NIL),NIL))),NIL)),NIL),cons(cons(mk_symbol("and"),cons(mk_symbol("variable"),cons(cons(mk_symbol("cdr"),cons(mk_symbol("variable"),NIL)),NIL))),NIL))),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("emergency-exit"),cons(mk_operation(LOC_EMERGENCY_EXIT,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("exit"),cons(F,NIL))),cons(cons(mk_symbol("call-with-current-continuation"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("return"),NIL),cons(cons(mk_symbol("let"),cons(cons(cons(mk_symbol("obj"),cons(cons(mk_symbol("call-with-current-continuation"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("_exit"),NIL),cons(cons(mk_symbol("cond"),cons(cons(cons(mk_symbol("not"),cons(mk_symbol("exit"),NIL)),cons(cons(mk_symbol("set!"),cons(mk_symbol("exit"),cons(mk_symbol("_exit"),NIL))),cons(cons(mk_symbol("return"),NIL),NIL))),NIL)),NIL))),NIL)),NIL)),NIL),cons(cons(mk_symbol("emergency-exit"),cons(cons(mk_symbol("cond"),cons(cons(cons(mk_symbol("integer?"),cons(mk_symbol("obj"),NIL)),cons(mk_symbol("obj"),NIL)),cons(cons(cons(mk_symbol("eq?"),cons(mk_symbol("obj"),cons(F,NIL))),cons(mk_integer(1),NIL)),cons(cons(mk_symbol("else"),cons(mk_integer(0),NIL)),NIL)))),NIL)),NIL))),NIL))),NIL)),NIL))))))),NIL))))), environment);
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("scheme"),cons(mk_symbol("process-context"),NIL)),cons(cons(mk_symbol("import"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("base"),NIL))),NIL)),cons(cons(mk_symbol("export"),cons(mk_symbol("command-line"),cons(mk_symbol("emergency-exit"),cons(mk_symbol("exit"),cons(mk_symbol("get-environment-variables"),cons(mk_symbol("get-environment-variable"),NIL)))))),cons(cons(mk_symbol("begin"),cons(cons(mk_symbol("define"),cons(mk_symbol("command-line"),cons(mk_operation(LOC_CMD_LINE,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("get-environment-variables"),cons(mk_function(ff_get_environment_variables,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("get-environment-variable"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("name"),NIL),cons(cons(mk_symbol("let"),cons(cons(cons(mk_symbol("variable"),cons(cons(mk_symbol("assoc"),cons(mk_symbol("name"),cons(cons(mk_symbol("get-environment-variables"),NIL),NIL))),NIL)),NIL),cons(cons(mk_symbol("and"),cons(mk_symbol("variable"),cons(cons(mk_symbol("cdr"),cons(mk_symbol("variable"),NIL)),NIL))),NIL))),NIL))),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("emergency-exit"),cons(mk_operation(LOC_EMERGENCY_EXIT,&NIL),NIL))),cons(cons(mk_symbol("define"),cons(mk_symbol("exit"),cons(F,NIL))),cons(cons(mk_symbol("call-with-current-continuation"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("return"),NIL),cons(cons(mk_symbol("let"),cons(cons(cons(mk_symbol("obj"),cons(cons(mk_symbol("call-with-current-continuation"),cons(cons(mk_symbol("lambda"),cons(cons(mk_symbol("_exit"),NIL),cons(cons(mk_symbol("cond"),cons(cons(cons(mk_symbol("not"),cons(mk_symbol("exit"),NIL)),cons(cons(mk_symbol("set!"),cons(mk_symbol("exit"),cons(mk_symbol("_exit"),NIL))),cons(cons(mk_symbol("return"),NIL),NIL))),NIL)),NIL))),NIL)),NIL)),NIL),cons(cons(mk_symbol("emergency-exit"),cons(cons(mk_symbol("cond"),cons(cons(cons(mk_symbol("integer?"),cons(mk_symbol("obj"),NIL)),cons(mk_symbol("obj"),NIL)),cons(cons(cons(mk_symbol("eq?"),cons(mk_symbol("obj"),cons(F,NIL))),cons(mk_integer(1),NIL)),cons(cons(mk_symbol("else"),cons(mk_integer(0),NIL)),NIL)))),NIL)),NIL))),NIL))),NIL)),NIL))))))),NIL))))), environment);
 return return_value;
 }

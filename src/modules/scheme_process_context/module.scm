@@ -22,7 +22,9 @@
 
   (begin
 
-    (define command-line (foreign-function ff_command_line))
+    (define command-line (foreign-operation LOC_CMD_LINE))
+
+
     (define get-environment-variables (foreign-function ff_get_environment_variables))
 
     (define get-environment-variable 

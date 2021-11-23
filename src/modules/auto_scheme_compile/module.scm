@@ -279,19 +279,14 @@
 								 module-list))
 
 				       (module-function-declaration "program") ";\n"
-
-				       "int auto_argc;\n"
-				       "char **auto_argv;\n"
-
+				       "\n"
 				       ))
 
 	       (functions-template (string-append
 
 				    "int main( int argc, char **argv )\n"
 				    "{\n"
-				    "    auto_argc = argc;\n"
-				    "    auto_argv = argv;\n"
-				    "    scheme_init();\n"
+				    "    scheme_init( argc, argv );\n"
 
 				    (apply string-append (map (lambda (name)
 								(string-append "    LOAD_MODULE__" name "(global_env);\n"))

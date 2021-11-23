@@ -7,6 +7,7 @@
   (import (auto scheme base)
 	  (scheme eval)
 	  (scheme load)
+	  (scheme process-context)
 	  )
 
   (export interpret
@@ -18,10 +19,11 @@
        (lambda (sources arguments)
 
 	 (define int-env (environment))
-
-	 (for-each (lambda (source)
-		     (load source int-env))
-		   sources)
-	 ))
+	 
+		       (for-each (lambda (source)
+				   (parameterize ((command-line (cons source arguments)))
+						 (load source int-env)))
+				 sources)
+		       ))
 
      ))

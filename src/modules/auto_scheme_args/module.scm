@@ -16,7 +16,7 @@
   (begin
 
     (define args-usage
-      (lambda (opt-tab)
+      (lambda (opt-tab . rest)
 
 	(let* ((max-short 0)
 	       (max-long 0)
@@ -24,16 +24,19 @@
 
 	       (opt-strings (map (lambda (row)
 				   (let* ((opt (car row))
+					  (description (cadr row))
+					  (var-name (if (>= (length row) 3) (caddr row) #f))
+
 					  (names (option-names opt))
 					  
 					  (short-names (apply append (map (lambda (name) (if (char? name) (list name) '())) names)))
 					  (long-names (apply append (map (lambda (name) (if (string? name) (list name) '())) names)))
 
+
 					  (name-delimiter (if (or (null? short-names)(null? long-names)) "  " ", "))
 
 					  (short-string (string-join (map (lambda (short-name) (string-append "-" (string short-name))) short-names) ", " ))
-					  (long-string (string-join (map (lambda (long-name) (string-append "--" long-name)) long-names) ", " ))
-					  (description (cadr row))
+					  (long-string (string-join (map (lambda (long-name) (string-append "--" long-name (if var-name (string-append "=" var-name) ""))) long-names) ", " ))
 
 					  (short-length (string-length short-string))
 					  (long-length (string-length long-string))
@@ -61,7 +64,7 @@
 			(padding-long (make-string (- max-long (string-length long-string)) #\space))
 			
 			)
-		   (display (string-append " " padding-short short-string delimiter long-string padding-long "  " description))(newline)
+		   (apply display (cons (string-append " " padding-short short-string delimiter long-string padding-long "   " description) rest))(apply newline rest)
 
 		   ))
 	       opt-strings)

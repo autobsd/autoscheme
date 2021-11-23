@@ -96,9 +96,9 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_EQV, "eqv?", environment);
 /* error - defined in module */
 
-/* error-object-irritants */
-/* error-object-message */
-/* error-object? */
+/* error-object-irritants - defined in module */
+/* error-object-message - defined in module */
+/* error-object? - defined in module */
 
     scheme_register_operation(LOC_EVEN, "even?", environment);
 
@@ -108,7 +108,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
     scheme_register_operation(LOC_EXPT, "expt", environment);
 
 /* features */
-/* file-error? */
+/* file-error? - defined in module */
 
     scheme_register_operation(LOC_FLOOR, "floor", environment);
 
@@ -124,7 +124,7 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
     scheme_register_operation(LOC_GET_OUTSTRING, "get-output-string", environment);
 
-/* guard */
+/* guard - defined in module */
 
     scheme_register_syntax(LOC_IF0, "if", environment);
 /* include - defined in module */
@@ -225,8 +225,8 @@ pointer INITIALIZE_LIBRARY__auto_scheme_base( pointer environment )
 
     scheme_register_operation(LOC_READ_CHAR, "read-char", environment);
 
-/* read-error? */
-/* read-line */
+/* read-error? - defined in module */
+/* read-line - defined in module */
 /* read-string - defined in module */
 /* read-u8 */
 

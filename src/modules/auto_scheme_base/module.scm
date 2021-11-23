@@ -76,8 +76,8 @@
 
 
 (define error (foreign-operation LOC_ERROR))
-(define error-object-message (foreign-operation LOC_ERRMSG0))
 (define error-object-irritants (foreign-operation LOC_ERRIRR0))
+(define error-object-message (foreign-operation LOC_ERRMSG0))
 (define error-object? (foreign-operation LOC_ERROBJP))
 
 (define file-error? (foreign-operation LOC_FILERRP0))
@@ -207,6 +207,17 @@
 
 
 (define read-error? (foreign-operation LOC_REDERRP0))
+
+
+(define read-line 
+  (lambda args
+    (list->string (reverse (let read-chars ((next-char (apply read-char args))
+					    (char-list '()))
+
+			     (cond ((eof-object? next-char) char-list)
+				   ((char=? next-char #\newline) char-list)
+				   ((char=? next-char #\return) (if (char=? (apply peek-char args) #\newline) (apply read-char args)) char-list)
+				   (else (read-chars (apply read-char args) (cons next-char char-list)))))))))
 
 (define read-string 
   (letrec ((r7-read-string (lambda (k . rest)

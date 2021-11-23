@@ -43,7 +43,7 @@
 									(set! updated-remainder (cddr remainder)) (cadr remainder))
 								       (else #f)))
 
-								((or (not opt-arg-allowed) (find-option (opt-arg-string 0)))
+								((or (not opt-arg-allowed) (find-option (string-ref opt-arg-string 0)))
 								 (set! updated-remainder (cons (string-append "-" opt-arg-string) (cdr remainder))) #f)
 
 								(else opt-arg-string)

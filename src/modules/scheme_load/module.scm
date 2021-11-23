@@ -34,6 +34,7 @@
 
 		       (with-input-from-file filename
 			 (lambda ()
+			   (if (char=? (peek-char) #\#) (read-line))
 			   (let load-expression ((expression (read)))
 			     (cond ((not (eof-object? expression))
 				    (eval expression load-environment)

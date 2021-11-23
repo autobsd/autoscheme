@@ -5,12 +5,8 @@
 (define-library (auto scheme interpret)
 
   (import (auto scheme base)
-	  (auto scheme write)
-	  (auto scheme environment)
 	  (scheme eval)
 	  (scheme load)
-	  (auto scheme file)
-	  (scheme read)
 	  )
 
   (export interpret
@@ -19,7 +15,7 @@
   (begin
      
      (define interpret
-       (lambda sources
+       (lambda (sources arguments)
 
 	 (define int-env (environment))
 

@@ -24,16 +24,16 @@
     (display (string-append "AutoScheme version " program-version))(newline)))
 
 (define display-usage
-  (lambda ()
-    (display "Usage: autoscheme options... [sources...]")(newline)
-    (args-usage option-table)))    
+  (lambda args
+    (apply display (cons "Usage: autoscheme option ... [argument ...]" args))(apply newline args)
+    (apply args-usage (cons option-table args))))   
 
 
 (define recognized-processor 
   (lambda (option name arg . seeds)
     (let ((options (car seeds))
-	  (source-files (cadr seeds)))
-      (values (cons (list option name arg) options) source-files)
+	  (arguments (cadr seeds)))
+      (values (cons (list option name arg) options) arguments)
       )))
 
 (define repl-processor
@@ -54,36 +54,41 @@
 
 (define unrecognized-processor 
   (lambda (option name arg . seeds)
-    (let ((name-string (if (char? name) 
+    (let ((options (car seeds))
+	  (arguments (cadr seeds))
+	  (name-string (if (char? name) 
 			   (string-append "-" (string name))
-			   (string-append "--" name)))
-	  )
+			   (string-append "--" name))))
+      (cond ((assoc interpret-option options) 
+	     (values options 
+		     (if (char? name) 
+			 (cons arg (cons name-string arguments))
+			 (cons (string-append name-string "=" arg ) arguments))))
 
-      (display (string-append "autoscheme: unrecognized option " name-string))(newline)
-      (display-usage)
-      (exit 1) )))
+	    (else (display (string-append "autoscheme: unrecognized option " name-string) (current-error-port))(newline (current-error-port))
+		  (display-usage (current-error-port))
+		  (exit 1) )))))
 
 (define operand-processor 
   (lambda (operand . seeds)
     (let ((options (car seeds))
-	  (source-files (cadr seeds)))
+	  (arguments (cadr seeds)))
 
-      (values options (cons operand source-files)))))
+      (values options (cons operand arguments)))))
 
+(define interpret-option (option '(#\i "interpret") #t #f recognized-processor))
 
-(define option-table (quasiquote ((,(option '(#\i "interpret") #f #f recognized-processor) "Interpret sources")
-				  (,(option '(#\c "compile") #f #f recognized-processor) "Compile sources")
-				  (,(option '(#\l "load-modules") #t #f recognized-processor) "Load modules")
-				  (,(option '(#\m "compile-module") #f #f recognized-processor) "Compile module")
-				  (,(option '(#\n "module-name") #t #f recognized-processor) "Specify compiled module name")
-				  (,(option '(#\o "output-file") #t #f recognized-processor) "Specify output file")
-				  (,(option '(#\r "repl") #f #f repl-processor) "Enter interactive REPL")
-				  (,(option '(#\s "shell") #f #f version-processor) "Enter command line shell")
-				  (,(option '(#\V "version") #f #f version-processor) "Display version information")
-				  (,(option '(#\h "help") #f #f help-processor) "Show this message")
-				  )))
-
-
+(define option-table `((,interpret-option "Interpret program files" "FILES")
+		       (,(option '(#\c "compile") #t #f recognized-processor) "Compile program files" "FILES")
+		       (,(option '(#\l "load-modules") #t #f recognized-processor) "Load module files" "FILES")
+		       (,(option '(#\m "compile-module") #t #f recognized-processor) "Compile module files" "FILES")
+		       (,(option '(#\n "module-name") #t #f recognized-processor) "Specify module name" "NAME")
+		       (,(option '(#\o "output-file") #t #f recognized-processor) "Specify output file" "FILE")
+		       ;; (,(option '(#\r "repl") #f #f repl-processor) "Enter interactive REPL")
+		       ;; (,(option '(#\s "shell") #f #f version-processor) "Enter command line shell")
+		       (,(option '(#\V "version") #f #f version-processor) "Display version information")
+		       (,(option '(#\h "help") #f #f help-processor) "Show this message")
+		       ))
 
 
 
@@ -98,7 +103,7 @@
 
 
        (options (car result))
-       (source-files (reverse (cadr result)))
+       (arguments (reverse (cadr result)))
 
        (option-selected? (lambda (name selected-options)
        			   (call/cc (lambda (return)
@@ -111,30 +116,25 @@
        			   (let ((selected-option (option-selected? name options)))
        			     (if selected-option (caddr selected-option) #f))))
 
-       (compile-selected (option-selected? "compile" options))
-       (output-file (get-selected-arg "output-file"))
-
-       (compile-module-selected (option-selected? "compile-module" options))
-       (module-name (get-selected-arg "module-name"))
-
-       (load-modules (get-selected-arg "load-modules"))
-
-
-       (interpret-selected (option-selected? "interpret" options))
-
-       (module-list (if load-modules (apply append (map (lambda (token)
-							  (if (= (string-length token) 0) '()
-							      (list token)))
-							(string-tokenize load-modules)))
-
-			'()))
+       (arg->list (lambda (arg)
+		    (if arg (apply append (map (lambda (token)
+						 (if (= (string-length token) 0) '()
+						     (list token)))
+					       (string-tokenize arg)))
+       			'())))
        )
 
 
-  (cond (compile-selected (compile-program source-files module-list output-file))
-  	(compile-module-selected (compile-module source-files module-name output-file))
-  	(interpret-selected (apply interpret source-files))
-  	(else (help-processor))
-  	)
-  
+  (cond ((option-selected? "interpret" options) (interpret (arg->list (get-selected-arg "interpret")) arguments))
+
+	((option-selected? "compile" options) (compile-program (arg->list (get-selected-arg "compile")) 
+							       (arg->list (get-selected-arg "load-modules")) 
+							       (get-selected-arg "output-file")))
+
+	((option-selected? "compile-module" options) (compile-module (arg->list (get-selected-arg "compile-module")) 
+								     (get-selected-arg "module-name")
+								     (get-selected-arg "output-file")))
+
+	(else (help-processor))
+	)
   )

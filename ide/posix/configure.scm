@@ -10,15 +10,46 @@
 	(auto scheme list)
 	(auto scheme sort)
 	(auto scheme string)
+	(auto scheme args fold)
+	(auto scheme args)
+
 	(scheme process-context)
 	(scheme read)
 	)
 
 (display "configuring build...")(newline)
-
 (define applications-directory "../../src/applications/")
 (define modules-directory "../../src/modules/")
 (define manifest-file "MANIFEST.s")
+
+(define prefix "/usr/local")
+(define state-prefix "/var/local/lib")
+
+(define option-table (quasiquote ((,(option '(#\p "prefix") #t #f (lambda (option name arg . seeds) (set! prefix arg) (apply values seeds))) "Set installation prefix" "PREFIX")
+				  (,(option '(#\s "state-prefix") #t #f (lambda (option name arg . seeds) (set! state-prefix arg) (apply values seeds))) "Set state prefix" "PREFIX")
+				  (,(option '(#\h "help") #f #f (lambda args (display-version) (display-usage) (exit))) "Show this message"))))
+
+(define display-usage
+  (lambda args
+    (apply display (cons "Usage: configure.scm [option ...]" args))(apply newline args)
+    (apply args-usage (cons option-table args))))   
+
+(define operand-processor 
+  (lambda (operand . seeds)
+    (display (string-append "configure.scm: unrecognized operand '" operand "'") (current-error-port))(newline (current-error-port))
+    (display-usage (current-error-port))
+    (exit 1)))
+
+(define unrecognized-processor 
+  (lambda (option name arg . seeds)
+    (let ((name-string (if (char? name) (string-append "-" (string name)) (string-append "--" name))))
+      (display (string-append "configure.scm: unrecognized option " name-string) (current-error-port))(newline (current-error-port))
+      (display-usage (current-error-port))
+      (exit 1))))
+
+(args-fold (cdr (command-line)) (map car option-table) unrecognized-processor operand-processor '() '())
+
+
 
 (define modules (list-sort string<? (directory-files modules-directory)))
 (define applications (list-sort string<? (directory-files applications-directory)))
@@ -86,9 +117,10 @@
 (define autoscheme-mod-imported-modules (reverse (cdr (link-modules (list (assoc "autoscheme-mod" application-configurations))))))
 
 
-(define variables (string-append "prefix = /usr/local\n"
-				 "state_prefix = /var/local/lib\n"
+(define variables (string-append "prefix = " prefix "\n"
+				 "state_prefix = " state-prefix "\n"
 				 "state_dir = autoscheme.state\n"
+				 "state_path = $(DESTDIR)$(state_prefix)/$(state_dir)\n"
 				 "\n"
 				 "project_dir = ../..\n"
 				 "src_dir = $(project_dir)/src\n"
@@ -122,8 +154,9 @@
 					      " \\\n\t") 
 				 "\n"
 				 "\n"
-				 "export DESTDIR prefix state_prefix\n"
+				 "#####################\n"
 				 "\n"
+
 				 ))
 
 (define targets
@@ -165,9 +198,9 @@
 		 "\n"
 		 "#####################\n"
 		 "\n"
-		 "$(gen_dir)/Makefile: $(libexec_dir)/autoscheme-prime\n"
+		 "$(gen_dir)/Makefile: configure.scm $(libexec_dir)/autoscheme-prime\n"
 		 "	mkdir -p $(gen_dir)\n"
-		 "	$(libexec_dir)/autoscheme-prime -i configure.scm\n"
+		 "	$(libexec_dir)/autoscheme-prime -i configure.scm --prefix=\"$(prefix)\" --state-prefix=\"$(state_prefix)\"\n"
 		 "\n"
 		 "$(libexec_dir)/autoscheme-prime: \n"
 		 "	mkdir -p $(libexec_dir)\n"
@@ -194,7 +227,7 @@
 		 "\n"
 		 "	mkdir -p $(bin_dir)\n"
 		 "	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules=\"$(autoscheme_mod_requirements)\"\n"
-		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir)\n"
+		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir) -DSTATE_PATH=$(state_path)\n"
 		 "\n"
 		 "$(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)\n"
 		 "	mkdir -p $(lib_dir)\n"

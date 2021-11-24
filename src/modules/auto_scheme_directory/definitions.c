@@ -61,6 +61,45 @@ pointer ff_directory_files( pointer args )
 	}
 	closedir(d);
     }
+    else
+    {
+	char *error_string;
+	switch( errno ) 
+	{
+	case EACCES :
+	    error_string = "Permission denied.";
+	    break; 
+	
+	case EBADF :
+	    error_string = "fd is not a valid file descriptor opened for reading.";
+	    break; 
+
+	case EMFILE :
+	    error_string = "The per-process limit on the number of open file descriptors has been reached.";
+	    break;
+
+	case ENFILE :
+	    error_string = "The system-wide limit on the total number of open files has been reached.";
+	    break;
+
+	case ENOENT :
+	    error_string = "Directory does not exist, or name is an empty string.";
+	    break;
+
+	case ENOMEM :
+	    error_string = "Insufficient memory to complete the operation.";
+	    break;
+
+	case ENOTDIR :
+	    error_string = "name is not a directory.";
+	    break;
+
+	default : 
+	    error_string = "Unable to open directory for reading.";
+	}
+	printf( "%s\n", error_string );
+	FatalForeignError( "unable to open directory");
+    }
     return result;
 }
 

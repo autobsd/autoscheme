@@ -2,10 +2,16 @@
 ;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(import (auto scheme base)
-	(auto scheme write)
+(foreign-declare (include-string "macros.h"))
+
+
+(import (auto scheme args)
 	(auto scheme args fold)
-	(auto scheme args)
+	(auto scheme base)
+	(auto scheme directory)
+	(auto scheme lazy)
+	(auto scheme write)
+	
 	;; (scheme cxr)
 	(scheme process-context)
 	;; (auto scheme string)
@@ -16,6 +22,13 @@
 	;; (auto scheme interpret)
 	)
 
+(display "inside autoscheme-mod...")(newline)
+
+(define state-path (foreign-string STATE_PATH_STR))
+(write state-path)(newline)
+
+
+(exit)
 
 
 (define program-version (include "../../../version.txt"))
@@ -78,11 +91,11 @@
 
 (let* ((seeds (list '() '()))
        (result (call-with-values (lambda () (apply args-fold (append (list (cdr (command-line) )
-						    (map car option-table)
-						    unrecognized-processor
-						    operand-processor
-						    )
-					      seeds))
+								      (map car option-table)
+								      unrecognized-processor
+								      operand-processor
+								      )
+								seeds))
 				    ) list))
 
 

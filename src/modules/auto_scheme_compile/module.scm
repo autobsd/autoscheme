@@ -141,6 +141,10 @@
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-pointer))
 		 (object->string (cadr expression)))
 
+		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'foreign-string))
+		 (string-append "mk_string(" (cadr expression) ")" ))
+
+
 
 
 		((and (pair? expression) (zero? quote-level) (equal? (car expression) 'include))

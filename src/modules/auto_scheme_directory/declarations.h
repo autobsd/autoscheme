@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <errno.h>
 
 pointer ff_current_directory( pointer args );
 pointer ff_directory_files( pointer args );

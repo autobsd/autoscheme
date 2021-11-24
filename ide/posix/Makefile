@@ -5,6 +5,7 @@
 prefix = /usr/local
 state_prefix = /var/local/lib
 state_dir = autoscheme.state
+state_path = $(DESTDIR)$(state_prefix)/$(state_dir)
 
 project_dir = ../..
 src_dir = $(project_dir)/src
@@ -53,6 +54,8 @@ autoscheme_mod_requirements = \
 	auto_scheme_string \
 	scheme_cxr \
 	auto_scheme_args \
+	auto_scheme_directory \
+	auto_scheme_lazy \
 	scheme_process_context
 
 module_objects = \
@@ -86,7 +89,7 @@ module_objects = \
 	$(obj_dir)/auto_scheme_base.o \
 	$(obj_dir)/scheme.o
 
-export DESTDIR prefix state_prefix
+#####################
 
 
 all: build
@@ -127,9 +130,9 @@ clean:
 
 #####################
 
-$(gen_dir)/Makefile: $(libexec_dir)/autoscheme-prime
+$(gen_dir)/Makefile: configure.scm $(libexec_dir)/autoscheme-prime
 	mkdir -p $(gen_dir)
-	$(libexec_dir)/autoscheme-prime -i configure.scm
+	$(libexec_dir)/autoscheme-prime -i configure.scm --prefix="$(prefix)" --state-prefix="$(state_prefix)"
 
 $(libexec_dir)/autoscheme-prime: 
 	mkdir -p $(libexec_dir)
@@ -177,12 +180,13 @@ $(bin_dir)/autoscheme: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautoscheme.
 	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)
 
 $(bin_dir)/autoscheme-mod: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautoscheme.a \
+	../../src/applications/autoscheme-mod/macros.h \
 	../../src/applications/autoscheme-mod/main.scm \
 	../../src/applications/autoscheme-mod/MANIFEST.s
 
 	mkdir -p $(bin_dir)
 	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules="$(autoscheme_mod_requirements)"
-	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir)
+	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir) -DSTATE_PATH=$(state_path)
 
 $(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)
 	mkdir -p $(lib_dir)

@@ -3206,6 +3206,12 @@ LOOP:
 		} else if (is_function(code)) {	/* FUNCTION */
 			push_recent_alloc(args);
 			x = (foreignfnc(code))(args);
+			if( is_fftailcall( x ))
+			{
+			    code = car( x );
+			    args = cdr( x );
+			    s_goto( LOC_APPLY );
+			}
 			s_return(x);
 		} else if (is_closure(code)) {	/* CLOSURE */
 			/* make environment */
@@ -7305,6 +7311,12 @@ pointer autoscheme_eval( pointer object, pointer environment )
 	return value;
 }
 
+pointer tail_error( pointer message, pointer irritants )
+{
+	pointer error_call = cons( mk_operation( LOC_ERROR, &NIL), cons( message, irritants ));
+	setfftailcall( error_call );
+	return error_call;
+}
 
 
 /* ========== Error ==========  */

@@ -142,10 +142,11 @@ struct cell {
 
 #define T_PROMISE        1	/* 00000001 */
 #define T_RESULTREADY    2	/* 00000010 */
-#define T_MACRO          4	/* 00000100 */
-#define T_DEFMACRO       8	/* 00001000 */	/* for define-macro */
-#define T_SYNLAM        16	/* 00010000 */
-#define T_DEFSYNLAM     32	/* 00100000 */	/* for define-syntax-macro */
+#define T_FFTAILCALL     4	/* 00000100 */
+#define T_MACRO          8	/* 00001000 */
+#define T_DEFMACRO      16	/* 00010000 */	/* for define-macro */
+#define T_SYNLAM        32	/* 00100000 */
+#define T_DEFSYNLAM     64	/* 01000000 */	/* for define-syntax-macro */
 #define T_DEFSYNTAX  32768	/* 1000000000000000 */	/* for define-syntax */
 #define T_SYNTAXNUM  32767	/* 0111111111111111 */	/* for define-syntax */
 
@@ -220,6 +221,9 @@ enum {
 #define setpromise(p)   exttype(p) |= T_PROMISE
 #define is_resultready(p) (exttype(p) & T_RESULTREADY)
 #define setresultready(p) exttype(p) |= T_RESULTREADY
+
+#define is_fftailcall(p) (exttype(p) & T_FFTAILCALL)
+#define setfftailcall(p) exttype(p) |= T_FFTAILCALL
 
 #define is_atom(p)      (type(p)&T_ATOM)
 #define setatom(p)      type(p) |= T_ATOM
@@ -315,6 +319,8 @@ pointer scheme_eval(pointer obj);
 pointer autoscheme_eval( pointer object, pointer environment );
 
 pointer scheme_call(pointer procedure, pointer argslist);
+
+pointer tail_error( pointer message, pointer irritants );
 
 
 

@@ -34,7 +34,7 @@ pointer ff_directory_files( pointer args )
     DIR *d;
     struct dirent *dir;
 
-    char *path = ".";
+    char *path = "./";
     int show_hidden = 0;
 
     if( is_pair( args ))
@@ -67,38 +67,35 @@ pointer ff_directory_files( pointer args )
 	switch( errno ) 
 	{
 	case EACCES :
-	    error_string = "Permission denied.";
+	    error_string = "Directory error - permission denied";
 	    break; 
 	
 	case EBADF :
-	    error_string = "fd is not a valid file descriptor opened for reading.";
+	    error_string = "Directory error - invalid read file descriptor for";
 	    break; 
 
 	case EMFILE :
-	    error_string = "The per-process limit on the number of open file descriptors has been reached.";
-	    break;
-
 	case ENFILE :
-	    error_string = "The system-wide limit on the total number of open files has been reached.";
+	    error_string = "Directory error - open file descriptor limit exceeded";
 	    break;
 
 	case ENOENT :
-	    error_string = "Directory does not exist, or name is an empty string.";
+	    error_string = "Directory error - file does not exist";
 	    break;
 
 	case ENOMEM :
-	    error_string = "Insufficient memory to complete the operation.";
+	    error_string = "Directory error - insufficient memory to open";
 	    break;
 
 	case ENOTDIR :
-	    error_string = "name is not a directory.";
+	    error_string = "Directory error - file is not a directory";
 	    break;
 
 	default : 
-	    error_string = "Unable to open directory for reading.";
+	    error_string = "Directory error - unable to open directory for reading";
 	}
-	printf( "%s\n", error_string );
-	FatalForeignError( "unable to open directory");
+
+	return tail_error( mk_string( error_string ), cons( mk_string( path ), NIL ));
     }
     return result;
 }

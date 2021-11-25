@@ -27,7 +27,7 @@
 (define state-path (foreign-string STATE_PATH_STR))
 (write state-path)(newline)
 
-(write (force (delay (+ 2 2))))(newline)
+(write (directory-files "wrong-path"))(newline)
 
 (exit)
 

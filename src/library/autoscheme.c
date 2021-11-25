@@ -6124,6 +6124,7 @@ LOOP:
 		if (!validargs("force", 1, 1, TST_ANY)) Error_0(msg);
 		code = car(args);
 
+	case LOC_FORCE1:	/* force */
 		if (is_promise(code)) {
 			if (is_resultready(code)) {
 				s_return(cdar(code));
@@ -6154,7 +6155,7 @@ LOOP:
 				setresultready(value);
 			}
 		}
-		s_goto(LOC_FORCE);
+		s_goto(LOC_FORCE1);
 
 	case LOC_WRITE_CHAR:	/* write-char */
 	case LOC_WRITE:		/* write */

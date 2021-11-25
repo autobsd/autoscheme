@@ -14,7 +14,7 @@
 
   (begin
 
-    ((foreign-syntax LOC_DEF0 "define") delay (foreign-operation LOC_DELAY))
+    ((foreign-syntax LOC_DEF0 "define") delay (foreign-syntax LOC_DELAY "delay"))
     ((foreign-syntax LOC_DEF0 "define") force (foreign-operation LOC_FORCE))
 
     ;; ((foreign-syntax LOC_DEF0 "define") lazy (foreign-operation LOC_LAZY))

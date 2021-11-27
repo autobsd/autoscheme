@@ -95,31 +95,13 @@ module_objects = \
 all: build
 
 build: $(gen_dir)/Makefile
-	$(MAKE) -f $(gen_dir)/Makefile $(lib_dir)/libautoscheme.a 
-	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme
-	$(MAKE) -f $(gen_dir)/Makefile $(bin_dir)/autoscheme-mod
+	$(MAKE) -f $(gen_dir)/Makefile build_targets 
 
-install: 
-	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)
-	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/$(bin_dir)/
-	mkdir -p $(DESTDIR)$(prefix)/$(libexec_dir)
-	cp $(libexec_dir)/autoscheme-prime $(DESTDIR)$(prefix)/$(libexec_dir)/
-	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
-	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
+install: $(gen_dir)/Makefile
+	$(MAKE) -f $(gen_dir)/Makefile install_targets 
 
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/src
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
-
-	cp -R . $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
-	cp -R $(src_dir)/applications $(DESTDIR)$(state_prefix)/$(state_dir)/src/
-
-uninstall: 
-	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
-	rm -f $(DESTDIR)$(prefix)/$(libexec_dir)/autoscheme-prime
-	rm -f $(DESTDIR)$(prefix)/$(lib_dir)/libautoscheme.a
-	rm -rf $(DESTDIR)$(state_prefix)/$(state_dir)
+uninstall: $(gen_dir)/Makefile
+	$(MAKE) -f $(gen_dir)/Makefile uninstall_targets 
 
 clean:
 	rm -rf $(gen_dir)
@@ -127,6 +109,7 @@ clean:
 	rm -rf $(bin_dir)
 	rm -rf $(lib_dir)
 	rm -rf $(libexec_dir)
+
 
 #####################
 
@@ -168,6 +151,33 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/auto_scheme_write.c \
 	$(prime_dir)/auto_scheme_base.c \
 	$(prime_dir)/scheme.c
+
+#####################
+
+build_targets: $(lib_dir)/libautoscheme.a $(bin_dir)/autoscheme $(bin_dir)/autoscheme-mod
+
+install_targets: 
+	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)
+	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/$(bin_dir)/
+	mkdir -p $(DESTDIR)$(prefix)/$(libexec_dir)
+	cp $(libexec_dir)/autoscheme-prime $(DESTDIR)$(prefix)/$(libexec_dir)/
+	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
+	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
+
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/src
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep/autobsd/autoscheme
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep/autoscheme-modules
+	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+
+	cp -R . $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+	cp -R $(src_dir)/applications $(DESTDIR)$(state_prefix)/$(state_dir)/src/
+
+uninstall_targets: 
+	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
+	rm -f $(DESTDIR)$(prefix)/$(libexec_dir)/autoscheme-prime
+	rm -f $(DESTDIR)$(prefix)/$(lib_dir)/libautoscheme.a
+	rm -rf $(DESTDIR)$(state_prefix)/$(state_dir)
 
 #####################
 

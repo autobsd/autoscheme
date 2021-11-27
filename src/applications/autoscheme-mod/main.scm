@@ -16,19 +16,21 @@
 	(scheme process-context)
 	;; (auto scheme string)
 	;; (scheme read)
-	;; (auto scheme file)
+	(auto scheme file)
 
 	;; (auto scheme compile)
 	;; (auto scheme interpret)
 	)
 
-(display "inside autoscheme-mod...")(newline)
 
 (define state-path (foreign-string STATE_PATH_STR))
-(write state-path)(newline)
+(define lock-file (string-append state-path "/ide/posix/lock.s"))
+(cond ((not (file-exists? lock-file))
+       (display "autoscheme-mod: AutoScheme is not installed" (current-error-port))(newline (current-error-port))
+       (exit 1)))
 
-(write (directory-files "wrong-path"))(newline)
 
+(write lock-file)(newline)
 (exit)
 
 

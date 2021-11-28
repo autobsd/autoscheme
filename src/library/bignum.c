@@ -1,6 +1,6 @@
-/*  This file is part of the 'AutoScheme' project.
- *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
- *  SPDX-License-Identifier: BSD-2-Clause
+/*  The content of this file has not been modified. 
+ *  It is included with its original attribution as 
+ *  part of the 'AutoScheme' project.
  */
 /*  This software is released under the MIT License.
  *
@@ -26,11 +26,14 @@
  *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 #include "bignum.h"
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+
 
 /* greatest common divisor */
 int64_t gcd(int32_t x, int32_t y)

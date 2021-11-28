@@ -10,6 +10,7 @@
   (export call-with-input-file
 	  call-with-output-file
 	  
+	  delete-file
 	  file-exists?
 
 	  open-input-file
@@ -24,6 +25,7 @@
     ((foreign-syntax LOC_DEF0 "define") call-with-input-file (foreign-operation LOC_CALL_INFILE0))
     ((foreign-syntax LOC_DEF0 "define") call-with-output-file (foreign-operation LOC_CALL_OUTFILE0))
 
+    ((foreign-syntax LOC_DEF0 "define") delete-file (foreign-function ff_delete_file))
     ((foreign-syntax LOC_DEF0 "define") file-exists? (foreign-function ff_file_exists_p))
 
     ((foreign-syntax LOC_DEF0 "define") open-input-file (foreign-operation LOC_OPEN_INFILE))

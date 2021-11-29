@@ -63,39 +63,7 @@ pointer ff_directory_files( pointer args )
     }
     else
     {
-	char *error_string;
-	switch( errno ) 
-	{
-	case EACCES :
-	    error_string = "Directory error - permission denied";
-	    break; 
-	
-	case EBADF :
-	    error_string = "Directory error - invalid read file descriptor for";
-	    break; 
-
-	case EMFILE :
-	case ENFILE :
-	    error_string = "Directory error - open file descriptor limit exceeded";
-	    break;
-
-	case ENOENT :
-	    error_string = "Directory error - file does not exist";
-	    break;
-
-	case ENOMEM :
-	    error_string = "Directory error - insufficient memory to open";
-	    break;
-
-	case ENOTDIR :
-	    error_string = "Directory error - file is not a directory";
-	    break;
-
-	default : 
-	    error_string = "Directory error - unable to open directory for reading";
-	}
-
-	return tail_error( mk_string( error_string ), cons( mk_string( path ), NIL ));
+	return tail_error( mk_string( error_num_to_msg( errno )), cons( mk_string( path ), NIL ));
     }
     return result;
 }

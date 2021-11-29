@@ -25,7 +25,7 @@
 
 (define state-path (foreign-string STATE_PATH_STR))
 (define lock-file (string-append state-path "/ide/posix/lock.s"))
-(delete-file "lock-file")
+(delete-file lock-file)
 (cond ((not (file-exists? lock-file))
        (display "autoscheme-mod: AutoScheme is not installed" (current-error-port))(newline (current-error-port))
        (exit 1)))

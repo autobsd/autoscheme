@@ -7311,14 +7311,6 @@ pointer autoscheme_eval( pointer object, pointer environment )
 	return value;
 }
 
-pointer tail_error( pointer message, pointer irritants )
-{
-	pointer error_call = cons( mk_operation( LOC_ERROR, &NIL), cons( message, irritants ));
-	setfftailcall( error_call );
-	return error_call;
-}
-
-
 /* ========== Error ==========  */
 
 void FatalError(char *s)
@@ -7335,6 +7327,57 @@ void FatalForeignError( char *s )
     exit( 1 );
 }
 
+pointer tail_error( pointer message, pointer irritants )
+{
+	pointer error_call = cons( mk_operation( LOC_ERROR, &NIL), cons( message, irritants ));
+	setfftailcall( error_call );
+	return error_call;
+}
+
+const char *error_num_to_msg( int num )
+{
+    const char *error_string;
+    switch( num ) 
+    {
+    case EACCES :
+	error_string = "File error - permission denied to access";
+	break; 
+	
+    case EBUSY :
+	error_string = "File error - file currently in use";
+	break;
+
+    case ENOENT :
+	error_string = "File error - file does not exist";
+	break;
+
+    case EROFS :
+	error_string = "File error - file is stored on read-only file system";
+	break;
+	
+    case EBADF :
+	error_string = "File error - invalid file descriptor for";
+	break; 
+
+    case EMFILE :
+    case ENFILE :
+	error_string = "File error - open file descriptor limit exceeded";
+	args = NIL;
+	break;
+
+    case ENOMEM :
+	error_string = "File error - insufficient memory to open";
+	break;
+
+    case ENOTDIR :
+	error_string = "File error - file is not a directory";
+	break;
+
+    default : 
+	error_string = "Error - unable to complete operation for";
+    }
+    return error_string;
+}
 /* ========== Helper Functions ========== */
 
 int member( pointer object, pointer list )

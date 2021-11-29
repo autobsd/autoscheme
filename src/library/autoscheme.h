@@ -58,6 +58,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <setjmp.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -322,6 +323,7 @@ pointer scheme_call(pointer procedure, pointer argslist);
 
 pointer tail_error( pointer message, pointer irritants );
 
+const char *error_num_to_msg( int num );
 
 
 

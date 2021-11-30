@@ -17,6 +17,5 @@
 pointer ff_current_directory( pointer args );
 pointer ff_directory_files( pointer args );
 pointer ff_directory_p( pointer args );
-
-
+pointer ff_make_directory( pointer args );
 

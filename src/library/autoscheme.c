@@ -7347,12 +7347,16 @@ const char *error_num_to_msg( int num )
 	error_string = "File error - file currently in use";
 	break;
 
+    case EEXIST :
+	error_string = "File error - file already exists";
+	break;
+
     case ENOENT :
 	error_string = "File error - file does not exist";
 	break;
 
     case EROFS :
-	error_string = "File error - file is stored on read-only file system";
+	error_string = "File error - parent directory resides on read-only file system";
 	break;
 	
     case EBADF :

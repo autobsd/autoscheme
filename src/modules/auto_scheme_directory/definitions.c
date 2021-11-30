@@ -81,3 +81,15 @@ pointer ff_directory_p( pointer args )
 
    return F;
 }
+
+pointer ff_make_directory( pointer args )
+{
+    pointer path = car( args );
+    
+    if( mkdir( strvalue( path ), S_IRWXU | S_IRWXG | S_IRWXO ) == -1 ) 
+    {
+	return tail_error( mk_string( error_num_to_msg( errno )), cons( path, NIL ));
+    }
+    return T;
+}
+

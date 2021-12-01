@@ -299,6 +299,7 @@ int member( pointer object, pointer list );
 pointer assoc( pointer object, pointer alist );
 pointer make_environment( pointer alist );
 pointer append(pointer a, pointer b);
+pointer string_append( pointer s1, pointer s2 );
 
 void FatalForeignError( char *s );
 
@@ -321,9 +322,9 @@ pointer autoscheme_eval( pointer object, pointer environment );
 
 pointer scheme_call(pointer procedure, pointer argslist);
 
-pointer tail_error( pointer message, pointer irritants );
+pointer tail_error( pointer message, pointer irritants, int error_num );
 
-const char *error_num_to_msg( int num );
+
 
 
 

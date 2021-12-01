@@ -63,7 +63,7 @@ pointer ff_directory_files( pointer args )
     }
     else
     {
-	return tail_error( mk_string( error_num_to_msg( errno )), cons( mk_string( path ), NIL ));
+	return tail_error( mk_string( "File error - " ), cons( mk_string( path ), NIL ), errno);
     }
     return result;
 }
@@ -88,7 +88,7 @@ pointer ff_make_directory( pointer args )
     
     if( mkdir( strvalue( path ), S_IRWXU | S_IRWXG | S_IRWXO ) == -1 ) 
     {
-	return tail_error( mk_string( error_num_to_msg( errno )), cons( path, NIL ));
+	return tail_error( mk_string( "File error - " ), cons( path, NIL ), errno);
     }
     return T;
 }

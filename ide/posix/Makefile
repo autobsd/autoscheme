@@ -55,6 +55,7 @@ autoscheme_mod_requirements = \
 	scheme_cxr \
 	auto_scheme_args \
 	auto_scheme_directory \
+	auto_scheme_file \
 	auto_scheme_lazy \
 	scheme_process_context
 
@@ -119,7 +120,7 @@ $(gen_dir)/Makefile: configure.scm $(libexec_dir)/autoscheme-prime
 
 $(libexec_dir)/autoscheme-prime: 
 	mkdir -p $(libexec_dir)
-	$(CC) $(strict_options_99) -o $(libexec_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
+	$(CC) $(strict_options_99) -o $(libexec_dir)/autoscheme-prime -I$(src_dir)/library -lm $(src_dir)/library/error.c $(src_dir)/library/bignum.c $(src_dir)/library/autoscheme.c \
 	$(prime_dir)/autoscheme.c \
 	$(prime_dir)/load_modules.c \
 	$(prime_dir)/scheme_repl.c \
@@ -170,8 +171,12 @@ install_targets:
 	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep/autoscheme-modules
 	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
 
-	cp -R . $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+	cp -R gen/Makefile $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
+	cp -R gen/lock.s $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
+	cp -R configure.scm $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
 	cp -R $(src_dir)/applications $(DESTDIR)$(state_prefix)/$(state_dir)/src/
+	cp -R $(src_dir)/library $(DESTDIR)$(state_prefix)/$(state_dir)/src/
+	cp -R $(src_dir)/modules $(DESTDIR)$(state_prefix)/$(state_dir)/src/
 
 uninstall_targets: 
 	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
@@ -198,9 +203,9 @@ $(bin_dir)/autoscheme-mod: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautosch
 	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules="$(autoscheme_mod_requirements)"
 	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir) -DSTATE_PATH=$(state_path)
 
-$(lib_dir)/libautoscheme.a: $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)
+$(lib_dir)/libautoscheme.a: $(obj_dir)/error.o $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)
 	mkdir -p $(lib_dir)
-	ar cr $(lib_dir)/libautoscheme.a $(obj_dir)/libautoscheme.o $(obj_dir)/bignum.o $(obj_dir)/load_modules.o $(module_objects)
+	ar cr $(lib_dir)/libautoscheme.a $(obj_dir)/libautoscheme.o $(obj_dir)/bignum.o $(obj_dir)/error.o $(obj_dir)/load_modules.o $(module_objects)
 
 $(obj_dir)/load_modules.o: $(gen_dir)/load_modules.c
 	$(CC) $(strict_options_89) -c $(gen_dir)/load_modules.c -o $(obj_dir)/load_modules.o -I$(library_dir)
@@ -213,17 +218,21 @@ $(obj_dir)/bignum.o: $(src_dir)/library/bignum.c $(src_dir)/library/bignum.h
 	mkdir -p $(obj_dir)
 	$(CC) $(strict_options_99) -c $(src_dir)/library/bignum.c -o $(obj_dir)/bignum.o
 
+$(obj_dir)/error.o: $(src_dir)/library/error.c $(src_dir)/library/error.h
+	mkdir -p $(obj_dir)
+	$(CC) $(strict_options_99) -c $(src_dir)/library/error.c -o $(obj_dir)/error.o
+
 #####################
 
 $(obj_dir)/auto_scheme_args.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_args/manifest.s \
+	../../src/modules/auto_scheme_args/MANIFEST.s \
 	../../src/modules/auto_scheme_args/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_args/module.scm -n auto_scheme_args -o $(gen_dir)/auto_scheme_args.c
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_args.c -o $(obj_dir)/auto_scheme_args.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_args_fold.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_args_fold/manifest.s \
+	../../src/modules/auto_scheme_args_fold/MANIFEST.s \
 	../../src/modules/auto_scheme_args_fold/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_args_fold/module.scm -n auto_scheme_args_fold -o $(gen_dir)/auto_scheme_args_fold.c
@@ -258,7 +267,7 @@ $(obj_dir)/auto_scheme_closure.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_closure.c -o $(obj_dir)/auto_scheme_closure.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_compile.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_compile/manifest.s \
+	../../src/modules/auto_scheme_compile/MANIFEST.s \
 	../../src/modules/auto_scheme_compile/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_compile/module.scm -n auto_scheme_compile -o $(gen_dir)/auto_scheme_compile.c
@@ -282,6 +291,8 @@ $(obj_dir)/auto_scheme_environment.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_environment.c -o $(obj_dir)/auto_scheme_environment.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_file.o: $(libexec_dir)/autoscheme-prime \
+	../../src/modules/auto_scheme_file/definitions.c \
+	../../src/modules/auto_scheme_file/declarations.h \
 	../../src/modules/auto_scheme_file/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_file/module.scm -n auto_scheme_file -o $(gen_dir)/auto_scheme_file.c
@@ -294,7 +305,7 @@ $(obj_dir)/auto_scheme_inexact.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_inexact.c -o $(obj_dir)/auto_scheme_inexact.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_interpret.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_interpret/manifest.s \
+	../../src/modules/auto_scheme_interpret/MANIFEST.s \
 	../../src/modules/auto_scheme_interpret/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_interpret/module.scm -n auto_scheme_interpret -o $(gen_dir)/auto_scheme_interpret.c
@@ -307,7 +318,7 @@ $(obj_dir)/auto_scheme_lazy.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_lazy.c -o $(obj_dir)/auto_scheme_lazy.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_list.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_list/manifest.s \
+	../../src/modules/auto_scheme_list/MANIFEST.s \
 	../../src/modules/auto_scheme_list/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_list/module.scm -n auto_scheme_list -o $(gen_dir)/auto_scheme_list.c
@@ -349,14 +360,14 @@ $(obj_dir)/auto_scheme_process.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_process.c -o $(obj_dir)/auto_scheme_process.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_sort.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_sort/manifest.s \
+	../../src/modules/auto_scheme_sort/MANIFEST.s \
 	../../src/modules/auto_scheme_sort/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_sort/module.scm -n auto_scheme_sort -o $(gen_dir)/auto_scheme_sort.c
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_sort.c -o $(obj_dir)/auto_scheme_sort.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_string.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/auto_scheme_string/manifest.s \
+	../../src/modules/auto_scheme_string/MANIFEST.s \
 	../../src/modules/auto_scheme_string/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/auto_scheme_string/module.scm -n auto_scheme_string -o $(gen_dir)/auto_scheme_string.c
@@ -386,14 +397,14 @@ $(obj_dir)/scheme_cxr.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_cxr.c -o $(obj_dir)/scheme_cxr.o -I$(library_dir)
 
 $(obj_dir)/scheme_eval.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/scheme_eval/manifest.s \
+	../../src/modules/scheme_eval/MANIFEST.s \
 	../../src/modules/scheme_eval/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_eval/module.scm -n scheme_eval -o $(gen_dir)/scheme_eval.c
 	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_eval.c -o $(obj_dir)/scheme_eval.o -I$(library_dir)
 
 $(obj_dir)/scheme_load.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/scheme_load/manifest.s \
+	../../src/modules/scheme_load/MANIFEST.s \
 	../../src/modules/scheme_load/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_load/module.scm -n scheme_load -o $(gen_dir)/scheme_load.c
@@ -402,7 +413,7 @@ $(obj_dir)/scheme_load.o: $(libexec_dir)/autoscheme-prime \
 $(obj_dir)/scheme_process_context.o: $(libexec_dir)/autoscheme-prime \
 	../../src/modules/scheme_process_context/definitions.c \
 	../../src/modules/scheme_process_context/declarations.h \
-	../../src/modules/scheme_process_context/manifest.s \
+	../../src/modules/scheme_process_context/MANIFEST.s \
 	../../src/modules/scheme_process_context/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_process_context/module.scm -n scheme_process_context -o $(gen_dir)/scheme_process_context.c
@@ -415,7 +426,7 @@ $(obj_dir)/scheme_read.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_read.c -o $(obj_dir)/scheme_read.o -I$(library_dir)
 
 $(obj_dir)/scheme_repl.o: $(libexec_dir)/autoscheme-prime \
-	../../src/modules/scheme_repl/manifest.s \
+	../../src/modules/scheme_repl/MANIFEST.s \
 	../../src/modules/scheme_repl/module.scm
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_repl/module.scm -n scheme_repl -o $(gen_dir)/scheme_repl.c

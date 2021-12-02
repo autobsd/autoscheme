@@ -85,11 +85,34 @@ pointer ff_directory_p( pointer args )
 pointer ff_make_directory( pointer args )
 {
     pointer path = car( args );
-    
-    if( mkdir( strvalue( path ), S_IRWXU | S_IRWXG | S_IRWXO ) == -1 ) 
-    {
-	return tail_error( mk_string( "File error - " ), cons( path, NIL ), errno);
-    }
-    return T;
-}
+    mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO;
+    int make_parents = is_pair( cdr( args )) && istrue( cadr( args ));
 
+    if( strlength( path ) >= PATH_MAX )
+	return tail_error( mk_string( "File error - " ), cons( path, NIL ), ENAMETOOLONG);	
+
+    if( make_parents )
+    {
+	char *ptr;
+	char path_str[PATH_MAX];
+
+	strcpy( path_str, strvalue( path ));
+
+	for( ptr = path_str + 1; *ptr != '\0'; ptr++ ) 
+	{
+	    if( *ptr == '/') 
+	    {
+		*ptr = '\0';
+
+		if( mkdir(path_str, mode ) && errno != EEXIST )
+		    return tail_error( mk_string( "File error - " ), cons( mk_string( path_str ), NIL ), errno);
+		*ptr = '/';
+	    }
+	}   
+    }
+
+    if( mkdir( strvalue( path ), mode ) == 0 || ( make_parents && errno == EEXIST ))
+	return T;
+
+    return tail_error( mk_string( "File error - " ), cons( path, NIL ), errno);
+}

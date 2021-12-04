@@ -16,10 +16,11 @@ static pointer ff_file_exists_p( pointer args )
 static pointer ff_delete_file( pointer args )
 {
     pointer path = car( args );
+    int force = is_pair( cdr( args )) && istrue( cadr( args ));
 
-    if( remove( strvalue( path )))
+    if( !remove( strvalue( path )) || force && errno == ENOENT )
     {
-	return tail_error( mk_string( "File error - " ), cons( path, NIL ), errno );
+	return T;
     }
-    return T;
+    return tail_error( mk_string( "File error - " ), cons( path, NIL ), errno );
 }

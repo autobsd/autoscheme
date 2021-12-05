@@ -13,6 +13,9 @@
 	  delete-file
 	  file-exists?
 
+	  open-binary-input-file
+	  open-binary-output-file 
+
 	  open-input-file
 	  open-output-file 
 
@@ -27,6 +30,9 @@
 
     ((foreign-syntax LOC_DEF0 "define") delete-file (foreign-function ff_delete_file))
     ((foreign-syntax LOC_DEF0 "define") file-exists? (foreign-function ff_file_exists_p))
+
+    ((foreign-syntax LOC_DEF0 "define") open-binary-input-file (foreign-operation LOC_OPEN_BINFILE))
+    ((foreign-syntax LOC_DEF0 "define") open-binary-output-file (foreign-operation LOC_OPEN_BOUTFILE))
 
     ((foreign-syntax LOC_DEF0 "define") open-input-file (foreign-operation LOC_OPEN_INFILE))
     ((foreign-syntax LOC_DEF0 "define") open-output-file (foreign-operation LOC_OPEN_OUTFILE))

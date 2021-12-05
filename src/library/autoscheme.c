@@ -900,13 +900,13 @@ pointer mk_const(const char *name)
 	}
 }
 
-pointer mk_port(FILE *fp, int prop)
+pointer mk_port(FILE *fp, unsigned char port_type)
 {
 	pointer x = get_consecutive_cells(2, &NIL, &NIL);
 
 	type(x + 1) = type(x) = (T_PORT | T_ATOM);
 	exttype(x) = 0;
-	(x + 1)->_isfixnum = x->_isfixnum = (unsigned char)(prop | T_PORT_FILE);
+	(x + 1)->_isfixnum = x->_isfixnum = ( port_type | T_PORT_FILE );
 	port_file(x) = fp;
 #ifdef USE_COPYING_GC
 	gcell_next(x) = gcell_list;
@@ -1379,21 +1379,30 @@ void gc(pointer *a, pointer *b)
 
 /* ========== Routines for Ports ========== */
 
-static pointer port_from_filename(const char *filename, int prop)
+static pointer port_from_filename(const char *filename, unsigned char port_type)
 {
 	FILE *fp = NULL;
+	const char *mode;
 
-	if (prop == T_PORT_INPUT) {
-		fp = fopen(filename, "rb");
-	} else if (prop == T_PORT_OUTPUT) {
-		fp = fopen(filename, "wb");
-	} else if (prop == (T_PORT_INPUT | T_PORT_OUTPUT)) {
-		fp = fopen(filename, "a+b");
-	}
+	if( port_type == ( T_PORT_INPUT | T_PORT_TEXT ))
+	    mode = "r";
+	else if( port_type == ( T_PORT_OUTPUT | T_PORT_TEXT ))
+	    mode = "w";
+	else if (port_type == (T_PORT_INPUT | T_PORT_OUTPUT | T_PORT_TEXT ))
+	    mode = "a+";
+	else if( port_type == ( T_PORT_INPUT | T_PORT_BINARY ))
+	    mode = "rb";
+	else if( port_type == ( T_PORT_OUTPUT | T_PORT_BINARY ))
+	    mode = "wb";
+	else if (port_type == (T_PORT_INPUT | T_PORT_OUTPUT | T_PORT_BINARY ))
+	    mode = "a+b";
+	
+	fp = fopen( filename, mode );
+
 	if (fp == NULL) {
 		return NIL;
 	}
-	return mk_port(fp, prop);
+	return mk_port(fp, port_type);
 }
 
 #define BLOCK_SIZE 256
@@ -6439,7 +6448,7 @@ LOOP:
 
 	case LOC_CALL_INFILE0:	/* call-with-input-file */
 		if (!validargs("call-with-input-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6454,7 +6463,7 @@ LOOP:
 
 	case LOC_CALL_OUTFILE0:	/* call-with-output-file */
 		if (!validargs("call-with-output-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6499,7 +6508,7 @@ LOOP:
 
 	case LOC_WITH_INFILE0:	/* with-input-from-file */
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_TEXT );
 		if (x == NIL) {
 		    Error_1("Read error - unable to open file", car(args));
 		    /* s_return(F); */
@@ -6518,7 +6527,7 @@ LOOP:
 
 	case LOC_WITH_OUTFILE0:	/* with-output-to-file */
 		if (!validargs("with-output-to-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6536,7 +6545,7 @@ LOOP:
 
 	case LOC_OPEN_INFILE:	/* open-input-file */
 		if (!validargs("open-input-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6544,7 +6553,7 @@ LOOP:
 
 	case LOC_OPEN_OUTFILE:	/* open-output-file */
 		if (!validargs("open-output-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6552,15 +6561,43 @@ LOOP:
 
 	case LOC_OPEN_INOUTFILE:	/* open-input-output-file */
 		if (!validargs("open-input-output-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_OUTPUT);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_OUTPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
 		s_return(x);
 
+
+
+	case LOC_OPEN_BINFILE:	/* open-binary-input-file */
+		if (!validargs("open-binary-input-file", 1, 1, TST_STRING)) Error_0(msg);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_BINARY );
+		if (x == NIL) {
+			s_return(F);
+		}
+		s_return(x);
+
+	case LOC_OPEN_BOUTFILE:	/* open-binary-output-file */
+		if (!validargs("open-binary-output-file", 1, 1, TST_STRING)) Error_0(msg);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT | T_PORT_BINARY );
+		if (x == NIL) {
+			s_return(F);
+		}
+		s_return(x);
+
+	case LOC_OPEN_BINOUTFILE:	/* open-binary-input-output-file */
+		if (!validargs("open-binary-input-output-file", 1, 1, TST_STRING)) Error_0(msg);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_OUTPUT | T_PORT_BINARY );
+		if (x == NIL) {
+			s_return(F);
+		}
+		s_return(x);
+
+
+
 	case LOC_OPEN_INSTRING:	/* open-input-string */
 		if (!validargs("open-input-string", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_string(strvalue(car(args)), T_PORT_INPUT);
+		x = port_from_string(strvalue(car(args)), T_PORT_INPUT | T_PORT_TEXT );
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -7118,8 +7155,8 @@ static void init_vars_global( int argc, char **argv )
 	load_stack[0] = mk_port(stdin, T_PORT_INPUT);
 	load_files = 1;
 
-	current_outport = mk_port(stdout, T_PORT_OUTPUT);
-	current_errport = mk_port(stderr, T_PORT_OUTPUT);
+	current_outport = mk_port(stdout, T_PORT_OUTPUT | T_PORT_INPUT );
+	current_errport = mk_port(stderr, T_PORT_OUTPUT | T_PORT_INPUT );
 	current_xhands = cons( mk_operation( LOC_DFLT_XHAND0, &NIL), NIL );
 	current_source = mk_string( "" );
 

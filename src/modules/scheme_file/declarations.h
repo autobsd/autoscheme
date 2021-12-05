@@ -4,6 +4,9 @@
  */
 #include <unistd.h>
 #include <errno.h>
+#include <dirent.h> 
+#include <limits.h>
+#include <string.h>
 
 static pointer ff_file_exists_p( pointer args );
 

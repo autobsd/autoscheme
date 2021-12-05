@@ -32,7 +32,8 @@
 
 (write (current-directory))(newline)
 (create-directory "tmp_dir/1/2/3" #t)
-(delete-file "lock-file" #t)
+(delete-file "tmp_dir/1" )
+
 ;; (write lock-file)(newline)
 (exit)
 

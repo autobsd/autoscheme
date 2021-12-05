@@ -23,7 +23,7 @@ const char *error_num_to_msg( int num )
 	break;
 
     case EADDRNOTAVAIL :
-	error_string = "can't assign requested address";
+	error_string = "cannot assign requested address";
 	break;
 
 /* case EADV :
@@ -31,7 +31,7 @@ const char *error_num_to_msg( int num )
    break;
 */
     case EAFNOSUPPORT :
-	error_string = "address family isn't supported by protocol family";
+	error_string = "address family is not supported by protocol family";
 	break;
 
 /* case EAGAIN :
@@ -215,7 +215,7 @@ const char *error_num_to_msg( int num )
    break;
 */
 /* case ELIBACC :
-   error_string = "can't access shared library";
+   error_string = "cannot access shared library";
    break;
 */
 /* case ELIBBAD :
@@ -335,15 +335,15 @@ const char *error_num_to_msg( int num )
    break;
 */
 /* case ENONET :
-   error_string = "machine isn't on the network";
+   error_string = "machine is not on the network";
    break;
 */
 /* case ENOPKG :
-   error_string = "package isn't installed";
+   error_string = "package is not installed";
    break;
 */
     case ENOPROTOOPT :
-	error_string = "protocol isn't available";
+	error_string = "protocol is not available";
 	break;
 
 /* case ENOREMOTE :
@@ -359,11 +359,11 @@ const char *error_num_to_msg( int num )
 	break;
 
     case ENOSTR :
-	error_string = "device isn't a stream";
+	error_string = "device is not a stream";
 	break;
 
     case ENOSYS :
-	error_string = "function isn't implemented";
+	error_string = "function is not implemented";
 	break;
 
     case ENOTBLK :
@@ -371,7 +371,7 @@ const char *error_num_to_msg( int num )
 	break;
 
     case ENOTCONN :
-	error_string = "socket isn't connected";
+	error_string = "socket is not connected";
 	break;
 
     case ENOTDIR :
@@ -379,7 +379,7 @@ const char *error_num_to_msg( int num )
 	break;
 
     case ENOTEMPTY :
-	error_string = "directory isn't empty";
+	error_string = "directory is not empty";
 	break;
 
     case ENOTSOCK :
@@ -395,7 +395,7 @@ const char *error_num_to_msg( int num )
 	break;
 
 /* case ENOTUNIQ :
-   error_string = "given name isn't unique";
+   error_string = "given name is not unique";
    break;
 */
     case ENXIO :
@@ -407,7 +407,7 @@ const char *error_num_to_msg( int num )
    break;
 */
     case EOPNOTSUPP :
-	error_string = "operation isn't supported";
+	error_string = "operation is not supported";
 	break;
 
     case EOVERFLOW :
@@ -419,11 +419,11 @@ const char *error_num_to_msg( int num )
 	break;
 
     case EPERM :
-	error_string = "operation isn't permitted";
+	error_string = "operation is not permitted";
 	break;
 
     case EPFNOSUPPORT :
-	error_string = "protocol family isn't supported";
+	error_string = "protocol family is not supported";
 	break;
 
     case EPIPE :
@@ -439,7 +439,7 @@ const char *error_num_to_msg( int num )
 	break;
 
     case EPROGUNAVAIL :
-	error_string = "RPC program isn't available";
+	error_string = "RPC program is not available";
 	break;
 
     case EPROTO :
@@ -447,7 +447,7 @@ const char *error_num_to_msg( int num )
 	break;
 
     case EPROTONOSUPPORT :
-	error_string = "protocol isn't supported";
+	error_string = "protocol is not supported";
 	break;
 
     case EPROTOTYPE :
@@ -479,11 +479,11 @@ const char *error_num_to_msg( int num )
 	break;
 
     case ESHUTDOWN :
-	error_string = "can't send after socket shutdown";
+	error_string = "cannot send after socket shutdown";
 	break;
 
     case ESOCKTNOSUPPORT :
-	error_string = "socket type isn't supported";
+	error_string = "socket type is not supported";
 	break;
 
     case ESPIPE :
@@ -507,7 +507,7 @@ const char *error_num_to_msg( int num )
 	break;
 
 /* case ESTRPIPE :
-   error_string = "if pipe/FIFO, don't sleep in stream head";
+   error_string = "if pipe/FIFO, do not sleep in stream head";
    break;
 */
     case ETIME :
@@ -519,14 +519,14 @@ const char *error_num_to_msg( int num )
 	break;
 
     case ETOOMANYREFS :
-	error_string = "too many references: can't splice";
+	error_string = "too many references, cannot splice";
 	break;
 
     case ETXTBSY : error_string = "text file is busy";
 	break;
 
 /* case EUNATCH :
-   error_string = "protocol driver isn't attached";
+   error_string = "protocol driver is not attached";
    break;
 */
     case EUSERS :
@@ -545,47 +545,6 @@ const char *error_num_to_msg( int num )
    error_string = "exchange full";
    break;
 */
-
-
-	/* case EACCES : */
-	/* 	error_string = "permission denied to access"; */
-	/* 	break;  */
-	
-	/* case EBUSY : */
-	/* 	error_string = "file currently in use"; */
-	/* 	break; */
-
-	/* case EEXIST : */
-	/* 	error_string = "file already exists"; */
-	/* 	break; */
-
-	/* case ENOENT : */
-	/* 	error_string = "file does not exist"; */
-	/* 	break; */
-
-	/* case EROFS : */
-	/* 	error_string = "parent directory resides on read-only file system"; */
-	/* 	break; */
-	
-	/* case EBADF : */
-	/* 	error_string = "invalid file descriptor for"; */
-	/* 	break;  */
-
-	/* case EMFILE : */
-	/* case ENFILE : */
-	/* 	error_string = "open file descriptor limit exceeded"; */
-	/* 	args = NIL; */
-	/* 	break; */
-
-	/* case ENOMEM : */
-	/* 	error_string = "insufficient memory to open"; */
-	/* 	break; */
-
-	/* case ENOTDIR : */
-	/* 	error_string = "file is not a directory"; */
-	/* 	break; */
-
-
 
     default : 
 	error_string = "unable to complete operation for";

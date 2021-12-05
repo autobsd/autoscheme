@@ -15,7 +15,7 @@
 	(auto scheme memory)
 	(auto scheme closure)
 	(auto scheme path)
-	(auto scheme file)
+	(scheme file)
 	(auto scheme macro)
 	(auto scheme process)
 	(auto scheme char-set)

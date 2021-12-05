@@ -37,7 +37,7 @@ autoscheme_requirements = \
 	auto_scheme_args \
 	auto_scheme_char \
 	auto_scheme_path \
-	auto_scheme_file \
+	scheme_file \
 	scheme_read \
 	auto_scheme_compile \
 	scheme_eval \
@@ -55,8 +55,8 @@ autoscheme_mod_requirements = \
 	scheme_cxr \
 	auto_scheme_args \
 	auto_scheme_directory \
-	auto_scheme_file \
 	auto_scheme_lazy \
+	scheme_file \
 	scheme_process_context
 
 module_objects = \
@@ -73,11 +73,12 @@ module_objects = \
 	$(obj_dir)/scheme_load.o \
 	$(obj_dir)/scheme_eval.o \
 	$(obj_dir)/auto_scheme_inexact.o \
+	$(obj_dir)/auto_scheme_file.o \
 	$(obj_dir)/auto_scheme_environment.o \
 	$(obj_dir)/auto_scheme_directory.o \
 	$(obj_dir)/auto_scheme_compile.o \
 	$(obj_dir)/scheme_read.o \
-	$(obj_dir)/auto_scheme_file.o \
+	$(obj_dir)/scheme_file.o \
 	$(obj_dir)/auto_scheme_path.o \
 	$(obj_dir)/auto_scheme_closure.o \
 	$(obj_dir)/auto_scheme_char.o \
@@ -136,11 +137,12 @@ $(libexec_dir)/autoscheme-prime:
 	$(prime_dir)/scheme_load.c \
 	$(prime_dir)/scheme_eval.c \
 	$(prime_dir)/auto_scheme_inexact.c \
+	$(prime_dir)/auto_scheme_file.c \
 	$(prime_dir)/auto_scheme_environment.c \
 	$(prime_dir)/auto_scheme_directory.c \
 	$(prime_dir)/auto_scheme_compile.c \
 	$(prime_dir)/scheme_read.c \
-	$(prime_dir)/auto_scheme_file.c \
+	$(prime_dir)/scheme_file.c \
 	$(prime_dir)/auto_scheme_path.c \
 	$(prime_dir)/auto_scheme_closure.c \
 	$(prime_dir)/auto_scheme_char.c \
@@ -402,6 +404,14 @@ $(obj_dir)/scheme_eval.o: $(libexec_dir)/autoscheme-prime \
 
 	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_eval/module.scm -n scheme_eval -o $(gen_dir)/scheme_eval.c
 	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_eval.c -o $(obj_dir)/scheme_eval.o -I$(library_dir)
+
+$(obj_dir)/scheme_file.o: $(libexec_dir)/autoscheme-prime \
+	../../src/modules/scheme_file/definitions.c \
+	../../src/modules/scheme_file/declarations.h \
+	../../src/modules/scheme_file/module.scm
+
+	$(libexec_dir)/autoscheme-prime --compile-module=$(modules_dir)/scheme_file/module.scm -n scheme_file -o $(gen_dir)/scheme_file.c
+	$(CC) $(strict_options_89) -c $(gen_dir)/scheme_file.c -o $(obj_dir)/scheme_file.o -I$(library_dir)
 
 $(obj_dir)/scheme_load.o: $(libexec_dir)/autoscheme-prime \
 	../../src/modules/scheme_load/MANIFEST.s \

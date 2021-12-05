@@ -10,7 +10,7 @@
 	(scheme process-context)
 	(auto scheme string)
 	(scheme read)
-	(auto scheme file)
+	(scheme file)
 
 	(auto scheme compile)
 	(auto scheme interpret)

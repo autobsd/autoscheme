@@ -9,8 +9,8 @@
 (define-library (scheme load)
 
   (import (auto scheme base)
-	  (auto scheme file)
 	  (scheme eval)
+	  (scheme file)
 	  (scheme read)
 	  )
 

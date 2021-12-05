@@ -5,22 +5,22 @@
 (foreign-declare (include-string "declarations.h"))
 (foreign-define (include-string "definitions.c"))
 
-(define-library (auto scheme file)
+(define-library (scheme file)
 
-  (export ;; call-with-input-file
-	  ;; call-with-output-file
+  (export call-with-input-file
+	  call-with-output-file
 	  
-	  ;; delete-file
-	  ;; file-exists?
+	  delete-file
+	  file-exists?
 
-	  ;; open-binary-input-file
-	  ;; open-binary-output-file 
+	  open-binary-input-file
+	  open-binary-output-file 
 
-	  ;; open-input-file
-	  ;; open-output-file 
+	  open-input-file
+	  open-output-file 
 
-	  ;; with-input-from-file
-	  ;; with-output-to-file
+	  with-input-from-file
+	  with-output-to-file
 	  )
 
   (begin

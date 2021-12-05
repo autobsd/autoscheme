@@ -4,7 +4,6 @@
 
 (import (auto scheme base)
 	(auto scheme write)
-	(auto scheme file)
 	(auto scheme directory)
 	(auto scheme path)
 	(auto scheme list)
@@ -13,6 +12,7 @@
 	(auto scheme args fold)
 	(auto scheme args)
 
+	(scheme file)
 	(scheme process-context)
 	(scheme read)
 	)

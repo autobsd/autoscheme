@@ -9,10 +9,10 @@
 
   (import (auto scheme path)
 	  (auto scheme base)
-	  (auto scheme file)
-	  (scheme read)
 	  (auto scheme write)
 	  (scheme cxr)
+	  (scheme file)
+	  (scheme read)
 	  )
 
   (begin

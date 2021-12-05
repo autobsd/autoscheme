@@ -13,10 +13,10 @@
 	(auto scheme write)
 	
 	;; (scheme cxr)
+	(scheme file)
 	(scheme process-context)
 	;; (auto scheme string)
 	;; (scheme read)
-	(auto scheme file)
 
 	;; (auto scheme compile)
 	;; (auto scheme interpret)

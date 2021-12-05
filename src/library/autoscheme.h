@@ -192,19 +192,28 @@ struct cell {
 
 #define is_character(p) (type(p)&T_CHARACTER)
 
-enum {
-	port_input = 1,
-	port_output = 2,
-	port_file = 4,
-	port_string = 8,
-	port_eof = 16
-};
+#define T_PORT_INPUT      1	/* 00000001 */
+#define T_PORT_OUTPUT     2	/* 00000010 */
+#define T_PORT_BINARY     4	/* 00000100 */
+#define T_PORT_TEXT       8	/* 00001000 */
+
+#define T_PORT_FILE      16	/* 00010000 */
+#define T_PORT_STRING    32	/* 00100000 */
+#define T_PORT_EOF       64	/* 01000000 */
+
+/* enum { */
+/* 	/\* T_PORT_INPUT = 1, *\/ */
+/* 	/\* T_PORT_OUTPUT = 2, *\/ */
+/* 	/\* T_PORT_FILE = 4, *\/ */
+/* 	/\* T_PORT_STRING = 8, *\/ */
+/* 	/\* T_PORT_EOF = 16 *\/ */
+/* }; */
 #define is_port(p)      (type(p) & T_PORT)
-#define is_inport(p)    (is_port(p) && ((p)->_isfixnum & port_input))
-#define is_outport(p)   (is_port(p) && ((p)->_isfixnum & port_output))
-#define is_fileport(p)  (is_port(p) && ((p)->_isfixnum & port_file))
-#define is_strport(p)   (is_port(p) && ((p)->_isfixnum & port_string))
-#define is_eofport(p)   (is_port(p) && ((p)->_isfixnum & port_eof))
+#define is_inport(p)    (is_port(p) && ((p)->_isfixnum & T_PORT_INPUT))
+#define is_outport(p)   (is_port(p) && ((p)->_isfixnum & T_PORT_OUTPUT))
+#define is_fileport(p)  (is_port(p) && ((p)->_isfixnum & T_PORT_FILE))
+#define is_strport(p)   (is_port(p) && ((p)->_isfixnum & T_PORT_STRING))
+#define is_eofport(p)   (is_port(p) && ((p)->_isfixnum & T_PORT_EOF))
 #define port_file(p)    ((p)->_object._port._file)
 #define port_curr(p)    ((p)->_object._port._curr)
 

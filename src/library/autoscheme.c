@@ -906,7 +906,7 @@ pointer mk_port(FILE *fp, int prop)
 
 	type(x + 1) = type(x) = (T_PORT | T_ATOM);
 	exttype(x) = 0;
-	(x + 1)->_isfixnum = x->_isfixnum = (unsigned char)(prop | port_file);
+	(x + 1)->_isfixnum = x->_isfixnum = (unsigned char)(prop | T_PORT_FILE);
 	port_file(x) = fp;
 #ifdef USE_COPYING_GC
 	gcell_next(x) = gcell_list;
@@ -921,7 +921,7 @@ pointer mk_port_string(pointer p, int prop)
 
 	type(x) = (T_PORT | T_ATOM);
 	exttype(x) = 0;
-	x->_isfixnum = (unsigned char)(prop | port_string);
+	x->_isfixnum = (unsigned char)(prop | T_PORT_STRING);
 	port_file(x) = (FILE *)p;
 	port_curr(x) = strvalue(p);
 	return x;
@@ -1383,11 +1383,11 @@ static pointer port_from_filename(const char *filename, int prop)
 {
 	FILE *fp = NULL;
 
-	if (prop == port_input) {
+	if (prop == T_PORT_INPUT) {
 		fp = fopen(filename, "rb");
-	} else if (prop == port_output) {
+	} else if (prop == T_PORT_OUTPUT) {
 		fp = fopen(filename, "wb");
-	} else if (prop == (port_input | port_output)) {
+	} else if (prop == (T_PORT_INPUT | T_PORT_OUTPUT)) {
 		fp = fopen(filename, "a+b");
 	}
 	if (fp == NULL) {
@@ -1400,7 +1400,7 @@ static pointer port_from_filename(const char *filename, int prop)
 
 static pointer port_from_scratch(void)
 {
-	return mk_port_string(mk_empty_string(BLOCK_SIZE, '\0'), port_output);
+	return mk_port_string(mk_empty_string(BLOCK_SIZE, '\0'), T_PORT_OUTPUT);
 }
 
 static pointer port_from_string(const char *str, int prop)
@@ -1460,13 +1460,13 @@ static int inchar(void)
 	}
 	if (is_fileport(current_inport)) {
 		if (feof(port_file(current_inport))) {
-			current_inport->_isfixnum |= port_eof;
+			current_inport->_isfixnum |= T_PORT_EOF;
 			return EOF;
 		}
 
 		c = utf8_fgetc(port_file(current_inport));
 		if (c == EOF) {
-			current_inport->_isfixnum |= port_eof;
+			current_inport->_isfixnum |= T_PORT_EOF;
 			if (port_file(current_inport) == stdin) {
 				fprintf(stderr, "Good-bye\n");
 				port_file(current_inport) = NULL;
@@ -1474,7 +1474,7 @@ static int inchar(void)
 		}
 	} else {
 		if (port_curr(current_inport) == strvalue(car(current_inport)) + strlength(car(current_inport))) {
-			current_inport->_isfixnum |= port_eof;
+			current_inport->_isfixnum |= T_PORT_EOF;
 			return EOF;
 		} else {
 			port_curr(current_inport) += utf8_get_next(port_curr(current_inport), &c);
@@ -6439,7 +6439,7 @@ LOOP:
 
 	case LOC_CALL_INFILE0:	/* call-with-input-file */
 		if (!validargs("call-with-input-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_input);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6454,7 +6454,7 @@ LOOP:
 
 	case LOC_CALL_OUTFILE0:	/* call-with-output-file */
 		if (!validargs("call-with-output-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_output);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6499,7 +6499,7 @@ LOOP:
 
 	case LOC_WITH_INFILE0:	/* with-input-from-file */
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_input);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
 		if (x == NIL) {
 		    Error_1("Read error - unable to open file", car(args));
 		    /* s_return(F); */
@@ -6518,7 +6518,7 @@ LOOP:
 
 	case LOC_WITH_OUTFILE0:	/* with-output-to-file */
 		if (!validargs("with-output-to-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_output);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6536,7 +6536,7 @@ LOOP:
 
 	case LOC_OPEN_INFILE:	/* open-input-file */
 		if (!validargs("open-input-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_input);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6544,7 +6544,7 @@ LOOP:
 
 	case LOC_OPEN_OUTFILE:	/* open-output-file */
 		if (!validargs("open-output-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_output);
+		x = port_from_filename(strvalue(car(args)), T_PORT_OUTPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6552,7 +6552,7 @@ LOOP:
 
 	case LOC_OPEN_INOUTFILE:	/* open-input-output-file */
 		if (!validargs("open-input-output-file", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_filename(strvalue(car(args)), port_input | port_output);
+		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_OUTPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6560,7 +6560,7 @@ LOOP:
 
 	case LOC_OPEN_INSTRING:	/* open-input-string */
 		if (!validargs("open-input-string", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_string(strvalue(car(args)), port_input);
+		x = port_from_string(strvalue(car(args)), T_PORT_INPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -6576,7 +6576,7 @@ LOOP:
 
 	case LOC_OPEN_INOUTSTRING:	/* open-input-output-string */
 		if (!validargs("open-input-output-string", 1, 1, TST_STRING)) Error_0(msg);
-		x = port_from_string(strvalue(car(args)), port_input | port_output);
+		x = port_from_string(strvalue(car(args)), T_PORT_INPUT | T_PORT_OUTPUT);
 		if (x == NIL) {
 			s_return(F);
 		}
@@ -7115,11 +7115,11 @@ static void init_vars_global( int argc, char **argv )
 	set_num_integer(&_ONE);
 	ivalue(&_ONE) = 1;
 	bignum(&_ONE) = NIL;
-	load_stack[0] = mk_port(stdin, port_input);
+	load_stack[0] = mk_port(stdin, T_PORT_INPUT);
 	load_files = 1;
 
-	current_outport = mk_port(stdout, port_output);
-	current_errport = mk_port(stderr, port_output);
+	current_outport = mk_port(stdout, T_PORT_OUTPUT);
+	current_errport = mk_port(stderr, T_PORT_OUTPUT);
 	current_xhands = cons( mk_operation( LOC_DFLT_XHAND0, &NIL), NIL );
 	current_source = mk_string( "" );
 
@@ -7200,7 +7200,7 @@ int scheme_load_file(FILE *fin)
 	if (fin == stdin) {
 		interactive_repl = 1;
 	}
-	current_inport = mk_port(fin, port_input);
+	current_inport = mk_port(fin, T_PORT_INPUT);
 	if (setjmp(error_jmp) == 0) {
 		op = LOC_T0LVL;
 	} else {
@@ -7214,7 +7214,7 @@ int scheme_load_string(const char *cmd)
 	int op;
 
 	interactive_repl = 0;
-	current_inport = port_from_string(cmd, port_input);
+	current_inport = port_from_string(cmd, T_PORT_INPUT);
 	if (setjmp(error_jmp) == 0) {
 		op = LOC_T0LVL;
 	} else {

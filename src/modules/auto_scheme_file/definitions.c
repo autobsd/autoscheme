@@ -18,7 +18,7 @@ static pointer ff_delete_file( pointer args )
     pointer path = car( args );
     int force = is_pair( cdr( args )) && istrue( cadr( args ));
 
-    if( !remove( strvalue( path )) || force && errno == ENOENT )
+    if( !remove( strvalue( path )) || ( force && errno == ENOENT ))
     {
 	return T;
     }

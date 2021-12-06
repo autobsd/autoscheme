@@ -9,6 +9,7 @@
 	(auto scheme args fold)
 	(auto scheme base)
 	(auto scheme directory)
+	(auto scheme file)
 	(auto scheme lazy)
 	(auto scheme write)
 	
@@ -32,7 +33,9 @@
 
 (write (current-directory))(newline)
 (create-directory "tmp_dir/1/2/3" #t)
-(delete-file "tmp_dir/1" )
+(rename-file "tmp_dir" "tmp_dir_2")
+(rename-file "tmp_dir_2" "tmp_dir_3" #t)
+(delete-file "tmp_dir_3/1/2" #t #t)
 
 ;; (write lock-file)(newline)
 (exit)

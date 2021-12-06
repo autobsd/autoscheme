@@ -2,7 +2,7 @@
  *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
-static pointer ff_file_exists_p( pointer args )
+pointer ff_file_exists_p( pointer args )
 {
     pointer file_name = car( args );
 
@@ -12,7 +12,7 @@ static pointer ff_file_exists_p( pointer args )
     return F;
 }
 
-static pointer ff_delete_file( pointer args )
+pointer ff_delete_file( pointer args )
 {
     pointer path = car( args );
     int recurse = is_pair( cdr( args )) && istrue( cadr( args ));

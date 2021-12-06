@@ -8,6 +8,6 @@
 #include <limits.h>
 #include <string.h>
 
-static pointer ff_file_exists_p( pointer args );
+pointer ff_file_exists_p( pointer args );
 
-static pointer ff_delete_file( pointer args );
+pointer ff_delete_file( pointer args );

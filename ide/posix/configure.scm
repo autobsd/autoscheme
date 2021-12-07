@@ -70,7 +70,7 @@
 					     (else '())))
 			 (dependencies (map (lambda (file)
 					      (string-append src-dir file))
-					    (directory-files))))
+					    (directory-files (current-directory)))))
 
 		    `((requirements: . ,requirements)
 		      (dependencies: . ,dependencies))))))

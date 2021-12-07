@@ -96,22 +96,12 @@ pointer ff_directory_files( pointer args )
     DIR *d;
     struct dirent *dir;
 
-    char *path = "./";
-    int show_hidden = 0;
+    char *path = strvalue( car( args ));
+    int show_hidden = is_pair( cdr( args )) && istrue( cadr( args ));
 
-    if( is_pair( args ))
-    {
-	if( is_string( car( args )))
-	    path = strvalue( car( args ));
-	else if( car( args ) == T )
-	    show_hidden = 1;
-
-	if( is_pair( cdr( args )) && istrue( cadr( args )))
-	    show_hidden = 1;
-    }
+    errno = 0;
 
     d = opendir( path );
-
     if( d ) 
     {
 	while(( dir = readdir( d )) != NULL ) 
@@ -121,12 +111,11 @@ pointer ff_directory_files( pointer args )
 		( dir->d_name[0] != '.' || show_hidden ))
 		result = cons( mk_string( dir->d_name ), result );
 	}
-	closedir(d);
+	closedir( d );
     }
-    else
-    {
-	return tail_error( mk_string( "File error - " ), cons( mk_string( path ), NIL ), errno);
-    }
+    if( errno ) 
+	result = tail_error( mk_string( "File error - " ), cons( mk_string( path ), NIL ), errno);    
+    
     return result;
 }
 

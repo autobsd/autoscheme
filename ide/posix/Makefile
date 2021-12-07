@@ -55,6 +55,7 @@ autoscheme_mod_requirements = \
 	scheme_cxr \
 	auto_scheme_args \
 	auto_scheme_directory \
+	auto_scheme_file \
 	auto_scheme_lazy \
 	scheme_file \
 	scheme_process_context
@@ -293,6 +294,7 @@ $(obj_dir)/auto_scheme_environment.o: $(libexec_dir)/autoscheme-prime \
 	$(CC) $(strict_options_89) -c $(gen_dir)/auto_scheme_environment.c -o $(obj_dir)/auto_scheme_environment.o -I$(library_dir)
 
 $(obj_dir)/auto_scheme_file.o: $(libexec_dir)/autoscheme-prime \
+	../../src/modules/auto_scheme_file/Manifiest.s \
 	../../src/modules/auto_scheme_file/definitions.c \
 	../../src/modules/auto_scheme_file/declarations.h \
 	../../src/modules/auto_scheme_file/module.scm

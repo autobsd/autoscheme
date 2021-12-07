@@ -59,6 +59,7 @@
 #include <inttypes.h>
 #include <setjmp.h>
 #include <errno.h>
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {

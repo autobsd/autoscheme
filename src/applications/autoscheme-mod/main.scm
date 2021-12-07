@@ -37,6 +37,8 @@
 (rename-file "tmp_dir_2" "tmp_dir_3" #t)
 (delete-file "tmp_dir_3/1/2" #t #t)
 
+(write (directory-files (current-directory)))(newline)
+
 ;; (write lock-file)(newline)
 (exit)
 

@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <string.h>
+#include <dirent.h> 
+#include <limits.h>
+
+
+
 foreign_function ff_delete_file;
 foreign_function ff_file_exists_p;
 

@@ -32,13 +32,13 @@
        (exit 1)))
 
 (write (current-directory))(newline)
-(create-directory "tmp_dir/1/2/3" #t)
-(rename-file "tmp_dir" "tmp_dir_2")
-(rename-file "tmp_dir_2" "tmp_dir_3" #t)
-(delete-file "tmp_dir_3/1/2" #t #t)
+;; (create-directory "tmp_dir/1/2/3" #t)
+;; (rename-file "tmp_dir" "tmp_dir_2")
+;; (rename-file "tmp_dir_2" "tmp_dir_3" #t)
+;; (delete-file "tmp_dir_3/1/2" #t #t)
 
 (write (directory-files (current-directory)))(newline)
-
+(copy-file "." "../posix_" #t #t)
 ;; (write lock-file)(newline)
 (exit)
 

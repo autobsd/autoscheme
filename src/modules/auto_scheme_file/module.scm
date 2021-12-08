@@ -8,7 +8,8 @@
 (define-library (auto scheme file)
 
 
-  (export open-binary-input-output-file
+  (export copy-file
+	  open-binary-input-output-file
 	  open-input-output-file
 	  rename-file
 	  )

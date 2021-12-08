@@ -79,8 +79,8 @@ pointer ff_directory_files( pointer args )
     {
 	while(( dir = readdir( d )) != NULL ) 
 	{
-	    if( strcmp( dir->d_name, ".") &&
-		strcmp( dir->d_name, "..") &&
+	    if( strcmp( dir->d_name, "." ) &&
+		strcmp( dir->d_name, ".." ) &&
 		( dir->d_name[0] != '.' || show_hidden ))
 		result = cons( mk_string( dir->d_name ), result );
 	}

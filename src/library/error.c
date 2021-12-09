@@ -535,7 +535,7 @@ const char *error_num_to_msg( int num )
     case EUSERS : error_string = "too many users (for UFS)"; break;
 #endif
 
-#if defined (EWOULDBLOCK) && ! defined (EAGAIN)  
+#if defined (EWOULDBLOCK) && EWOULDBLOCK != EAGAIN
     case EWOULDBLOCK : error_string = "operation would block"; break;
 #endif
 

@@ -168,24 +168,24 @@ install_targets:
 	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
 	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
 
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/src
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep/autobsd/autoscheme
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/rep/autoscheme-modules
-	mkdir -p $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix
+	mkdir -p $(state_path)
+	mkdir -p $(state_path)/src
+	mkdir -p $(state_path)/rep/autobsd/autoscheme
+	mkdir -p $(state_path)/rep/autoscheme-modules
+	mkdir -p $(state_path)/ide/posix
 
-	cp -R gen/Makefile $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
-	cp -R gen/lock.s $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
-	cp -R configure.scm $(DESTDIR)$(state_prefix)/$(state_dir)/ide/posix/
-	cp -R $(src_dir)/applications $(DESTDIR)$(state_prefix)/$(state_dir)/src/
-	cp -R $(src_dir)/library $(DESTDIR)$(state_prefix)/$(state_dir)/src/
-	cp -R $(src_dir)/modules $(DESTDIR)$(state_prefix)/$(state_dir)/src/
+	cp -R gen/Makefile $(state_path)/ide/posix/
+	cp -R gen/lock.s $(state_path)/ide/posix/
+	cp -R configure.scm $(state_path)/ide/posix/
+	cp -R $(src_dir)/applications $(state_path)/src/
+	cp -R $(src_dir)/library $(state_path)/src/
+	cp -R $(src_dir)/modules $(state_path)/src/
 
 uninstall_targets: 
 	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
 	rm -f $(DESTDIR)$(prefix)/$(libexec_dir)/autoscheme-prime
 	rm -f $(DESTDIR)$(prefix)/$(lib_dir)/libautoscheme.a
-	rm -rf $(DESTDIR)$(state_prefix)/$(state_dir)
+	rm -rf $(state_path)
 
 #####################
 

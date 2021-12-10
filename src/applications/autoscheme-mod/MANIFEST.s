@@ -4,6 +4,7 @@
 	   "auto_scheme_directory"
 	   "auto_scheme_file"
 	   "auto_scheme_lazy"
+	   "auto_scheme_path"
 	   "auto_scheme_write"
 	   "scheme_file"
 	   "scheme_process_context"

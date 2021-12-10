@@ -11,33 +11,38 @@
 	(auto scheme directory)
 	(auto scheme file)
 	(auto scheme lazy)
+	(auto scheme path)
 	(auto scheme write)
-	
-	;; (scheme cxr)
 	(scheme file)
 	(scheme process-context)
-	;; (auto scheme string)
-	;; (scheme read)
-
-	;; (auto scheme compile)
-	;; (auto scheme interpret)
 	)
 
 
+(define install-path (foreign-string INSTALL_PATH_STR))
 (define state-path (foreign-string STATE_PATH_STR))
-(define lock-file (string-append state-path "/ide/posix/lock.s"))
 
-(cond ((not (file-exists? lock-file))
-       (display "autoscheme-mod: AutoScheme is not installed" (current-error-port))(newline (current-error-port))
-       (exit 1)))
+(define prime-path (path-make-absolute "libexec/autoscheme-prime" install-path))
 
-(write (current-directory))(newline)
-(create-directory "tmp_dir/1/2/3" #t)
-(rename-file "tmp_dir" "tmp_dir_2")
-(rename-file "tmp_dir" "tmp_dir_3" #t)
-;; (delete-file "tmp_dir_3/1/2" #t #t)
+(display "install-path: ")(write install-path)(newline)
+(display "prime-path: ")(write prime-path)(newline)
 
-(write (directory-files (current-directory)))(newline)
+(display "state-path: ")(write state-path)(newline)
+
+
+
+;; (define lock-file (string-append state-path "/ide/posix/lock.s"))
+
+;; (cond ((not (file-exists? lock-file))
+;;        (display "autoscheme-mod: AutoScheme is not installed" (current-error-port))(newline (current-error-port))
+;;        (exit 1)))
+
+;; (write (current-directory))(newline)
+;; (create-directory "tmp_dir/1/2/3" #t)
+;; (rename-file "tmp_dir" "tmp_dir_2")
+;; (rename-file "tmp_dir" "tmp_dir_3" #t)
+;; ;; (delete-file "tmp_dir_3/1/2" #t #t)
+
+;; (write (directory-files (current-directory)))(newline)
 ;; (copy-file "." "../posix_" #t #t)
 ;; (write lock-file)(newline)
 (exit)

@@ -12,9 +12,11 @@
 	(auto scheme file)
 	(auto scheme lazy)
 	(auto scheme path)
+	(auto scheme process)
 	(auto scheme write)
 	(scheme file)
 	(scheme process-context)
+	(scheme read)
 	)
 
 
@@ -23,13 +25,14 @@
 
 (define prime-path (path-make-absolute "libexec/autoscheme-prime" install-path))
 
-(display "install-path: ")(write install-path)(newline)
-(display "prime-path: ")(write prime-path)(newline)
+(define lock-path (path-make-absolute "ide/posix/lock.s" state-path))
+;; (display "install-path: ")(write install-path)(newline)
+;; (display "prime-path: ")(write prime-path)(newline)
 
-(display "state-path: ")(write state-path)(newline)
+;; (display "state-path: ")(write state-path)(newline)
 
 
-
+;; (process-command (string-append prime-path " -V"))
 ;; (define lock-file (string-append state-path "/ide/posix/lock.s"))
 
 ;; (cond ((not (file-exists? lock-file))
@@ -45,7 +48,7 @@
 ;; (write (directory-files (current-directory)))(newline)
 ;; (copy-file "." "../posix_" #t #t)
 ;; (write lock-file)(newline)
-(exit)
+;; (exit)
 
 
 (define program-version (include "../../../version.txt"))
@@ -73,11 +76,19 @@
     (display-version)
     (exit) ))
 
-(define help-processor
+(define help-option-processor
   (lambda args
     (display-version)
     (display-usage)
     (exit) ))
+
+(define list-option-processor
+  (lambda args
+    (display "AutoScheme - Installed Modules:")(newline)
+    (map (lambda (module)
+	   (display module)(newline))
+	 (with-input-from-file lock-path read))
+    (exit)))
 
 (define unrecognized-processor 
   (lambda (option name arg . seeds)
@@ -99,9 +110,9 @@
 
 (define option-table (quasiquote ((,(option '(#\i "install") #f #f recognized-processor) "Install modules")
 				  (,(option '(#\u "uninstall") #f #f recognized-processor) "Uninstall modules")
-				  (,(option '(#\l "list") #f #f recognized-processor) "List installed modules")
+				  (,(option '(#\l "list") #f #f list-option-processor) "List installed modules")
 				  (,(option '(#\V "version") #f #f version-processor) "Display version information")
-				  (,(option '(#\h "help") #f #f help-processor) "Show this message")
+				  (,(option '(#\h "help") #f #f help-option-processor) "Show this message")
 				  )))
 
 
@@ -119,12 +130,12 @@
        (options (car result))
        (modules (reverse (cadr result)))
 
-;;        (option-selected? (lambda (name selected-options)
-;;        			   (call/cc (lambda (return)
-;;        				      (for-each (lambda (selected-option)
-;;        						  (if (member name (option-names (car selected-option))) (return selected-option) ))
-;;        						selected-options)
-;;        				      #f))))
+       (option-selected? (lambda (name selected-options)
+       			   (call/cc (lambda (return)
+       				      (for-each (lambda (selected-option)
+       						  (if (member name (option-names (car selected-option))) (return selected-option) ))
+       						selected-options)
+       				      #f))))
 
 ;;        (get-selected-arg (lambda (name)
 ;;        			   (let ((selected-option (option-selected? name options)))
@@ -149,14 +160,16 @@
 ;; 			'()))
        )
 
+
 (display-version)
 (display "options: ")(write options)(newline)
 (display "modules: ")(write modules)(newline)
 
+
 ;;   (cond (compile-selected (compile-program source-files module-list output-file))
 ;;   	(compile-module-selected (compile-module source-files module-name output-file))
 ;;   	(interpret-selected (apply interpret source-files))
-;;   	(else (help-processor))
+;;   	(else (help-option-processor))
 ;;   	)
   
   )

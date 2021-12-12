@@ -30,29 +30,42 @@ pointer ff_path_absolute_p( pointer args )
 
 pointer ff_path_make_absolute( pointer args )
 {
-    if( istrue( ff_path_absolute_p( args ))) 
+    if( !is_pair( cdr( args )) && istrue( ff_path_absolute_p( args ))) 
 	return car( args );
 
     {
 	pointer relative_path = car( args );
-	pointer absolute_path;
-	pointer parent_dir;
+	const char *relative_str = strvalue( relative_path );
+	size_t relative_len = strlength( relative_path );
 
-	size_t length;
+	pointer parent;
+	size_t parent_len;
+
+	pointer absolute_path;
+
 
 	foreign_function ff_current_directory;
 
 	if( is_pair( cdr( args ))) 
-	    parent_dir = cadr( args );
+	    parent = ff_path_make_absolute( cons( cadr( args ), NIL ));
 	else
-	    parent_dir = ff_current_directory( NIL );
+	    parent = ff_current_directory( NIL );
 
-	length = strlength( parent_dir ) + strlength( relative_path );
+	parent_len = strlength( parent );
 
-	absolute_path = mk_counted_string( "", length );
-    
-	memcpy( strvalue( absolute_path ), strvalue( parent_dir ), strlength( parent_dir ));
-	memcpy( strvalue( absolute_path ) + strlength( parent_dir ), strvalue( relative_path ), strlength( relative_path ) + 1);
+	if( !parent_len || strvalue( parent )[ parent_len - 1 ] != '/' )
+	    parent_len++;
+
+	if( relative_str[0] == '/' ) 
+	{
+	    relative_str++;
+	    relative_len--;
+	}
+
+	absolute_path = mk_counted_string( "", parent_len + relative_len);
+	memcpy( strvalue( absolute_path ), strvalue( parent ), strlength( parent ));
+	strvalue( absolute_path )[ parent_len - 1 ] = '/';
+	memcpy( strvalue( absolute_path ) + parent_len, relative_str, relative_len + 1 );
 	
 	return absolute_path;
     }

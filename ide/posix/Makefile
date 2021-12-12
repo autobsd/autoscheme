@@ -3,6 +3,7 @@
 #  SPDX-License-Identifier: BSD-2-Clause
 
 prefix = /usr/local
+install_path = $(DESTDIR)$(prefix)
 state_prefix = /var/local/lib
 state_dir = autoscheme.state
 state_path = $(DESTDIR)$(state_prefix)/$(state_dir)
@@ -57,8 +58,11 @@ autoscheme_mod_requirements = \
 	auto_scheme_directory \
 	auto_scheme_file \
 	auto_scheme_lazy \
+	auto_scheme_path \
+	auto_scheme_process \
 	scheme_file \
-	scheme_process_context
+	scheme_process_context \
+	scheme_read
 
 module_objects = \
 	$(obj_dir)/scheme_repl.o \
@@ -161,12 +165,12 @@ $(libexec_dir)/autoscheme-prime:
 build_targets: $(lib_dir)/libautoscheme.a $(bin_dir)/autoscheme $(bin_dir)/autoscheme-mod
 
 install_targets: 
-	mkdir -p $(DESTDIR)$(prefix)/$(bin_dir)
-	cp $(bin_dir)/autoscheme $(DESTDIR)$(prefix)/$(bin_dir)/
-	mkdir -p $(DESTDIR)$(prefix)/$(libexec_dir)
-	cp $(libexec_dir)/autoscheme-prime $(DESTDIR)$(prefix)/$(libexec_dir)/
-	mkdir -p $(DESTDIR)$(prefix)/$(lib_dir)
-	cp $(lib_dir)/libautoscheme.a $(DESTDIR)$(prefix)/$(lib_dir)/
+	mkdir -p $(install_path)/$(bin_dir)
+	cp $(bin_dir)/autoscheme $(install_path)/$(bin_dir)/
+	mkdir -p $(install_path)/$(libexec_dir)
+	cp $(libexec_dir)/autoscheme-prime $(install_path)/$(libexec_dir)/
+	mkdir -p $(install_path)/$(lib_dir)
+	cp $(lib_dir)/libautoscheme.a $(install_path)/$(lib_dir)/
 
 	mkdir -p $(state_path)
 	mkdir -p $(state_path)/src
@@ -182,9 +186,9 @@ install_targets:
 	cp -R $(src_dir)/modules $(state_path)/src/
 
 uninstall_targets: 
-	rm -f $(DESTDIR)$(prefix)/$(bin_dir)/autoscheme
-	rm -f $(DESTDIR)$(prefix)/$(libexec_dir)/autoscheme-prime
-	rm -f $(DESTDIR)$(prefix)/$(lib_dir)/libautoscheme.a
+	rm -f $(install_path)/$(bin_dir)/autoscheme
+	rm -f $(install_path)/$(libexec_dir)/autoscheme-prime
+	rm -f $(install_path)/$(lib_dir)/libautoscheme.a
 	rm -rf $(state_path)
 
 #####################
@@ -204,7 +208,7 @@ $(bin_dir)/autoscheme-mod: $(libexec_dir)/autoscheme-prime $(lib_dir)/libautosch
 
 	mkdir -p $(bin_dir)
 	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme-mod/main.scm -o $(gen_dir)/autoscheme-mod.c --load-modules="$(autoscheme_mod_requirements)"
-	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir) -DSTATE_PATH=$(state_path)
+	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme-mod $(gen_dir)/autoscheme-mod.c -lautoscheme -L$(lib_dir) -I$(library_dir) -DINSTALL_PATH=$(install_path) -DSTATE_PATH=$(state_path)
 
 $(lib_dir)/libautoscheme.a: $(obj_dir)/error.o $(obj_dir)/bignum.o $(obj_dir)/libautoscheme.o $(obj_dir)/load_modules.o $(module_objects)
 	mkdir -p $(lib_dir)

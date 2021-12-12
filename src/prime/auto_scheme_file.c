@@ -11,6 +11,12 @@ pointer LOAD_MODULE__auto_scheme_file(pointer environment);
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <string.h>
+#include <dirent.h> 
+#include <limits.h>
+
+
+
 foreign_function ff_delete_file;
 foreign_function ff_file_exists_p;
 
@@ -63,15 +69,63 @@ static pointer ff_copy_file( pointer args )
     FILE *input_file = NULL, *output_file = NULL;
     void *buf = NULL;
 
-    if( !stat( strvalue( src_path ), &statbuf )) goto SRC_ERR;
+    if( stat( strvalue( src_path ), &statbuf )) goto SRC_ERR;
 
-    /* if( S_ISDIR( statbuf.st_mode )) */
-    /* { */
-    /* 	result = ff_copy_directory( args ); */
-    /* 	if( result != T )  */
-    /* 	    return result; */
-    /* } */
-    /* else */
+    if( S_ISDIR( statbuf.st_mode ))
+    {
+	mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO;
+
+	if( mkdir( strvalue( dest_path ), mode ))
+	{
+	    if( errno != EEXIST || !replace ) goto DEST_ERR;
+
+	    result = ff_delete_file( cons( dest_path, cons( T, cons( T, NIL ))));
+
+	    if( result != T ) goto DEST_ERR;
+
+	    if( mkdir( strvalue( dest_path ), mode )) goto DEST_ERR;
+	}
+
+	if( recurse )
+	{
+	    DIR *d;
+	    struct dirent *dir;
+	    char src_str[PATH_MAX];
+	    char dest_str[PATH_MAX];
+
+	    errno = 0;
+	    d = opendir( strvalue( src_path ));
+
+	    if( d ) 
+	    {
+		while(( dir = readdir( d )) != NULL ) 
+		{
+		    if( strcmp( dir->d_name, "." ) &&
+			strcmp( dir->d_name, ".." ))
+		    {
+			strcpy( src_str, strvalue( src_path ));
+			strcpy( dest_str, strvalue( dest_path ));
+			src_str[ strlength( src_path )] = '/';
+			dest_str[ strlength( dest_path )] = '/';
+			strcpy( src_str + strlength( src_path ) + 1, dir->d_name);
+			strcpy( dest_str + strlength( dest_path ) + 1, dir->d_name);
+
+			src_str[ strlength( src_path ) + 1 + strlen( dir->d_name ) ] = '\0';
+			dest_str[ strlength( dest_path ) + 1 + strlen( dir->d_name ) ] = '\0';
+
+			result = ff_copy_file( cons( mk_string( src_str ), cons( mk_string( dest_str ), cons( T, cons( T, NIL )))));
+
+			if( result != T ) break;
+		    }
+		}
+		closedir( d );
+	    }
+	    if( result != T ) goto END;
+
+	    if( errno ) goto DEST_ERR;
+	}
+    }
+    else
     {
 	size_t n;
 	buf = malloc( buf_size );
@@ -101,27 +155,27 @@ static pointer ff_copy_file( pointer args )
 	} 
 	while( !feof( input_file ));
     }
-	
+
 END:
     if( buf ) free( buf );
 
     if( input_file && fclose( input_file ) == EOF && result == T )
-	result = tail_error( mk_string( "File error - " ), src_path, errno ); 
+	result = tail_error( mk_string( "File error - " ), cons( src_path, NIL ), errno ); 
 
     if( output_file && fclose( output_file ) == EOF && result == T )
-	result = tail_error( mk_string( "File error - " ), dest_path, errno );
+	result = tail_error( mk_string( "File error - " ), cons( dest_path, NIL ), errno );
 
-    if( result == T && !chmod( strvalue( dest_path ), statbuf.st_mode ) )
-	result = tail_error( mk_string( "File error - " ), dest_path, errno );
+    if( result == T && chmod( strvalue( dest_path ), statbuf.st_mode ) )
+	result = tail_error( mk_string( "File error - " ), cons( dest_path, NIL ), errno );
 
     return result;
 
 SRC_ERR:
-    result = tail_error( mk_string( "File error - " ), src_path, errno ); 
+    result = tail_error( mk_string( "File error - " ), cons( src_path, NIL ), errno ); 
     goto END; 
 
 DEST_ERR:
-    result = tail_error( mk_string( "File error - " ), dest_path, errno ); 
+    result = tail_error( mk_string( "File error - " ), cons( dest_path, NIL), errno ); 
     goto END;
 }
 
@@ -130,6 +184,6 @@ DEST_ERR:
 pointer return_value = T;
 autoscheme_eval(T, environment);
 autoscheme_eval(T, environment);
-return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("file"),NIL))),cons(cons(mk_symbol("export"),cons(mk_symbol("open-binary-input-output-file"),cons(mk_symbol("open-input-output-file"),cons(mk_symbol("rename-file"),NIL)))),cons(cons(mk_symbol("begin"),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("copy-file"),cons(mk_function(ff_copy_file,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("open-binary-input-output-file"),cons(mk_operation(LOC_OPEN_BINOUTFILE,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("open-input-output-file"),cons(mk_operation(LOC_OPEN_INOUTFILE,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("rename-file"),cons(mk_function(ff_rename_file,&NIL),NIL))),NIL))))),NIL)))), environment);
+return_value = autoscheme_eval(cons(mk_symbol("define-library"),cons(cons(mk_symbol("auto"),cons(mk_symbol("scheme"),cons(mk_symbol("file"),NIL))),cons(cons(mk_symbol("export"),cons(mk_symbol("copy-file"),cons(mk_symbol("open-binary-input-output-file"),cons(mk_symbol("open-input-output-file"),cons(mk_symbol("rename-file"),NIL))))),cons(cons(mk_symbol("begin"),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("copy-file"),cons(mk_function(ff_copy_file,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("open-binary-input-output-file"),cons(mk_operation(LOC_OPEN_BINOUTFILE,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("open-input-output-file"),cons(mk_operation(LOC_OPEN_INOUTFILE,&NIL),NIL))),cons(cons(mk_syntax(LOC_DEF0,"define"),cons(mk_symbol("rename-file"),cons(mk_function(ff_rename_file,&NIL),NIL))),NIL))))),NIL)))), environment);
 return return_value;
 }

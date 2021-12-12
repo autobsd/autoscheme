@@ -3014,13 +3014,13 @@ static int validargs(char *name, int min_arity, int max_arity, char *arg_tests)
 				break;
 			case '\005': /* TST_INPORT */
 				if (!is_inport(car(x))) {
-				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a port", i, name);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not an input port", i, name);
 					return 0;
 				}
 				break;
 			case '\006': /* TST_OUTPORT */
 				if (!is_outport(car(x))) {
-				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not a port", i, name);
+				    snprintf(msg, sizeof(msg), "Type error - argument %d in call to '%s' is not an output port", i, name);
 					return 0;
 				}
 				break;
@@ -3340,7 +3340,6 @@ LOOP:
 		s_goto(LOC_EVAL);
 
 	case LOC_READ_INTERNAL:		/* read internal */
-
 		tok = token();
 		s_goto(LOC_RDSEXPR);
 
@@ -6659,11 +6658,15 @@ LOOP:
 			}
 			if (car(args) != current_inport) {
 				current_inport = cons(current_inport, NIL);
-				s_save(LOC_CURR_INPORT, current_inport, NIL);
+				s_save(LOC_RDRET, current_inport, NIL);
 				current_inport = car(args);
 			}
 		}
 		s_goto(LOC_READ_INTERNAL);
+
+	case LOC_RDRET:
+	    current_inport = car( args );
+	    s_return( value );
 
 	case LOC_READ_CHAR:		/* read-char */
 	case LOC_PEEK_CHAR:		/* peek-char */
@@ -6683,7 +6686,7 @@ LOOP:
 			}
 			if (car(args) != current_inport) {
 				current_inport = cons(current_inport, NIL);
-				s_save(LOC_CURR_INPORT, current_inport, NIL);
+				s_save(LOC_RDRET, current_inport, NIL);
 				current_inport = car(args);
 			}
 		}
@@ -6706,7 +6709,6 @@ LOOP:
 		s_retbool(is_fileport(x) || is_strport(x));
 
 	case LOC_RDSEXPR:
-
 		if (tok == TOK_EOF) {
 			s_return(EOF_OBJ);
 		}
@@ -7155,8 +7157,9 @@ static void init_vars_global( int argc, char **argv )
 	load_stack[0] = mk_port(stdin, T_PORT_INPUT);
 	load_files = 1;
 
-	current_outport = mk_port(stdout, T_PORT_OUTPUT | T_PORT_INPUT );
-	current_errport = mk_port(stderr, T_PORT_OUTPUT | T_PORT_INPUT );
+	current_inport = mk_port(stdin, T_PORT_INPUT );
+	current_outport = mk_port(stdout, T_PORT_OUTPUT );
+	current_errport = mk_port(stderr, T_PORT_OUTPUT );
 	current_xhands = cons( mk_operation( LOC_DFLT_XHAND0, &NIL), NIL );
 	current_source = mk_string( "" );
 

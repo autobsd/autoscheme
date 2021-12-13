@@ -53,10 +53,7 @@
 
 (define program-version (include "../../../version.txt"))
 
-(define display-version
-  (lambda ()
-    (display (string-append "AutoScheme-mod version " program-version))(newline)
-    ))
+
 
 (define display-usage
   (lambda ()
@@ -71,11 +68,6 @@
       (values (cons (list option name arg) options) modules)
       )))
 
-(define version-processor
-  (lambda args
-    (display-version)
-    (exit) ))
-
 (define help-option-processor
   (lambda args
     (display-version)
@@ -84,7 +76,6 @@
 
 (define list-option-processor
   (lambda args
-    (display "AutoScheme - Installed Modules:")(newline)
     (map (lambda (module)
 	   (display module)(newline))
 	 (with-input-from-file lock-path read))
@@ -111,7 +102,6 @@
 (define option-table (quasiquote ((,(option '(#\i "install") #f #f recognized-processor) "Install modules")
 				  (,(option '(#\u "uninstall") #f #f recognized-processor) "Uninstall modules")
 				  (,(option '(#\l "list") #f #f list-option-processor) "List installed modules")
-				  (,(option '(#\V "version") #f #f version-processor) "Display version information")
 				  (,(option '(#\h "help") #f #f help-option-processor) "Show this message")
 				  )))
 

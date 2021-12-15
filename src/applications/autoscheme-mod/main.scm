@@ -24,34 +24,20 @@
 (define state-path (foreign-string STATE_PATH_STR))
 
 (define prime-path (path-make-absolute "libexec/autoscheme-prime" install-path))
-
 (define lock-path (path-make-absolute "ide/posix/lock.s" state-path))
-;; (display "install-path: ")(write install-path)(newline)
-;; (display "prime-path: ")(write prime-path)(newline)
 
-;; (display "state-path: ")(write state-path)(newline)
+(define list-installed-modules
+  (lambda ()
+    ;; (guard (condition
+    ;; 	    ((file-error? condition) (display "AutoScheme is not installed" (current-error-port))(newline (current-error-port))(exit 1))
+    ;; 	    (else (raise condition))
+    ;; 	    )
 
+	   (with-input-from-file lock-path read)
+	   ;; )
+	   ))
 
-;; (process-command (string-append prime-path " -V"))
-;; (define lock-file (string-append state-path "/ide/posix/lock.s"))
-
-;; (cond ((not (file-exists? lock-file))
-;;        (display "autoscheme-mod: AutoScheme is not installed" (current-error-port))(newline (current-error-port))
-;;        (exit 1)))
-
-;; (write (current-directory))(newline)
-;; (create-directory "tmp_dir/1/2/3" #t)
-;; (rename-file "tmp_dir" "tmp_dir_2")
-;; (rename-file "tmp_dir" "tmp_dir_3" #t)
-;; ;; (delete-file "tmp_dir_3/1/2" #t #t)
-
-;; (write (directory-files (current-directory)))(newline)
-;; (copy-file "." "../posix_" #t #t)
-;; (write lock-file)(newline)
-;; (exit)
-
-
-(define program-version (include "../../../version.txt"))
+(include "install.scm")
 
 
 
@@ -78,7 +64,7 @@
   (lambda args
     (map (lambda (module)
 	   (display module)(newline))
-	 (with-input-from-file lock-path read))
+	 (list-installed-modules))
     (exit)))
 
 (define unrecognized-processor 
@@ -117,49 +103,29 @@
 				    ) list))
 
 
-       (options (car result))
+       (selected-options (car result))
        (modules (reverse (cadr result)))
 
-       (option-selected? (lambda (name selected-options)
+       (option-selected? (lambda (name)
        			   (call/cc (lambda (return)
        				      (for-each (lambda (selected-option)
        						  (if (member name (option-names (car selected-option))) (return selected-option) ))
        						selected-options)
        				      #f))))
 
-;;        (get-selected-arg (lambda (name)
-;;        			   (let ((selected-option (option-selected? name options)))
-;;        			     (if selected-option (caddr selected-option) #f))))
+       ;;        (get-selected-arg (lambda (name)
+       ;;        			   (let ((selected-option (option-selected? name options)))
+       ;;        			     (if selected-option (caddr selected-option) #f))))
 
-;;        (compile-selected (option-selected? "compile" options))
-;;        (output-file (get-selected-arg "output-file"))
-
-;;        (compile-module-selected (option-selected? "compile-module" options))
-;;        (module-name (get-selected-arg "module-name"))
-
-;;        (load-modules (get-selected-arg "load-modules"))
-
-
-;;        (interpret-selected (option-selected? "interpret" options))
-
-;;        (module-list (if load-modules (apply append (map (lambda (token)
-;; 							  (if (= (string-length token) 0) '()
-;; 							      (list token)))
-;; 							(string-tokenize load-modules)))
-
-;; 			'()))
        )
 
 
-(display-version)
-(display "options: ")(write options)(newline)
-(display "modules: ")(write modules)(newline)
 
+  ;; (display "selected-options: ")(write selected-options)(newline)
+  ;; (display "modules: ")(write modules)(newline)
+  
 
-;;   (cond (compile-selected (compile-program source-files module-list output-file))
-;;   	(compile-module-selected (compile-module source-files module-name output-file))
-;;   	(interpret-selected (apply interpret source-files))
-;;   	(else (help-option-processor))
-;;   	)
+  (cond ((option-selected? "install") (install (car modules)))
+  	)
   
   )

@@ -18,7 +18,7 @@
 
 	   (clone-command (string-append "git clone https://github.com/autoscheme-modules/" module))
 	   (pull-command "git fetch && git merge" module)
-	   (config-command (string-append prime-path " -i configure.scm --install_path=\"" install-path "\""))
+	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
 	   )
 
 

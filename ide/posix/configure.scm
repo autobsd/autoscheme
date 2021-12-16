@@ -29,7 +29,7 @@
 
 (define option-table (quasiquote ((,(option '(#\p "prefix") #t #f (lambda (option name arg . seeds) (set! prefix arg) (apply values seeds))) "Set installation prefix" "PREFIX")
 				  (,(option '(#\s "state-prefix") #t #f (lambda (option name arg . seeds) (set! state-prefix arg) (apply values seeds))) "Set state prefix" "PREFIX")
-				  (,(option '("install-path") #t #f (lambda (option name arg . seeds) (set! install-patharg) (apply values seeds))) "Set installation path" "PATH")
+				  (,(option '("install-path") #t #f (lambda (option name arg . seeds) (set! install-path arg) (apply values seeds))) "Set installation path" "PATH")
 				  (,(option '(#\h "help") #f #f (lambda args (display-version) (display-usage) (exit))) "Show this message"))))
 
 (define display-usage
@@ -278,6 +278,7 @@
 					   modules))))
 
 
+(create-directory "gen" #t)
 
 (define output-file-port (open-output-file "gen/Makefile"))
 

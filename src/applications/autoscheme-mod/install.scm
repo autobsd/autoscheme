@@ -10,7 +10,7 @@
 
     (display "installing: ")(display module)(display "...")(newline)
     (let* ((module-src-dir (path-make-absolute (string-append "src/modules/" module ) state-path))
-	   (ide-dir (path-make-absolute (string-append "ide/posix/") state-path))
+	   (ide-dir (path-make-absolute "ide/posix/" state-path))
 
 	   (modules-dir (path-make-absolute (string-append "rep/autoscheme-modules/")  state-path))
 	   (rep-dir (string-append modules-dir module "/")  state-path)
@@ -19,6 +19,8 @@
 	   (clone-command (string-append "git clone https://github.com/autoscheme-modules/" module))
 	   (pull-command "git fetch && git merge" module)
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
+	   ;; (build-library-command "make  -f gen/Makefile lib/libautoscheme_something.a")
+	   (build-library-command "echo 'trying to build...'; pwd;  make lib/libautoscheme.a")
 	   )
 
 
@@ -39,6 +41,7 @@
 
       (parameterize ((current-directory ide-dir))
 		    (process-command config-command)
+		    (process-command build-library-command)		    
 		    (display (directory-files (current-directory)))(newline)
 		    )
 

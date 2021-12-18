@@ -240,7 +240,7 @@
 		 "	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme/main.scm -o $(gen_dir)/autoscheme.c --load-modules=\"$(autoscheme_requirements)\"\n"
 		 "	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)\n"
 		 "\n"
-		 "$(bin_dir)/autoscheme-mod:$(lib_dir)/libautoscheme.a \\\n\t"
+		 "$(bin_dir)/autoscheme-mod: $(lib_dir)/libautoscheme.a \\\n\t"
 		 (string-join (cdr (assoc 'dependencies: (cdr (assoc "autoscheme-mod" application-configurations)))) " \\\n\t") "\n"
 		 "\n"
 		 "	mkdir -p $(bin_dir)\n"

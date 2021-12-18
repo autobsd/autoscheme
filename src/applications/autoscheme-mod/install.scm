@@ -19,8 +19,7 @@
 	   (clone-command (string-append "git clone https://github.com/autoscheme-modules/" module))
 	   (pull-command "git fetch && git merge" module)
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
-	   ;; (build-library-command "make  -f gen/Makefile lib/libautoscheme_something.a")
-	   (build-library-command "echo 'trying to build...'; pwd;  make lib/libautoscheme.a")
+	   (build-library-command "make -f gen/Makefile lib/libautoscheme.a")
 	   )
 
 

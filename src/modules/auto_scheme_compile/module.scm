@@ -4,8 +4,10 @@
 
 (define-library (auto scheme compile)
 
-  (export compile-module
-	  compile-program)
+  (export compile-program
+	  compile-module
+	  module-loader-name
+	  )
 
   (import (auto scheme path)
 	  (auto scheme base)
@@ -177,24 +179,37 @@
 		))))
 
 
-    (define module-function-name
-      (lambda (module-name)
-	(string-append "LOAD_MODULE__" module-name)))
-    
-    (define module-function-declaration
-      (lambda (module-name)
-	;; (string-append "pointer " (module-function-name module-name) "(void)")
-	(string-append "pointer " (module-function-name module-name) "(pointer environment)")
-	))
+    (define module-name->c_name
+      (lambda (module)
+	(let ((valid-chars (string->list (string-append "abcdefghijklmnopqrstuvwxyz"
+							"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							"0123456789"
+							"_"))))
+	  (list->string (map (lambda (c)
+			       (if (member c valid-chars) c
+				   #\_))
+			     (string->list module))))))
 
-    (define module-function-prototype
-      (lambda (module-name)
-	;; (string-append "pointer " (module-function-name module-name) "()")
-	(string-append "pointer " (module-function-name module-name) "(pointer environment)")
-	))
     
 
-    (define compile-module-function
+    (define module-loader-name
+      (lambda (module-name)
+	(string-append "LOAD_MODULE__" (module-name->c_name module-name))))
+    
+    (define module-loader-declaration
+      (lambda (module-name)
+	;; (string-append "pointer " (module-loader-name module-name) "(void)")
+	(string-append "pointer " (module-loader-name module-name) "(pointer environment)")
+	))
+
+    (define module-loader-prototype
+      (lambda (module-name)
+	;; (string-append "pointer " (module-loader-name module-name) "()")
+	(string-append "pointer " (module-loader-name module-name) "(pointer environment)")
+	))
+    
+
+    (define compile-module-loader
       (lambda (name sources)
 
     	(let* ((statements "")
@@ -216,7 +231,7 @@
 			))
 		    sources)
 
-    	  (string-append (module-function-prototype name) "\n"
+    	  (string-append (module-loader-prototype name) "\n"
     			 "{\n"
 			 "pointer return_value = T;\n"
 			 
@@ -247,10 +262,10 @@
 				   "#include \"autoscheme.h\"\n"
 				   ))
 	       (declarations-template (string-append
-				       (module-function-declaration module-name) ";\n"
+				       (module-loader-declaration module-name) ";\n"
 				       ))
 	       
-	       (module-function (compile-module-function module-name source-files))
+	       (module-loader (compile-module-loader module-name source-files))
 
 	       (output-port (open-output-file output-file))
 	       )
@@ -261,7 +276,7 @@
 	  (display (apply string-append *foreign-declartions*) output-port)
 	  (display (apply string-append *foreign-definitions*) output-port)
 
-	  (display module-function output-port)
+	  (display module-loader output-port)
 
 	  (close-output-port output-port)
 	  )))
@@ -279,10 +294,10 @@
 	       (declarations-template (string-append
 
 				       (apply string-append (map (lambda (name)
-								   (string-append (module-function-declaration name) ";\n"))
+								   (string-append (module-loader-declaration name) ";\n"))
 								 module-list))
 
-				       (module-function-declaration "program") ";\n"
+				       (module-loader-declaration "program") ";\n"
 				       "\n"
 				       ))
 
@@ -302,7 +317,7 @@
 				    "}\n"
 				    ))
 
-	       (module-function (compile-module-function "program" source-files))
+	       (module-loader (compile-module-loader "program" source-files))
 	       
 	       (output-file (if output-file output-file "program.c"))
 	       (output-port (open-output-file output-file))
@@ -315,7 +330,7 @@
 	  (display (apply string-append *foreign-declartions*) output-port)
 	  (display (apply string-append *foreign-definitions*) output-port)
 
-	  (display module-function output-port)
+	  (display module-loader output-port)
 
 	  (close-output-port output-port)
 

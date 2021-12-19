@@ -15,6 +15,7 @@
 	(scheme file)
 	(scheme process-context)
 	(scheme read)
+	(auto scheme compile)
 	)
 
 (display "configuring build...")(newline)
@@ -166,7 +167,7 @@
 (define targets
   (string-append "all: build\n"
 		 "\n"
-		 "build: $(gen_dir)/Makefile\n"
+		 "build: $(libexec_dir)/autoscheme-prime $(gen_dir)/Makefile\n"
 		 "	$(MAKE) -f $(gen_dir)/Makefile build_targets \n"
 		 "\n"
 		 "install: $(gen_dir)/Makefile\n"
@@ -185,7 +186,7 @@
 		 "\n"
 		 "#####################\n"
 		 "\n"
-		 "$(gen_dir)/Makefile: configure.scm #$(libexec_dir)/autoscheme-prime\n"
+		 "$(gen_dir)/Makefile: configure.scm\n"
 		 "	mkdir -p $(gen_dir)\n"
 		 "	$(libexec_dir)/autoscheme-prime -i configure.scm --prefix=\"$(prefix)\" --state-prefix=\"$(state_prefix)\"\n"
 		 "\n"
@@ -296,11 +297,11 @@
 					"    pointer environment = car( args );\n"
 					"\n"
 					(apply string-append (map (lambda (module)
-								    (string-append "    foreign_function LOAD_MODULE__" module ";\n"))
+								    (string-append "    foreign_function " (module-loader-name module) ";\n"))
 								  lib-loaded-modules))
 					"\n"
 					(apply string-append (map (lambda (module)
-								    (string-append "    LOAD_MODULE__" module "( environment );\n"))
+								    (string-append "    " (module-loader-name module) "( environment );\n"))
 								  lib-loaded-modules))
 					"\n"
 					"    return environment;\n"

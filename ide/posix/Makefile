@@ -101,7 +101,7 @@ module_objects = \
 
 all: build
 
-build: $(gen_dir)/Makefile
+build: $(libexec_dir)/autoscheme-prime $(gen_dir)/Makefile
 	$(MAKE) -f $(gen_dir)/Makefile build_targets 
 
 install: $(gen_dir)/Makefile
@@ -120,7 +120,7 @@ clean:
 
 #####################
 
-$(gen_dir)/Makefile: configure.scm $(libexec_dir)/autoscheme-prime
+$(gen_dir)/Makefile: configure.scm
 	mkdir -p $(gen_dir)
 	$(libexec_dir)/autoscheme-prime -i configure.scm --prefix="$(prefix)" --state-prefix="$(state_prefix)"
 
@@ -200,7 +200,7 @@ $(bin_dir)/autoscheme: $(lib_dir)/libautoscheme.a \
 	$(libexec_dir)/autoscheme-prime --compile=$(applications_dir)/autoscheme/main.scm -o $(gen_dir)/autoscheme.c --load-modules="$(autoscheme_requirements)"
 	$(CC) $(strict_options_89) -o $(bin_dir)/autoscheme $(gen_dir)/autoscheme.c -lm -lautoscheme -L$(lib_dir) -I$(library_dir)
 
-$(bin_dir)/autoscheme-mod:$(lib_dir)/libautoscheme.a \
+$(bin_dir)/autoscheme-mod: $(lib_dir)/libautoscheme.a \
 	../../src/applications/autoscheme-mod/macros.h \
 	../../src/applications/autoscheme-mod/main.scm \
 	../../src/applications/autoscheme-mod/install.scm \

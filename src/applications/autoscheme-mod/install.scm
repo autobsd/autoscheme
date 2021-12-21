@@ -20,6 +20,7 @@
 	   (pull-command "git fetch && git merge" module)
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
 	   (build-library-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " lib/libautoscheme.a"))
+	   (build-application-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " bin/autoscheme"))
 	   )
 
 
@@ -41,6 +42,7 @@
       (parameterize ((current-directory ide-dir))
 		    (process-command config-command)
 		    (process-command build-library-command)		    
+		    (process-command build-application-command)		    
 		    (display (directory-files (current-directory)))(newline)
 		    )
 

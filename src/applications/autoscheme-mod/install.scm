@@ -41,7 +41,8 @@
 		    )
 
       (parameterize ((current-directory ide-dir))
-		    (process-command config-command)
+		    (if (not (zero? (process-command config-command)))
+			(error "Configuration error - unable to configure project for module" (string->symbol module)))
 		    (process-command build-library-command)		    
 		    (process-command build-application-command)		    
 		    (display (directory-files (current-directory)))(newline)

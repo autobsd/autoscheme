@@ -35,7 +35,8 @@
 	    )
 
       (parameterize ((current-directory rep-dir))
-		    (process-command pull-command)
+		    (if (not (zero? (process-command pull-command)))
+			(error "Repository error - unable to pull sources for module" (string->symbol module)))
 		    (copy-file "src" module-src-dir #t #t)
 		    )
 

@@ -105,7 +105,10 @@ build: $(libexec_dir)/autoscheme-prime $(gen_dir)/Makefile
 	$(MAKE) -f $(gen_dir)/Makefile build_targets 
 
 install: $(gen_dir)/Makefile
-	$(MAKE) -f $(gen_dir)/Makefile install_targets 
+	$(MAKE) -f $(gen_dir)/Makefile install_autoscheme
+	$(MAKE) -f $(gen_dir)/Makefile install_autoscheme_prime
+	$(MAKE) -f $(gen_dir)/Makefile install_libautoscheme
+	$(MAKE) -f $(gen_dir)/Makefile install_state
 
 uninstall: $(gen_dir)/Makefile
 	$(MAKE) -f $(gen_dir)/Makefile uninstall_targets 
@@ -164,22 +167,28 @@ $(libexec_dir)/autoscheme-prime:
 
 build_targets: $(lib_dir)/libautoscheme.a $(bin_dir)/autoscheme $(bin_dir)/autoscheme-mod
 
-install_targets: 
+install_autoscheme: 
 	mkdir -p $(install_path)/$(bin_dir)
 	cp $(bin_dir)/autoscheme $(install_path)/$(bin_dir)/
+
+install_autoscheme_prime: 
 	mkdir -p $(install_path)/$(libexec_dir)
 	cp $(libexec_dir)/autoscheme-prime $(install_path)/$(libexec_dir)/
+
+install_libautoscheme: 
 	mkdir -p $(install_path)/$(lib_dir)
 	cp $(lib_dir)/libautoscheme.a $(install_path)/$(lib_dir)/
 
+install_state:
 	mkdir -p $(state_path)
 	mkdir -p $(state_path)/src
 	mkdir -p $(state_path)/rep/autobsd/autoscheme
 	mkdir -p $(state_path)/rep/autoscheme-modules
 	mkdir -p $(state_path)/ide/posix
 
-	cp -R gen/lock.s $(state_path)/ide/posix/
-	cp -R configure.scm $(state_path)/ide/posix/
+	cp ../../version.txt $(state_path)/
+	cp gen/lock.s $(state_path)/ide/posix/
+	cp configure.scm $(state_path)/ide/posix/
 	cp -R $(src_dir)/applications $(state_path)/src/
 	cp -R $(src_dir)/library $(state_path)/src/
 	cp -R $(src_dir)/modules $(state_path)/src/

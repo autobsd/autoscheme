@@ -21,6 +21,7 @@
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
 	   (build-library-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " lib/libautoscheme.a"))
 	   (build-application-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " bin/autoscheme"))
+	   (install-library-command (string-append "make -f gen/Makefile install_path=" install-path  " install_libautoscheme"))
 	   )
 
 
@@ -47,6 +48,7 @@
 			(error "Make error - unable to build library with module" (string->symbol module)))
 		    (if (not (zero? (process-command build-application-command)))
 			(error "Make error - unable to build application with module" (string->symbol module)))
+		    (process-command install-library-command)
 		    (display (directory-files (current-directory)))(newline)
 		    )
 

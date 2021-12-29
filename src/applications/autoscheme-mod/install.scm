@@ -22,6 +22,7 @@
 	   (build-library-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " lib/libautoscheme.a"))
 	   (build-application-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " bin/autoscheme"))
 	   (install-library-command (string-append "make -f gen/Makefile install_path=" install-path  " install_libautoscheme"))
+	   (install-application-command (string-append "make -f gen/Makefile install_path=" install-path  " install_autoscheme"))
 	   )
 
 
@@ -50,6 +51,7 @@
 			(error "Make error - unable to build application with module" (string->symbol module)))
 		    (if (not (zero? (process-command install-library-command)))
 			(error "Install error - unable to install library with module" (string->symbol module)))
+		    (process-command install-application-command)
 		    (display (directory-files (current-directory)))(newline)
 		    )
 

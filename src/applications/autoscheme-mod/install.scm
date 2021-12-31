@@ -56,7 +56,8 @@
 		    (display (directory-files (current-directory)))(newline)
 		    )
 
-      
+      (copy-file (path-make-absolute "ide/posix/gen/lock.s" state-path) lock-path #t #t)
+
       )
     (display "installing: ")(display module)(display "...DONE")(newline)
     ))

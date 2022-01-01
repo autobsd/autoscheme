@@ -1,5 +1,5 @@
 ;;  This file is part of the 'AutoScheme' project.
-;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (define install
@@ -44,15 +44,15 @@
 
       (parameterize ((current-directory ide-dir))
 		    (if (not (zero? (process-command config-command)))
-			(error "Configuration error - unable to configure project for module" (string->symbol module)))
+			(error "Build error - unable to configure project"))
 		    (if (not (zero? (process-command build-library-command)))
-			(error "Make error - unable to build library with module" (string->symbol module)))
+			(error "Build error - unable to make library"))
 		    (if (not (zero? (process-command build-application-command)))
-			(error "Make error - unable to build application with module" (string->symbol module)))
+			(error "Build error - unable to make application"))
 		    (if (not (zero? (process-command install-library-command)))
-			(error "Install error - unable to install library with module" (string->symbol module)))
+			(error "Install error - unable to install library"))
 		    (if (not (zero? (process-command install-application-command)))
-			(error "Install error - unable to install application with module" (string->symbol module)))
+			(error "Install error - unable to install application"))
 		    (display (directory-files (current-directory)))(newline)
 		    )
 

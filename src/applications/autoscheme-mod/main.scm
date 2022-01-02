@@ -1,5 +1,5 @@
 ;;  This file is part of the 'AutoScheme' project.
-;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (foreign-declare (include-string "macros.h"))
@@ -38,6 +38,7 @@
 	   ))
 
 (include "install.scm")
+(include "uninstall.scm")
 
 
 
@@ -126,6 +127,7 @@
   
 
   (cond ((option-selected? "install") (install (car modules)))
+  	((option-selected? "uninstall") (uninstall (car modules)))
   	)
   
   )

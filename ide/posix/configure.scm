@@ -1,5 +1,5 @@
 ;;  This file is part of the 'AutoScheme' project.
-;;  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (import (auto scheme base)
@@ -61,7 +61,7 @@
 (define get-configuration
   (lambda (src-dir)
     (parameterize ((current-directory src-dir))
-		  (let* ((alist (guard (condition ((read-error? condition) '())
+		  (let* ((alist (guard (condition ((file-error? condition) '())
 						  (else (raise condition))
 						  )
 				       (with-input-from-file manifest-file (lambda ()

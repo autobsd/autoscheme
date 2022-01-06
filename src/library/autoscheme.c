@@ -1,5 +1,5 @@
 /*  This file has been modified as part of the 'AutoScheme' project.
- *  Copyright 2021 Steven Wiley <s.wiley@katchitek.com> 
+ *  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
  *  SPDX-License-Identifier: BSD-2-Clause
  */
 /*  This version has been modified by Tatsuya WATANABE.
@@ -6509,7 +6509,7 @@ LOOP:
 		if (!validargs("with-input-from-file", 2, 2, TST_STRING TST_ANY)) Error_0(msg);
 		x = port_from_filename(strvalue(car(args)), T_PORT_INPUT | T_PORT_TEXT );
 		if (x == NIL) {
-		    Error_1("Read error - unable to open file", car(args));
+		    Error_1("File error - unable to open file", car(args));
 		    /* s_return(F); */
 		}
 		code = cadr(args);

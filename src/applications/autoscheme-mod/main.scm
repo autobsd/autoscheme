@@ -28,14 +28,12 @@
 
 (define list-installed-modules
   (lambda ()
-    ;; (guard (condition
-    ;; 	    ((file-error? condition) (display "AutoScheme is not installed" (current-error-port))(newline (current-error-port))(exit 1))
-    ;; 	    (else (raise condition))
-    ;; 	    )
+    (guard (condition
+    	    ((file-error? condition) (display "AutoScheme is not installed" (current-error-port))(newline (current-error-port))(exit 1))
+    	    (else (raise condition)))
 
-	   (with-input-from-file lock-path read)
-	   ;; )
-	   ))
+	   (with-input-from-file lock-path read) )))
+
 
 (include "install.scm")
 (include "uninstall.scm")

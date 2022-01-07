@@ -2,9 +2,9 @@
 ;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(define build-project
+(define rebuild-project
   (lambda ()
-    (display "building project...")(newline)
+    (display "rebuilding project...")(newline)
     (let* ((ide-dir (path-make-absolute "ide/posix/" state-path))
 
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
@@ -21,12 +21,12 @@
 			(error "Build error - unable to make application"))
 		    )
       )
-    (display "building project...DONE")(newline)
+    (display "rebuilding project...DONE")(newline)
     ))
 
-(define install-project
+(define reinstall-project
   (lambda ()
-    (display "installing project...")(newline)
+    (display "reinstalling project...")(newline)
     (let ((ide-dir (path-make-absolute "ide/posix/" state-path))
 
 	  (install-library-command (string-append "make -f gen/Makefile install_path=" install-path  " install_libautoscheme"))
@@ -44,41 +44,48 @@
       (copy-file (path-make-absolute "ide/posix/gen/lock.s" state-path) lock-path #t #t)
 
       )
-    (display "installing project...DONE")(newline)
+    (display "reinstalling project...DONE")(newline)
     ))
   
-(define install-module
-  (lambda (module)
-    (cond ((member module (list-installed-modules))
-	   (display "Module is already installed: ")(display module)(newline)
-	   (exit)))
+(define install-modules
+  (lambda (modules)
+    (let ((modified #f))
+      (for-each (lambda (module)
+		  (cond ((member module (list-installed-modules))
+			 (display "Module is already installed: ")(display module)(newline))
 
-    (display "installing: ")(display module)(display "...")(newline)
+			(else (set! modified #t)
+			      
+			      (display "installing: ")(display module)(display "...")(newline)
 
-    (let* ((module-src-dir (path-make-absolute (string-append "src/modules/" module ) state-path))
-	   (ide-dir (path-make-absolute "ide/posix/" state-path))
+			      (let* ((module-src-dir (path-make-absolute (string-append "src/modules/" module ) state-path))
+				     (ide-dir (path-make-absolute "ide/posix/" state-path))
 
-	   (modules-dir (path-make-absolute (string-append "rep/autoscheme-modules/")  state-path))
-	   (rep-dir (string-append modules-dir module "/")  state-path)
-	   (git-dir (string-append rep-dir ".git/"))
+				     (modules-dir (path-make-absolute (string-append "rep/autoscheme-modules/")  state-path))
+				     (rep-dir (string-append modules-dir module "/")  state-path)
+				     (git-dir (string-append rep-dir ".git/"))
 
-	   (clone-command (string-append "git clone https://github.com/autoscheme-modules/" module))
-	   (pull-command "git fetch && git merge" module))
+				     (clone-command (string-append "git clone https://github.com/autoscheme-modules/" module))
+				     (pull-command "git fetch && git merge" module))
 
-      (cond ((not (file-exists? git-dir))
-	     (display "cloning repository...")(newline)
-	     (delete-file rep-dir #t #t)
-	     (parameterize ((current-directory modules-dir))
-			   (process-command clone-command)
-			   )
-	     (display "cloning repository...DONE")(newline) ))
+				(cond ((not (file-exists? git-dir))
+				       (display "cloning repository...")(newline)
+				       (delete-file rep-dir #t #t)
+				       (parameterize ((current-directory modules-dir))
+						     (process-command clone-command)
+						     )
+				       (display "cloning repository...DONE")(newline) ))
 
-      (parameterize ((current-directory rep-dir))
-		    (if (not (zero? (process-command pull-command)))
-			(error "Repository error - unable to pull sources for module" (string->symbol module)))
-		    (copy-file "src" module-src-dir #t #t) ))
+				(parameterize ((current-directory rep-dir))
+					      (if (not (zero? (process-command pull-command)))
+						  (error "Repository error - unable to pull sources for module" (string->symbol module)))
+					      (copy-file "src" module-src-dir #t #t) ))
 
-    (build-project)
-    (install-project)
-    (display "installing: ")(display module)(display "...DONE")(newline) ))
+			      (display "installing: ")(display module)(display "...DONE")(newline) 
+			      )))
+		modules)
+
+      (cond (modified (rebuild-project) (reinstall-project)))
+
+      )))
   

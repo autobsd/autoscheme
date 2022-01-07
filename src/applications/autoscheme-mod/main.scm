@@ -124,7 +124,7 @@
   ;; (display "modules: ")(write modules)(newline)
   
 
-  (cond ((option-selected? "install") (install-module (car modules)))
+  (cond ((option-selected? "install") (install-modules modules))
   	((option-selected? "uninstall") (uninstall-module (car modules)))
   	)
   

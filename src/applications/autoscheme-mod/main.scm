@@ -111,18 +111,8 @@
        						  (if (member name (option-names (car selected-option))) (return selected-option) ))
        						selected-options)
        				      #f))))
-
-       ;;        (get-selected-arg (lambda (name)
-       ;;        			   (let ((selected-option (option-selected? name options)))
-       ;;        			     (if selected-option (caddr selected-option) #f))))
-
        )
 
-
-
-  ;; (display "selected-options: ")(write selected-options)(newline)
-  ;; (display "modules: ")(write modules)(newline)
-  
 
   (cond ((option-selected? "install") (install-modules modules))
   	((option-selected? "uninstall") (uninstall-module (car modules)))

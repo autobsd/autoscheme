@@ -24,7 +24,7 @@
 (define state-path (foreign-string STATE_PATH_STR))
 
 (define prime-path (path-make-absolute "libexec/autoscheme-prime" install-path))
-(define lock-path (path-make-absolute "ide/posix/lock.s" state-path))
+(define lock-path (path-make-absolute "pkg/posix/lock.s" state-path))
 
 (define list-installed-modules
   (lambda ()

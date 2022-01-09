@@ -5,14 +5,14 @@
 (define rebuild-project
   (lambda ()
     (display "rebuilding project...")(newline)
-    (let* ((ide-dir (path-make-absolute "ide/posix/" state-path))
+    (let* ((pkg-dir (path-make-absolute "pkg/posix/" state-path))
 
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
 	   (build-library-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " lib/libautoscheme.a"))
 	   (build-application-command (string-append "make -f gen/Makefile libexec_dir=" install-path "/libexec" " bin/autoscheme"))
 	   )
 
-      (parameterize ((current-directory ide-dir))
+      (parameterize ((current-directory pkg-dir))
 		    (if (not (zero? (process-command config-command)))
 			(error "Build error - unable to configure project"))
 		    (if (not (zero? (process-command build-library-command)))
@@ -27,13 +27,13 @@
 (define reinstall-project
   (lambda ()
     (display "reinstalling project...")(newline)
-    (let ((ide-dir (path-make-absolute "ide/posix/" state-path))
+    (let ((pkg-dir (path-make-absolute "pkg/posix/" state-path))
 
 	  (install-library-command (string-append "make -f gen/Makefile install_path=" install-path  " install_libautoscheme"))
 	  (install-application-command (string-append "make -f gen/Makefile install_path=" install-path  " install_autoscheme"))
 	  )
 
-      (parameterize ((current-directory ide-dir))
+      (parameterize ((current-directory pkg-dir))
 		    (if (not (zero? (process-command install-library-command)))
 			(error "Install error - unable to install library"))
 		    (if (not (zero? (process-command install-application-command)))
@@ -41,7 +41,7 @@
 		    (display (directory-files (current-directory)))(newline)
 		    )
 
-      (copy-file (path-make-absolute "ide/posix/gen/lock.s" state-path) lock-path #t #t)
+      (copy-file (path-make-absolute "pkg/posix/gen/lock.s" state-path) lock-path #t #t)
 
       )
     (display "reinstalling project...DONE")(newline)
@@ -59,7 +59,7 @@
 			      (display "installing: ")(display module)(display "...")(newline)
 
 			      (let* ((module-src-dir (path-make-absolute (string-append "src/modules/" module ) state-path))
-				     (ide-dir (path-make-absolute "ide/posix/" state-path))
+				     (pkg-dir (path-make-absolute "pkg/posix/" state-path))
 
 				     (modules-dir (path-make-absolute (string-append "rep/autoscheme-modules/")  state-path))
 				     (rep-dir (string-append modules-dir module "/")  state-path)

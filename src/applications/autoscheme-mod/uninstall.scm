@@ -14,8 +14,8 @@
       (parameterize ((current-directory modules-src-dir))
 		    (delete-file module #t #t) ))
 
-    (rebuild-project)
-    (reinstall-project)
+    (rebuild-package)
+    (reinstall-package)
     (display "uninstalling: ")(display module)(display "...DONE")(newline)
     ))
   

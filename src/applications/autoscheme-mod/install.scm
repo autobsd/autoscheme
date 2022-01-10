@@ -2,9 +2,9 @@
 ;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(define rebuild-project
+(define rebuild-package
   (lambda ()
-    (display "rebuilding project...")(newline)
+    (display "rebuilding package...")(newline)
     (let* ((pkg-dir (path-make-absolute "pkg/posix/" state-path))
 
 	   (config-command (string-append prime-path " -i configure.scm --install-path=\"" install-path "\""))
@@ -14,19 +14,19 @@
 
       (parameterize ((current-directory pkg-dir))
 		    (if (not (zero? (process-command config-command)))
-			(error "Build error - unable to configure project"))
+			(error "Build error - unable to configure package"))
 		    (if (not (zero? (process-command build-library-command)))
 			(error "Build error - unable to make library"))
 		    (if (not (zero? (process-command build-application-command)))
 			(error "Build error - unable to make application"))
 		    )
       )
-    (display "rebuilding project...DONE")(newline)
+    (display "rebuilding package...DONE")(newline)
     ))
 
-(define reinstall-project
+(define reinstall-package
   (lambda ()
-    (display "reinstalling project...")(newline)
+    (display "reinstalling package...")(newline)
     (let ((pkg-dir (path-make-absolute "pkg/posix/" state-path))
 
 	  (install-library-command (string-append "make -f gen/Makefile install_path=" install-path  " install_libautoscheme"))
@@ -44,7 +44,7 @@
       (copy-file (path-make-absolute "pkg/posix/gen/lock.s" state-path) lock-path #t #t)
 
       )
-    (display "reinstalling project...DONE")(newline)
+    (display "reinstalling package...DONE")(newline)
     ))
   
 (define install-modules
@@ -85,7 +85,7 @@
 			      )))
 		modules)
 
-      (cond (modified (rebuild-project) (reinstall-project)))
+      (cond (modified (rebuild-package) (reinstall-package)))
 
       )))
   

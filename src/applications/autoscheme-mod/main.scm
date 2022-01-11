@@ -86,6 +86,7 @@
 
 (define option-table (quasiquote ((,(option '(#\i "install") #f #f recognized-processor) "Install modules")
 				  (,(option '(#\u "uninstall") #f #f recognized-processor) "Uninstall modules")
+				  (,(option '("update") #f #f recognized-processor) "Update modules")
 				  (,(option '(#\l "list") #f #f list-option-processor) "List installed modules")
 				  (,(option '(#\h "help") #f #f help-option-processor) "Show this message")
 				  )))
@@ -116,6 +117,7 @@
 
   (cond ((option-selected? "install") (install-modules modules))
   	((option-selected? "uninstall") (uninstall-module (car modules)))
+  	((option-selected? "update") (update-module (car modules)))
   	)
   
   )

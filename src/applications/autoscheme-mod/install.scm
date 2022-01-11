@@ -89,3 +89,7 @@
 
       )))
   
+(define update-module
+  (lambda (module)
+    (display "updating module: ")(display module)(display "...")(newline)
+    ))

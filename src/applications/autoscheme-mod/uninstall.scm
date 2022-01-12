@@ -2,20 +2,25 @@
 ;;  Copyright 2022 Steven Wiley <s.wiley@katchitek.com> 
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
-(define uninstall-module
-  (lambda (module)
-    (cond ((not (member module (list-installed-modules)))
-	   (display "Module is not installed: ")(display module)(newline)
-	   (exit)))
+(define uninstall-modules
+  (lambda (modules)
+    (let ((modified #f))
+      (for-each (lambda (module)
 
-    (display "uninstalling: ")(display module)(display "...")(newline)
-    (let ((modules-src-dir (path-make-absolute "src/modules/" state-path)))
+		  (cond ((not (member module (list-installed-modules)))
+			 (display "Module is not installed: ")(display module)(newline))
 
-      (parameterize ((current-directory modules-src-dir))
-		    (delete-file module #t #t) ))
+			(else (set! modified #t)
 
-    (rebuild-package)
-    (reinstall-package)
-    (display "uninstalling: ")(display module)(display "...DONE")(newline)
-    ))
-  
+			      (display "uninstalling: ")(display module)(display "...")(newline)
+			      (let ((modules-src-dir (path-make-absolute "src/modules/" state-path)))
+
+				(parameterize ((current-directory modules-src-dir))
+					      (delete-file module #t #t) ))
+
+			      (display "uninstalling: ")(display module)(display "...DONE")(newline)
+			      )))
+		modules)
+      
+      (cond (modified (rebuild-package) (reinstall-package)))
+      )))

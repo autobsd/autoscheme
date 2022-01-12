@@ -116,7 +116,7 @@
 
 
   (cond ((option-selected? "install") (install-modules modules))
-  	((option-selected? "uninstall") (uninstall-module (car modules)))
+  	((option-selected? "uninstall") (uninstall-modules modules))
   	((option-selected? "update") (update-module (car modules)))
   	)
   

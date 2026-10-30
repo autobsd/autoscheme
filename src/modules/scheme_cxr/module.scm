@@ -1,5 +1,5 @@
 ;;  This file is part of the 'AutoScheme' project.
-;;  Copyright © 2024 Steven Wiley <s.wiley@katchitek.com> 
+;;  Copyright (c) 2026 AutoBSD Contributors.
 ;;  SPDX-License-Identifier: BSD-2-Clause
 
 (foreign-initialize "pointer library = make_environment( NIL );\n"

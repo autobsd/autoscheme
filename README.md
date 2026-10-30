@@ -1,5 +1,5 @@
 <!-- This file is part of the 'AutoScheme' project.
-     Copyright © 2024 Steven Wiley <s.wiley@katchitek.com> 
+     Copyright (c) 2026 AutoBSD Contributors.
      SPDX-License-Identifier: BSD-2-Clause
 -->
 # AutoScheme
@@ -13,7 +13,7 @@ AutoScheme comprises a command-line application and an embeddable C library that
 - a set of modules that implement and extend a subset of the R7RS standard
 <!-- 
 - an interactive REPL
-- a command-line shell 
+- a command-line shell
 -->
 
 
